@@ -1,0 +1,53 @@
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.ehcache.org/v3"
+        xmlns:jsr107="http://www.ehcache.org/v3/jsr107"
+        xsi:schemaLocation="
+            http://www.ehcache.org/v3 http://www.ehcache.org/schema/ehcache-core-3.0.xsd
+            http://www.ehcache.org/v3/jsr107 http://www.ehcache.org/schema/ehcache-107-ext-3.0.xsd">
+
+    <!--
+        캐쉬가 하나만 있으면 굳이 템플릿을 안 맹글어도 되지만 여러군데 쓸 수 있기 때문에
+        중복되는것을 피하기 위해 템플릿을 맹금
+    -->
+    <cache-template name="template">
+        <!-- 캐시 만료기간 설정 -->
+        <expiry>
+            <!-- unit : nanos, micros, millis, seconds, minutes, hours, days -->
+            <ttl unit="days">1</ttl>
+        </expiry>
+
+        <!--
+        캐시가 생성되고 삭제되고 하는 이벤트를 모니터링 하고 싶으면
+        org.ehcache.event.CacheEventListener 를 구현하는 클래스를 만들어서 요렇게 설정해 주면됨
+        태그 순서가 중요해서 아무데나 listeners 태그를 추가하면 오류남
+        <listeners>
+            <listener>
+                <class>io.github.stove99.sample.CacheEventLogger</class>
+                <event-firing-mode>ASYNCHRONOUS</event-firing-mode>
+                <event-ordering-mode>UNORDERED</event-ordering-mode>
+                <events-to-fire-on>CREATED</events-to-fire-on>
+                <events-to-fire-on>EVICTED</events-to-fire-on>
+                <events-to-fire-on>REMOVED</events-to-fire-on>
+                <events-to-fire-on>UPDATED</events-to-fire-on>
+                <events-to-fire-on>EXPIRED</events-to-fire-on>
+            </listener>
+        </listeners>
+        -->
+
+        <resources>
+            <!-- 캐시에 최대 몇개 까지 유지할지 -->
+            <heap unit="entries">200</heap>
+        </resources>
+    </cache-template>
+
+    <!--
+        alias 는 @Cacheable(value = "codes", key="#codeGrp") 여기에서 썻던 value 값으로
+    -->
+    <cache alias="codes" uses-template="template"></cache>
+    <cache alias="menus" uses-template="template" >
+        <expiry>
+            <ttl unit="seconds">60</ttl>
+        </expiry>
+    </cache>
+    <cache alias="contents_pages" uses-template="template"></cache>
+</config>

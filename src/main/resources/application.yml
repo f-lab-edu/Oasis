@@ -21,7 +21,13 @@ spring:
     port: 6379
     host: ${REDIS_HOST}
 
+  cache:
+    jcache:
+      config: ehcache.xml
+
 
 # mybatis
 mybatis:
   mapper-locations: mapper/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
