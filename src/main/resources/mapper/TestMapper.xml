@@ -4,7 +4,14 @@
 <mapper namespace="com.flab.oasis.mapper.TestMapper">
 
     <select id="dbConnectionTest" resultType="com.flab.oasis.model.TestModel">
-        SELECT 10 data FROM dual;
+        SELECT 10 DATA
+        FROM DUAL;
+    </select>
+
+    <select id="cacheTest" resultType="com.flab.oasis.model.Book">
+        SELECT BOOK_ID, TITLE, AUTHOR, TRANSLATOR, PUBLISHER, PUBLISH_DATE, IMAGE_URL, DESCRIPTION, CATEGORY_ID
+        FROM BOOK_LIST
+        LIMIT 1;
     </select>
 
 </mapper>

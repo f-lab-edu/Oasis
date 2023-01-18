@@ -1,5 +1,6 @@
 package com.flab.oasis;
 
+import com.flab.oasis.model.Book;
 import com.flab.oasis.model.TestModel;
 import com.flab.oasis.service.TestService;
 import org.junit.jupiter.api.Assertions;
@@ -31,5 +32,13 @@ class ConnectionTest {
         TestModel testModel = testService.dbConnectionTest();
 
         Assertions.assertEquals(10, testModel.getData());
+    }
+
+    @Test
+    void ehCacheTest() {
+        Book book = testService.cacheTest();
+        book = testService.cacheTest();
+
+        Assertions.assertNotNull(book);
     }
 }
