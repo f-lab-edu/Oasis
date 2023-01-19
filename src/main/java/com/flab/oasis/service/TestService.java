@@ -16,7 +16,7 @@ public class TestService {
         return testMapper.dbConnectionTest();
     }
 
-    @Cacheable(value = "bookList", key = "#bookId")
+    @Cacheable(cacheNames = "testCache")
     public Book cacheTest() {
         return testMapper.cacheTest();
     }
