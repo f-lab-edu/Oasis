@@ -1,9 +1,23 @@
 package com.flab.oasis.service;
 
+import com.flab.oasis.mapper.TestMapper;
 import com.flab.oasis.model.Book;
 import com.flab.oasis.model.TestModel;
+import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.stereotype.Service;
 
-public interface TestService {
-    public TestModel dbConnectionTest();
-    public Book cacheTest();
+@Service
+@RequiredArgsConstructor
+public class TestService {
+    private final TestMapper testMapper;
+
+    public TestModel dbConnectionTest() {
+        return testMapper.dbConnectionTest();
+    }
+
+    @Cacheable(value = "bookList", key = "#bookId")
+    public Book cacheTest() {
+        return testMapper.cacheTest();
+    }
 }
