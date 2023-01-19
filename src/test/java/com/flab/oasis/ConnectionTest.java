@@ -7,7 +7,12 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.interceptor.SimpleKey;
 import org.springframework.data.redis.core.StringRedisTemplate;
+
+import javax.annotation.Resource;
 
 @SpringBootTest
 class ConnectionTest {
@@ -17,6 +22,9 @@ class ConnectionTest {
 
     @Autowired
     TestService testService;
+
+    @Resource
+    CacheManager cacheManager;
 
     @Test
     void redisTest() {
@@ -37,8 +45,13 @@ class ConnectionTest {
     @Test
     void ehCacheTest() {
         Book book = testService.cacheTest();
-        book = testService.cacheTest();
 
-        Assertions.assertNotNull(book);
+        Cache cache = cacheManager.getCache("testCache");
+
+        Assertions.assertNotNull(cache);
+
+        Book bookCache = cache.get(SimpleKey.EMPTY, Book.class);
+
+        Assertions.assertEquals(book, bookCache);
     }
 }
