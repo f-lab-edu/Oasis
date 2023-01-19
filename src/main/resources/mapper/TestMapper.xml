@@ -9,7 +9,9 @@
     </select>
 
     <select id="cacheTest" resultType="com.flab.oasis.model.Book">
-        SELECT BOOK_ID, TITLE, AUTHOR, TRANSLATOR, PUBLISHER, PUBLISH_DATE, IMAGE_URL, DESCRIPTION, CATEGORY_ID
+        SELECT
+            BOOK_ID AS bookId, TITLE, AUTHOR, TRANSLATOR, PUBLISHER, PUBLISH_DATE AS publishDate,
+            IMAGE_URL AS imageUrl, DESCRIPTION, CATEGORY_ID AS categoryId
         FROM BOOK_LIST
         LIMIT 1;
     </select>

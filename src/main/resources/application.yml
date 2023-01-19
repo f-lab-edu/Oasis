@@ -23,11 +23,9 @@ spring:
 
   cache:
     jcache:
-      config: ehcache.xml
+      config: classpath:ehcache.xml
 
 
 # mybatis
 mybatis:
   mapper-locations: mapper/*.xml
-  configuration:
-    map-underscore-to-camel-case: true
