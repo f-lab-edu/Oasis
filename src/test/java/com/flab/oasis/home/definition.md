@@ -1,24 +1,39 @@
 # 기능 정의
 
-## Home API
+## HomeController
 
 > 유저의 관심 카테고리에 해당하는 책 추천 정보를 제공한다.
 
-* Input : UID_String, SuggestionType_String[recommend/newBook/bestSeller]
-* Output : BookSuggestionList_List&lt;Book&gt;
+* Input Value들이 null 혹은 Empty라면 에러 코드를 response 한다.
+* Input : UID, SuggestionType[recommend/newBook/bestSeller]
+* Output : BookSuggestionList;
 
-### Process
+## HomeService
 
-> recommend/newBook/bestSeller 중 요청된 타입의 book 데이터를 return 한다.
-
-1. DB의 USER_CATEGORY에서 요청 UID에 해당하는 데이터를 Select한다. 
+1. DB의 USER_CATEGORY에서 요청 UID에 해당하는 데이터를 Select 한다.
    * 조회된 데이터는 캐싱된다.
+   * input : UID
+   * output : UserCategoryList
 2. Redis에서 요청 책 추천 타입에 해당하는 데이터를 조회한다.
-   1. Redis 조회 결과가 Empty일 경우, DB의 BOOK_SUGGESTION 관련 데이터를 모두 가져온다.
-   2. 2-1의 데이터를 Redis에 맞게 Parsing 한다.
-   3. 2-2의 데이터를 Redis에 Push 한다.
-3. 2의 데이터에서 user의 category에 해당하는 데이터를 찾아 response 한다.
+   * 조회 결과가 Empty일 경우, DB에서 Book Suggestion 데이터를 가져와 Redis에 반영한다.
+   * input : SuggestionType[recommend/newBook/bestSeller]
+   * output : -
+4. 2의 데이터에서 user의 category에 해당하는 데이터를 찾아 response 한다.
    * 1의 데이터가 Empty면 요청 책 추천 타입에 해당하는 모든 데이터를 response 한다.
+   * input : user category
+   * output : BookList
+
+### RedisUtil
+
+#### insertBookSuggestionDBToRedis
+
+1. DB의 BOOK_SUGGESTION 관련 데이터를 모두 가져온다.
+   * input : -
+   * output : BookSuggestionList
+2. 1의 데이터를 Redis에 사용할 형식에 맞게 Parsing 한다.
+   * input : BookSuggestionList
+   * output : JsonArrayStringList
+3. 2의 데이터를 Redis에 Push 한다.
 
 #### Redis 구조
 
