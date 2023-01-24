@@ -17,6 +17,9 @@
         <heap>20</heap>
     </cache-template>
 
+    <cache alias="homeCache" uses-template="defaultTemplate">
+    </cache>
+
     <cache alias="testCache" uses-template="defaultTemplate">
     </cache>
 
