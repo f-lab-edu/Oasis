@@ -9,23 +9,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-class BookSuggestionConverter {
-    public static Map<String, String> convertBookSuggestion(List<BookSuggestion> bookSuggestionList) {
-        return convertToHashFieldValue(groupBySuggestionType(bookSuggestionList));
+class BookSuggestionParser {
+    public static Map<String, String> parseBookSuggestion(List<BookSuggestion> bookSuggestionList) {
+        return parseToHashFieldValue(groupBySuggestionType(bookSuggestionList));
     }
 
     private static Map<String, List<BookSuggestion>> groupBySuggestionType(List<BookSuggestion> bookSuggestionList) {
         return bookSuggestionList.stream().collect(Collectors.groupingBy(BookSuggestion::getSuggestionType));
     }
 
-    private static Map<String, String> convertToHashFieldValue(
+    private static Map<String, String> parseToHashFieldValue(
             Map<String, List<BookSuggestion>> bookSuggestionListBySuggestionType) {
 
         Map<String, String> hashFieldValue = new HashMap<>();
         for (Map.Entry<String, List<BookSuggestion>> entry : bookSuggestionListBySuggestionType.entrySet()) {
             hashFieldValue.put(
                     getSuggestionType(entry),
-                    convertBookSuggestionListToJsonString(getBookSuggestionList(entry))
+                    parseBookSuggestionListToJsonString(getBookSuggestionList(entry))
             );
         }
 
@@ -40,8 +40,8 @@ class BookSuggestionConverter {
         return entry.getValue();
     }
 
-    private static String convertBookSuggestionListToJsonString(List<BookSuggestion> bookSuggestionList) {
-        return JsonUtils.parseValueToString(groupByCategoryId(bookSuggestionList));
+    private static String parseBookSuggestionListToJsonString(List<BookSuggestion> bookSuggestionList) {
+        return JsonUtils.parseObjectToString(groupByCategoryId(bookSuggestionList));
     }
 
     private static Map<Integer, List<Book>> groupByCategoryId(List<BookSuggestion> bookSuggestionList) {
