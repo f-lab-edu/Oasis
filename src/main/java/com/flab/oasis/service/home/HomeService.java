@@ -23,15 +23,17 @@ public class HomeService {
     private final HomeMapper homeMapper;
     private final RedisService redisService;
 
-    @Cacheable(cacheNames = "homeCache", key = "#uid + #suggestionType")
-    public List<Book> suggestion(String uid, String suggestionType) {
+    // 캐시키 재설정 필요
+    @Cacheable(cacheNames = "homeCache", key = "#uid + #suggestionType.name()")
+    public List<Book> suggestion(String uid, SuggestionType suggestionType) {
         return getSuggestionBookList(
                 homeMapper.findUserCategoryByUid(uid),
                 getBookSuggestionFromRedis(suggestionType)
         );
     }
 
-    private String getBookSuggestionFromRedis(String suggestionType) {
+    private String getBookSuggestionFromRedis(SuggestionType suggestionType) {
+        // suggestionType enum 처리
         if (!redisService.existKey(RedisKey.HOME)) {
             redisService.putHashData(
                     RedisKey.HOME,
@@ -41,7 +43,7 @@ public class HomeService {
             );
         }
 
-        return redisService.getHashData(RedisKey.HOME, suggestionType);
+        return redisService.getHashData(RedisKey.HOME, suggestionType.getSuggestionType());
     }
 
     private List<Book> getSuggestionBookList(List<UserCategory> userCategory, String bookSuggestionJsonString) {
@@ -54,14 +56,19 @@ public class HomeService {
     }
 
     private static List<JsonNode> selectNodeByUserCategory(List<UserCategory> userCategory, JsonNode jsonNode) {
+        if (userCategory.size() == 0) {
+            // 전체 카테고리 반환
+        }
+
+        // jsonNode에서 가져온 데이터가 null safe한지 확인 필요
         return userCategory.stream().map(uc -> jsonNode.get(uc.getCategoryId())).collect(Collectors.toList());
     }
 
     private List<Book> parseJsonToBookList(List<JsonNode> bookSuggestionJsonArrayByUserCategory) {
         List<Book> bookSuggestionList = new ArrayList<>();
-        for (JsonNode bookSuggestionJson : bookSuggestionJsonArrayByUserCategory) {
-            bookSuggestionList.addAll(bookSuggestionJsonToBookList(bookSuggestionJson));
-        }
+        bookSuggestionJsonArrayByUserCategory.forEach(
+                jn -> bookSuggestionList.addAll(bookSuggestionJsonToBookList(jn))
+        );
 
         return bookSuggestionList;
     }
