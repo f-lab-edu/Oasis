@@ -9,7 +9,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString(callSuper = true)
-public class BookSuggestionDTO extends Book {
+public class BookSuggestion extends Book {
     @JsonIgnore
     private String suggestionType;
 }

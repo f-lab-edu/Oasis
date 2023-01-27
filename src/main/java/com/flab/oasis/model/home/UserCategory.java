@@ -7,7 +7,7 @@ import lombok.ToString;
 @Getter
 @AllArgsConstructor
 @ToString
-public class UserCategoryDTO {
+public class UserCategory {
     private String uid;
     private String categoryId;
 }
