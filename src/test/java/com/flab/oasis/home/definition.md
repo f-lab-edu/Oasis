@@ -18,7 +18,7 @@
    * 조회 결과가 Empty일 경우, DB에서 Book Suggestion 데이터를 가져와 Redis에 반영한다.
    * input : SuggestionType[recommend/newBook/bestSeller]
    * output : -
-4. 2의 데이터에서 user의 category에 해당하는 데이터를 찾아 response 한다.
+3. 2의 데이터에서 user의 category에 해당하는 데이터를 찾아 response 한다.
    * 1의 데이터가 Empty면 요청 책 추천 타입에 해당하는 모든 데이터를 response 한다.
    * input : user category
    * output : BookList
