@@ -1,6 +1,5 @@
 package com.flab.oasis.service;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -24,7 +23,7 @@ public class RedisService {
 
     }
 
-    public Boolean checkKey(String key) {
+    public Boolean existKey(String key) {
         return stringRedisTemplate.hasKey(key);
     }
 }

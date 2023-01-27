@@ -1,10 +1,12 @@
 package com.flab.oasis.service.home;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flab.oasis.config.RedisKey;
 import com.flab.oasis.mapper.home.HomeMapper;
 import com.flab.oasis.model.Book;
-import com.flab.oasis.model.home.UserCategoryDTO;
+import com.flab.oasis.model.home.UserCategory;
 import com.flab.oasis.service.RedisService;
 import com.flab.oasis.utils.JsonUtils;
 import lombok.RequiredArgsConstructor;
@@ -30,10 +32,10 @@ public class HomeService {
     }
 
     private String getBookSuggestionFromRedis(String suggestionType) {
-        if (!redisService.checkKey(RedisKey.HOME)) {
+        if (!redisService.existKey(RedisKey.HOME)) {
             redisService.putHashData(
                     RedisKey.HOME,
-                    new BookSuggestionParser().parse(
+                    BookSuggestionParser.parseBookSuggestion(
                             homeMapper.getBookSuggestion()
                     )
             );
@@ -42,21 +44,30 @@ public class HomeService {
         return redisService.getHashData(RedisKey.HOME, suggestionType);
     }
 
-    private List<Book> getSuggestionBookList(List<UserCategoryDTO> userCategoryDTO, String bookSuggestionJsonString) {
-        JsonNode bookSuggestionJsonArray = JsonUtils.parseValueToJsonArray(bookSuggestionJsonString);
-        List<JsonNode> bookSuggestionJsonArrayByUserCategory = userCategoryDTO.stream().map(
-                u -> bookSuggestionJsonArray.get(u.getCategoryId())
-        ).collect(Collectors.toList());
+    private List<Book> getSuggestionBookList(List<UserCategory> userCategory, String bookSuggestionJsonString) {
+        return parseJsonToBookList(
+                selectNodeByUserCategory(
+                        userCategory,
+                        JsonUtils.parseStringToJsonNode(bookSuggestionJsonString)
+                )
+        );
+    }
 
-        return parseJsonToBookList(bookSuggestionJsonArrayByUserCategory);
+    private static List<JsonNode> selectNodeByUserCategory(List<UserCategory> userCategory, JsonNode jsonNode) {
+        return userCategory.stream().map(uc -> jsonNode.get(uc.getCategoryId())).collect(Collectors.toList());
     }
 
     private List<Book> parseJsonToBookList(List<JsonNode> bookSuggestionJsonArrayByUserCategory) {
         List<Book> bookSuggestionList = new ArrayList<>();
         for (JsonNode bookSuggestionJson : bookSuggestionJsonArrayByUserCategory) {
-            bookSuggestionList.addAll(JsonUtils.parseValueToBookList(bookSuggestionJson));
+            bookSuggestionList.addAll(bookSuggestionJsonToBookList(bookSuggestionJson));
         }
 
         return bookSuggestionList;
+    }
+
+    private List<Book> bookSuggestionJsonToBookList(JsonNode bookSuggestionJson) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.convertValue(bookSuggestionJson, new TypeReference<List<Book>>() {});
     }
 }
