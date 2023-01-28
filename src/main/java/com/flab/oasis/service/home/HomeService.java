@@ -60,11 +60,10 @@ public class HomeService {
 
     private static List<JsonNode> selectNodeByUserCategory(List<UserCategory> userCategory, JsonNode jsonNode) {
         if (userCategory.isEmpty()) {
-            return getAllCategoryJsonNodeList(jsonNode);
+            return JsonUtils.parseJsonNodeToJsonNodeList(jsonNode);
         }
 
-        // jsonNode에서 가져온 데이터가 null safe한지 확인 필요
-        return getUserCategoryJsonNodeList(userCategory, jsonNode);
+        return JsonUtils.getValueListFromJsonNode(getCategoryIdList(userCategory), jsonNode);
     }
 
     private List<Book> parseJsonToBookList(List<JsonNode> bookSuggestionJsonArrayByUserCategory) {
@@ -76,15 +75,8 @@ public class HomeService {
         return bookSuggestionList;
     }
 
-    private static List<JsonNode> getAllCategoryJsonNodeList(JsonNode jsonNode) {
-        List<JsonNode> allCategory = new ArrayList<>();
-        jsonNode.fieldNames().forEachRemaining(key -> allCategory.add(jsonNode.get(key)));
-
-        return allCategory;
-    }
-
-    private static List<JsonNode> getUserCategoryJsonNodeList(List<UserCategory> userCategory, JsonNode jsonNode) {
-        return userCategory.stream().map(uc -> jsonNode.get(uc.getCategoryId())).collect(Collectors.toList());
+    private static List<String> getCategoryIdList(List<UserCategory> userCategory) {
+        return userCategory.stream().map(UserCategory::getCategoryId).toList();
     }
 
     private List<Book> bookSuggestionJsonToBookList(JsonNode bookSuggestionJson) {
