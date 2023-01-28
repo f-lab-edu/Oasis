@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class JsonUtils {
@@ -29,12 +30,16 @@ public class JsonUtils {
 
     public static List<JsonNode> parseJsonNodeToJsonNodeList(JsonNode jsonNode) {
         List<JsonNode> jsonNodeList = new ArrayList<>();
-        jsonNode.fieldNames().forEachRemaining(key -> jsonNodeList.add(jsonNode.get(key)));
+        jsonNode.fieldNames().forEachRemaining(key -> jsonNodeList.add(getJsonNodeByKey(key, jsonNode)));
 
         return jsonNodeList;
     }
 
     public static List<JsonNode> getValueListFromJsonNode(List<String> keyList,JsonNode jsonNode) {
-        return keyList.stream().map(jsonNode::get).collect(Collectors.toList());
+        return keyList.stream().map(key -> getJsonNodeByKey(key, jsonNode)).collect(Collectors.toList());
+    }
+
+    private static JsonNode getJsonNodeByKey(String key, JsonNode jsonNode) {
+        return Optional.ofNullable(jsonNode.get(key)).orElseThrow(() -> new RuntimeException("Key가 존재하지 않습니다!"));
     }
 }
