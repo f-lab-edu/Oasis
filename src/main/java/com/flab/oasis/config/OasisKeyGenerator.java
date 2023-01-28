@@ -1,4 +1,4 @@
-package com.flab.oasis.service;
+package com.flab.oasis.config;
 
 import org.springframework.cache.interceptor.KeyGenerator;
 

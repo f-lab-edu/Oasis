@@ -1,6 +1,5 @@
 package com.flab.oasis.config;
 
-import com.flab.oasis.service.OasisKeyGenerator;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.context.annotation.Bean;

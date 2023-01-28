@@ -2,7 +2,7 @@ package com.flab.oasis.controller.home;
 
 import com.flab.oasis.model.Book;
 import com.flab.oasis.service.home.HomeService;
-import com.flab.oasis.service.home.SuggestionType;
+import com.flab.oasis.constant.SuggestionType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

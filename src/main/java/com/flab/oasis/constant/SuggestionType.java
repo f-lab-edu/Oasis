@@ -1,4 +1,4 @@
-package com.flab.oasis.service.home;
+package com.flab.oasis.constant;
 
 import lombok.Getter;
 

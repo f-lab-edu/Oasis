@@ -1,6 +1,6 @@
 package com.flab.oasis.home;
 
-import com.flab.oasis.service.home.SuggestionType;
+import com.flab.oasis.constant.SuggestionType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
