@@ -76,7 +76,7 @@ public class HomeService {
     }
 
     private static List<String> getCategoryIdList(List<UserCategory> userCategory) {
-        return userCategory.stream().map(UserCategory::getCategoryId).toList();
+        return userCategory.stream().map(UserCategory::getCategoryId).collect(Collectors.toList());
     }
 
     private List<Book> bookSuggestionJsonToBookList(JsonNode bookSuggestionJson) {
