@@ -20,8 +20,8 @@ public class RedisService {
 
     public String getHashData(String key, String field) {
         HashOperations<String, Object, Object> hashOperations = stringRedisTemplate.opsForHash();
-        return Optional.ofNullable((String) hashOperations.get(key, field)).orElse("notExistKey");
-
+        return Optional.ofNullable((String) hashOperations.get(key, field))
+                .orElseThrow(() -> new RuntimeException("notExistKey"));
     }
 
     public Boolean existKey(String key) {
