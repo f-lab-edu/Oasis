@@ -3,7 +3,8 @@ package com.flab.oasis.service.home;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.flab.oasis.config.RedisKey;
+import com.flab.oasis.constant.RedisKey;
+import com.flab.oasis.constant.SuggestionType;
 import com.flab.oasis.mapper.home.HomeMapper;
 import com.flab.oasis.model.Book;
 import com.flab.oasis.model.home.UserCategory;
@@ -23,7 +24,6 @@ public class HomeService {
     private final HomeMapper homeMapper;
     private final RedisService redisService;
 
-    // 캐시키 재설정 필요
     @Cacheable(cacheNames = "homeCache", keyGenerator = "oasisKeyGenerator")
     public List<Book> suggestion(String uid, SuggestionType suggestionType) {
         return getSuggestionBookList(
@@ -33,16 +33,16 @@ public class HomeService {
     }
 
     private String getBookSuggestionFromRedis(SuggestionType suggestionType) {
-        if (redisService.existKey(RedisKey.HOME).equals(Boolean.FALSE)) {
+        if (redisService.existKey(RedisKey.HOME.name()).equals(Boolean.FALSE)) {
             pushNewBookSuggestion();
         }
 
-        return redisService.getHashData(RedisKey.HOME, suggestionType.getSuggestionType());
+        return redisService.getHashData(RedisKey.HOME.name(), suggestionType.getSuggestionType());
     }
 
     private void pushNewBookSuggestion() {
         redisService.putHashData(
-                RedisKey.HOME,
+                RedisKey.HOME.name(),
                 BookSuggestionParser.parseBookSuggestion(
                         homeMapper.getBookSuggestion()
                 )
@@ -59,12 +59,12 @@ public class HomeService {
     }
 
     private static List<JsonNode> selectNodeByUserCategory(List<UserCategory> userCategory, JsonNode jsonNode) {
-        if (userCategory.size() == 0) {
-            // 전체 카테고리 반환
+        if (userCategory.isEmpty()) {
+            return getAllCategoryJsonNodeList(jsonNode);
         }
 
         // jsonNode에서 가져온 데이터가 null safe한지 확인 필요
-        return userCategory.stream().map(uc -> jsonNode.get(uc.getCategoryId())).collect(Collectors.toList());
+        return getUserCategoryJsonNodeList(userCategory, jsonNode);
     }
 
     private List<Book> parseJsonToBookList(List<JsonNode> bookSuggestionJsonArrayByUserCategory) {
@@ -74,6 +74,17 @@ public class HomeService {
         );
 
         return bookSuggestionList;
+    }
+
+    private static List<JsonNode> getAllCategoryJsonNodeList(JsonNode jsonNode) {
+        List<JsonNode> allCategory = new ArrayList<>();
+        jsonNode.fieldNames().forEachRemaining(key -> allCategory.add(jsonNode.get(key)));
+
+        return allCategory;
+    }
+
+    private static List<JsonNode> getUserCategoryJsonNodeList(List<UserCategory> userCategory, JsonNode jsonNode) {
+        return userCategory.stream().map(uc -> jsonNode.get(uc.getCategoryId())).collect(Collectors.toList());
     }
 
     private List<Book> bookSuggestionJsonToBookList(JsonNode bookSuggestionJson) {
