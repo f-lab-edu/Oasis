@@ -24,7 +24,7 @@ public class HomeService {
     private final RedisService redisService;
 
     // 캐시키 재설정 필요
-    @Cacheable(cacheNames = "homeCache", key = "#uid + #suggestionType.name()")
+    @Cacheable(cacheNames = "homeCache", keyGenerator = "oasisKeyGenerator")
     public List<Book> suggestion(String uid, SuggestionType suggestionType) {
         return getSuggestionBookList(
                 homeMapper.findUserCategoryByUid(uid),
@@ -33,17 +33,20 @@ public class HomeService {
     }
 
     private String getBookSuggestionFromRedis(SuggestionType suggestionType) {
-        // suggestionType enum 처리
-        if (!redisService.existKey(RedisKey.HOME)) {
-            redisService.putHashData(
-                    RedisKey.HOME,
-                    BookSuggestionParser.parseBookSuggestion(
-                            homeMapper.getBookSuggestion()
-                    )
-            );
+        if (redisService.existKey(RedisKey.HOME).equals(Boolean.FALSE)) {
+            pushNewBookSuggestion();
         }
 
         return redisService.getHashData(RedisKey.HOME, suggestionType.getSuggestionType());
+    }
+
+    private void pushNewBookSuggestion() {
+        redisService.putHashData(
+                RedisKey.HOME,
+                BookSuggestionParser.parseBookSuggestion(
+                        homeMapper.getBookSuggestion()
+                )
+        );
     }
 
     private List<Book> getSuggestionBookList(List<UserCategory> userCategory, String bookSuggestionJsonString) {
