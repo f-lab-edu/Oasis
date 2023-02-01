@@ -1,5 +1,6 @@
 package com.flab.oasis.service;
 
+import com.flab.oasis.constant.RedisKey;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -18,10 +19,12 @@ public class RedisService {
         hashOperations.putAll(key, data);
     }
 
-    public String getHashData(String key, String field) {
+    public Object getHashData(RedisKey key, String field) {
         HashOperations<String, Object, Object> hashOperations = stringRedisTemplate.opsForHash();
-        return Optional.ofNullable((String) hashOperations.get(key, field))
+        String jsonString = Optional.ofNullable((String) hashOperations.get(key.name(), field))
                 .orElseThrow(() -> new RuntimeException("notExistKey"));
+
+        return key.jsonStringToModel(jsonString);
     }
 
     public Boolean existKey(String key) {
