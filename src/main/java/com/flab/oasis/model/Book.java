@@ -5,7 +5,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.springframework.data.annotation.Transient;
 
 import java.util.Date;
 
@@ -23,7 +22,6 @@ public class Book {
     private String imageUrl;
     private String description;
 
-    @Transient
     @JsonIgnore
     private int categoryId;
     private String categoryName;
