@@ -8,7 +8,6 @@ import com.flab.oasis.constant.RedisKey;
 import com.flab.oasis.constant.SuggestionType;
 import com.flab.oasis.mapper.home.HomeMapper;
 import com.flab.oasis.model.Book;
-import com.flab.oasis.utils.JsonUtils;
 import lombok.AllArgsConstructor;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -24,14 +23,18 @@ public class BookSuggestionRedis {
     private final HomeMapper homeMapper;
 
     public List<Book> getBookList(RedisKey key, String uid, SuggestionType suggestionType) {
-        JsonNode redisData = JsonUtils.parseStringToJsonNode(getBookSuggestionFromRedis(key, suggestionType.name()));
+        try {
+            JsonNode redisData = objectMapper.readTree(getBookSuggestionFromRedis(key, suggestionType.name()));
 
-        List<Book> bookList = new ArrayList<>();
-        getUserCategoryByUid(uid).forEach(uci -> bookList.addAll(
-            objectMapper.convertValue(redisData.get(String.valueOf(uci)), new TypeReference<List<Book>>() {})
-        ));
+            List<Book> bookList = new ArrayList<>();
+            getUserCategoryByUid(uid).forEach(uci -> bookList.addAll(
+                    objectMapper.convertValue(redisData.get(String.valueOf(uci)), new TypeReference<List<Book>>() {})
+            ));
 
-        return bookList;
+            return bookList;
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private String getBookSuggestionFromRedis(RedisKey key, String field) {
