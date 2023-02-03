@@ -46,12 +46,12 @@ public class BookSuggestionRedis {
         });
     }
 
-    private Map<String, String> getBookSuggestionHashFieldValue() {
-        return new BookSuggestionCollection(homeMapper.getBookSuggestion()).parseToHashFieldValue();
-    }
-
     private void pushNewBookSuggestion(Map<String, String> hashFieldValue) {
         redisTemplate.opsForHash().putAll(RedisKey.HOME.name(), hashFieldValue);
+    }
+
+    private Map<String, String> getBookSuggestionHashFieldValue() {
+        return new BookSuggestionCollection(homeMapper.getBookSuggestion()).parseToHashFieldValue();
     }
 
     private List<Integer> getUserCategoryByUid(String uid) {
