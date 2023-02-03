@@ -1,5 +1,6 @@
 package com.flab.oasis.model.home;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,10 +14,7 @@ import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @AllArgsConstructor
@@ -51,7 +49,27 @@ public class BookSuggestionRedis {
     }
 
     private Map<String, String> getBookSuggestionHashFieldValue() {
-        return new BookSuggestionCollection(homeMapper.getBookSuggestion()).parseToHashFieldValue();
+        Map<String, Map<Integer, List<Book>>> hashFormat = new BookSuggestionCollection(
+                homeMapper.getBookSuggestion()
+        ).parseToHashFormat();
+
+        return parseValueToJsonString(hashFormat);
+    }
+
+    private Map<String, String> parseValueToJsonString(Map<String, Map<Integer, List<Book>>> hashFormat) {
+        Map<String, String> hashFieldValue = new HashMap<>();
+        hashFormat.forEach((key, value) -> {
+            try {
+                hashFieldValue.put(
+                        key,
+                        objectMapper.writeValueAsString(value)
+                );
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        return hashFieldValue;
     }
 
     private List<Integer> getUserCategoryByUid(String uid) {
