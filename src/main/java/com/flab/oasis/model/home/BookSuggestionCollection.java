@@ -14,12 +14,12 @@ import java.util.stream.Collectors;
 public class BookSuggestionCollection {
     private final List<BookSuggestion> bookSuggestionList;
 
-    public Map<String, String> parseToHashFieldValue() {
-        Map<String, String> hashFieldValue = new HashMap<>();
+    public Map<String, Map<Integer, List<Book>>> parseToHashFieldValue() {
+        Map<String, Map<Integer, List<Book>>> hashFieldValue = new HashMap<>();
         for (Map.Entry<SuggestionType, List<BookSuggestion>> entry : groupBySuggestionType().entrySet()) {
             hashFieldValue.put(
                     getSuggestionType(entry),
-                    JsonUtils.parseObjectToString(groupByCategoryId(getBookSuggestionList(entry)))
+                    groupByCategoryId(getBookSuggestionList(entry))
             );
         }
 

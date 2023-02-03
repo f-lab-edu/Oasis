@@ -9,5 +9,5 @@ import lombok.ToString;
 @ToString
 public class UserCategory {
     private String uid;
-    private String categoryId;
+    private Integer categoryId;
 }

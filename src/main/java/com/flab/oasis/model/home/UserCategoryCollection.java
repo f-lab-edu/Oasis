@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 public class UserCategoryCollection {
     private final List<UserCategory> userCategoryList;
 
-    public List<String> getCategoryIdList() {
+    public List<Integer> getCategoryIdList() {
         return userCategoryList.stream().map(UserCategory::getCategoryId).collect(Collectors.toList());
     }
 }
