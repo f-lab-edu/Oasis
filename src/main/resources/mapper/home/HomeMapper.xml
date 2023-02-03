@@ -4,7 +4,7 @@
 <mapper namespace="com.flab.oasis.mapper.home.HomeMapper">
 
     <select id="getBookSuggestion" resultType="com.flab.oasis.model.home.BookSuggestion">
-        SELECT A.SUGGESTION_TYPE AS suggestionType, B.BOOK_ID AS bookId,
+        SELECT UCASE(A.SUGGESTION_TYPE) AS suggestionType, B.BOOK_ID AS bookId,
                B.TITLE, B.AUTHOR, B.TRANSLATOR, B.PUBLISHER, B.PUBLISH_DATE AS publishDate,
                B.IMAGE_URL AS imageUrl, B.DESCRIPTION, B.CATEGORY_ID AS categoryId, B.categoryName
         FROM BOOK_SUGGESTION A, (
