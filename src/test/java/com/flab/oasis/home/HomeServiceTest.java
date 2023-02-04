@@ -2,6 +2,7 @@ package com.flab.oasis.home;
 
 import com.flab.oasis.mapper.home.HomeMapper;
 import com.flab.oasis.model.Book;
+import com.flab.oasis.model.home.BookSuggestion;
 import com.flab.oasis.service.home.HomeService;
 import com.flab.oasis.constant.SuggestionType;
 import org.junit.jupiter.api.Assertions;
@@ -28,7 +29,7 @@ class HomeServiceTest {
 
     @Test
     void ehCacheTest() {
-        List<Book> bookList =  homeService.suggestion(
+        List<BookSuggestion> bookList =  homeService.suggestion(
                 "test@naver.com", SuggestionType.valueOf("newBook".toUpperCase())
         );
 

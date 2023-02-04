@@ -1,6 +1,7 @@
 package com.flab.oasis.controller.home;
 
 import com.flab.oasis.model.Book;
+import com.flab.oasis.model.home.BookSuggestion;
 import com.flab.oasis.model.home.BookSuggestionRequest;
 import com.flab.oasis.service.home.HomeService;
 import com.flab.oasis.constant.SuggestionType;
@@ -20,7 +21,7 @@ public class HomeController {
     private final HomeService homeService;
 
     @PostMapping("/suggestion")
-    public List<Book> bookSuggestion(@RequestBody BookSuggestionRequest request) {
+    public List<BookSuggestion> bookSuggestion(@RequestBody BookSuggestionRequest request) {
         return homeService.suggestion(request.getUid(), request.getSuggestionType());
     }
 }
