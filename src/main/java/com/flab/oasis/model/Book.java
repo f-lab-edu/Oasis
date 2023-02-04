@@ -1,6 +1,5 @@
 package com.flab.oasis.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,8 +20,6 @@ public class Book {
     private Date publishDate;
     private String imageUrl;
     private String description;
-
-    @JsonIgnore
     private int categoryId;
     private String categoryName;
 }
