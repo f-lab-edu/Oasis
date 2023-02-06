@@ -5,12 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Getter
+@Setter
 public class BookSuggestionRequest {
     private String uid;
     private SuggestionType suggestionType;
-
-    public BookSuggestionRequest(String uid, String suggestionType) {
-        this.uid = uid;
-        this.suggestionType = SuggestionType.valueOf(suggestionType);
-    }
 }

@@ -1,6 +1,5 @@
 package com.flab.oasis.service.home;
 
-import com.flab.oasis.constant.RedisKey;
 import com.flab.oasis.constant.SuggestionType;
 import com.flab.oasis.mapper.home.HomeMapper;
 import com.flab.oasis.model.home.BookSuggestion;

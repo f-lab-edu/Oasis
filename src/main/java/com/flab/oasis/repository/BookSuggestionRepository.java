@@ -6,30 +6,33 @@ import com.flab.oasis.constant.RedisKey;
 import com.flab.oasis.constant.SuggestionType;
 import com.flab.oasis.mapper.home.HomeMapper;
 import com.flab.oasis.model.home.BookSuggestion;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Repository
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class BookSuggestionRepository {
     private final RedisTemplate<String, Object> redisTemplate;
     private final ObjectMapper objectMapper;
     private final HomeMapper homeMapper;
+
     private final RedisKey key = RedisKey.HOME;
 
     public List<BookSuggestion> getBookSuggestionList(SuggestionType suggestionType) {
-        return getBookSuggestionFromRedis(key, suggestionType.name());
+        return getBookSuggestionFromRedis(key, suggestionType);
     }
 
-    private List<BookSuggestion> getBookSuggestionFromRedis(RedisKey key, String field) {
+    private List<BookSuggestion> getBookSuggestionFromRedis(RedisKey key, SuggestionType field) {
         List<BookSuggestion> bookSuggestionList;
         Object hashValue = redisTemplate.opsForHash().get(key.name(), field);
         if (Objects.isNull(hashValue)) {
-            Map<String, List<BookSuggestion>> hashFieldValue = getBookSuggestionHashFieldValue();
+            Map<SuggestionType, List<BookSuggestion>> hashFieldValue = getBookSuggestionHashFieldValue();
 
             redisTemplate.opsForHash().putAll(key.name(), hashFieldValue);
             bookSuggestionList = hashFieldValue.get(field);
@@ -40,7 +43,7 @@ public class BookSuggestionRepository {
         return bookSuggestionList;
     }
 
-    private Map<String, List<BookSuggestion>> getBookSuggestionHashFieldValue() {
+    private Map<SuggestionType, List<BookSuggestion>> getBookSuggestionHashFieldValue() {
         return homeMapper.getBookSuggestion().stream()
                 .collect(Collectors.groupingBy(BookSuggestion::getSuggestionType));
     }
