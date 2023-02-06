@@ -19,8 +19,9 @@ public class BookSuggestionRepository {
     private final RedisTemplate<String, Object> redisTemplate;
     private final ObjectMapper objectMapper;
     private final HomeMapper homeMapper;
+    private final RedisKey key = RedisKey.HOME;
 
-    public List<BookSuggestion> getBookSuggestionList(RedisKey key, String uid, SuggestionType suggestionType) {
+    public List<BookSuggestion> getBookSuggestionList(SuggestionType suggestionType) {
         return getBookSuggestionFromRedis(key, suggestionType.name());
     }
 

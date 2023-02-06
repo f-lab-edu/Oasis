@@ -25,7 +25,7 @@ public class HomeService {
     public List<BookSuggestion> suggestion(String uid, SuggestionType suggestionType) {
         return getBookSuggestionListByUserCategory(
                 uid,
-                bookSuggestionRepository.getBookSuggestionList(RedisKey.HOME, uid, suggestionType)
+                bookSuggestionRepository.getBookSuggestionList(suggestionType)
         );
     }
 
