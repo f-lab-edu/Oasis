@@ -4,7 +4,6 @@ import com.flab.oasis.constant.SuggestionType;
 import com.flab.oasis.mapper.home.HomeMapper;
 import com.flab.oasis.model.home.BookSuggestion;
 import com.flab.oasis.model.home.UserCategory;
-import com.flab.oasis.repository.BookSuggestionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
