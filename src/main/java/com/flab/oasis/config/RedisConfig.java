@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.flab.oasis.constant.SuggestionType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -43,12 +44,12 @@ public class RedisConfig {
     }
 
     @Bean
-    public RedisTemplate<String, Object> bookSuggestionTemplate(ObjectMapper objectMapper) {
+    public RedisTemplate<SuggestionType, Object> bookSuggestionTemplate(ObjectMapper objectMapper) {
         GenericJackson2JsonRedisSerializer serializer = new GenericJackson2JsonRedisSerializer(objectMapper);
-        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
-        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        RedisTemplate<SuggestionType, Object> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setKeySerializer(serializer);
         redisTemplate.setValueSerializer(serializer);
-        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
+        redisTemplate.setHashKeySerializer(serializer);
         redisTemplate.setHashValueSerializer(serializer);
         redisTemplate.setConnectionFactory(redisConnectionFactory());
 

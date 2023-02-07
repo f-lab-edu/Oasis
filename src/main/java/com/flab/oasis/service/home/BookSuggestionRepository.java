@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 @Repository
 @RequiredArgsConstructor
 public class BookSuggestionRepository {
-    private final RedisTemplate<String, Object> redisTemplate;
+    private final RedisTemplate<SuggestionType, Object> redisTemplate;
     private final ObjectMapper objectMapper;
     private final HomeMapper homeMapper;
 
@@ -26,11 +26,11 @@ public class BookSuggestionRepository {
     }
 
     private List<BookSuggestion> getBookSuggestionFromRedis(SuggestionType suggestionType) {
-        Object stringValue = redisTemplate.opsForValue().get(suggestionType.name());
+        Object stringValue = redisTemplate.opsForValue().get(suggestionType);
 
         if (Objects.isNull(stringValue)) {
             Map<SuggestionType, List<BookSuggestion>> stringKeyValue = getBookSuggestionStringKeyValue();
-            stringKeyValue.forEach((key, value) -> redisTemplate.opsForValue().set(key.name(), value));
+            stringKeyValue.forEach((key, value) -> redisTemplate.opsForValue().set(key, value));
 
             return stringKeyValue.get(suggestionType);
         }
