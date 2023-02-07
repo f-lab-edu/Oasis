@@ -2,7 +2,6 @@ package com.flab.oasis.service.home;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.flab.oasis.constant.RedisKey;
 import com.flab.oasis.constant.SuggestionType;
 import com.flab.oasis.mapper.home.HomeMapper;
 import com.flab.oasis.model.home.BookSuggestion;
@@ -22,28 +21,23 @@ public class BookSuggestionRepository {
     private final ObjectMapper objectMapper;
     private final HomeMapper homeMapper;
 
-    private final RedisKey key = RedisKey.HOME;
-
     public List<BookSuggestion> getBookSuggestionList(SuggestionType suggestionType) {
-        return getBookSuggestionFromRedis(key, suggestionType);
+        return getBookSuggestionFromRedis(suggestionType);
     }
 
-    private List<BookSuggestion> getBookSuggestionFromRedis(RedisKey key, SuggestionType field) {
-        List<BookSuggestion> bookSuggestionList;
-        Object hashValue = redisTemplate.opsForHash().get(key.name(), field);
-        if (Objects.isNull(hashValue)) {
-            Map<SuggestionType, List<BookSuggestion>> hashFieldValue = getBookSuggestionHashFieldValue();
+    private List<BookSuggestion> getBookSuggestionFromRedis(SuggestionType suggestionType) {
+        Object stringValue = redisTemplate.opsForValue().get(suggestionType.name());
 
-            redisTemplate.opsForHash().putAll(key.name(), hashFieldValue);
-            bookSuggestionList = hashFieldValue.get(field);
-        } else {
-            bookSuggestionList = objectMapper.convertValue(hashValue, new TypeReference<List<BookSuggestion>>() {});
+        if (Objects.isNull(stringValue)) {
+            Map<SuggestionType, List<BookSuggestion>> stringKeyValue = getBookSuggestionStringKeyValue();
+            stringKeyValue.forEach((key, value) -> redisTemplate.opsForValue().set(key.name(), value));
+
+            return stringKeyValue.get(suggestionType);
         }
-
-        return bookSuggestionList;
+        return objectMapper.convertValue(stringValue, new TypeReference<List<BookSuggestion>>() {});
     }
 
-    private Map<SuggestionType, List<BookSuggestion>> getBookSuggestionHashFieldValue() {
+    private Map<SuggestionType, List<BookSuggestion>> getBookSuggestionStringKeyValue() {
         return homeMapper.getBookSuggestion().stream()
                 .collect(Collectors.groupingBy(BookSuggestion::getSuggestionType));
     }
