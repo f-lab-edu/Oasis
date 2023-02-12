@@ -28,4 +28,4 @@ spring:
 
 # mybatis
 mybatis:
-  mapper-locations: mapper/*.xml
+  mapper-locations: mapper/**/*.xml
