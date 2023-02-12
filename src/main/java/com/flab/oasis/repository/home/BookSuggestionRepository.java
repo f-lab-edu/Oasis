@@ -7,6 +7,7 @@ import com.flab.oasis.mapper.home.HomeMapper;
 import com.flab.oasis.model.home.BookSuggestion;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,7 +15,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-@Service
+@Repository
 @RequiredArgsConstructor
 public class BookSuggestionRepository {
     private final RedisTemplate<SuggestionType, Object> redisTemplate;
