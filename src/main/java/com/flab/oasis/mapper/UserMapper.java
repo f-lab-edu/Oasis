@@ -13,4 +13,7 @@ public interface UserMapper {
     public void insertUserInfo(UserInfo userInfo);
     public void insertUserCategory(UserCategory userCategory);
     public List<UserCategory> findUserCategoryByUid(String uid);
+    public void deleteUserAuthByUid(String uid);
+    public void deleteUserInfoByUid(String uid);
+    public void deleteUserCategoryByUid(String uid);
 }

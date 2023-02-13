@@ -30,4 +30,19 @@
         WHERE UID=#{uid}
     </select>
 
+    <delete id="deleteUserAuthByUid" parameterType="java.lang.String">
+        DELETE FROM USER_AUTH
+        WHERE UID=#{uid}
+    </delete>
+
+    <delete id="deleteUserInfoByUid" parameterType="java.lang.String">
+        DELETE FROM USER_INFO
+        WHERE UID=#{uid}
+    </delete>
+
+    <delete id="deleteUserCategoryByUid" parameterType="java.lang.String">
+        DELETE FROM USER_CATEGORY
+        WHERE UID=#{uid}
+    </delete>
+
 </mapper>
