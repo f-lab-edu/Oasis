@@ -1,7 +1,7 @@
 package com.flab.oasis.service;
 
 import com.flab.oasis.constant.SuggestionType;
-import com.flab.oasis.mapper.HomeMapper;
+import com.flab.oasis.mapper.UserMapper;
 import com.flab.oasis.model.BookSuggestion;
 import com.flab.oasis.model.UserCategory;
 import com.flab.oasis.repository.BookSuggestionRepository;
@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class HomeService {
     private final BookSuggestionRepository bookSuggestionRepository;
-    private final HomeMapper homeMapper;
+    private final UserMapper userMapper;
 
     @Cacheable(cacheNames = "homeCache", keyGenerator = "oasisKeyGenerator")
     public List<BookSuggestion> suggestion(String uid, SuggestionType suggestionType) {
@@ -30,7 +30,7 @@ public class HomeService {
 
     private List<BookSuggestion> getBookSuggestionListByUserCategory(
             String uid, List<BookSuggestion> bookSuggestionList) {
-        List<UserCategory> userCategory = homeMapper.findUserCategoryByUid(uid);
+        List<UserCategory> userCategory = userMapper.findUserCategoryByUid(uid);
 
         if (userCategory.isEmpty()) {
             return bookSuggestionList;

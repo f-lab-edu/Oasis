@@ -8,6 +8,5 @@ import java.util.List;
 
 @Mapper
 public interface HomeMapper {
-    public List<UserCategory> findUserCategoryByUid(String uid);
     public List<BookSuggestion> getBookSuggestion();
 }

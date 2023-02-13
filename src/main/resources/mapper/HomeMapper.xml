@@ -15,10 +15,4 @@
         WHERE A.BOOK_ID = B.BOOK_ID
     </select>
 
-    <select id="findUserCategoryByUid" parameterType="java.lang.String" resultType="com.flab.oasis.model.UserCategory">
-        SELECT UID, CATEGORY_ID AS categoryId
-        FROM USER_CATEGORY
-        WHERE UID=#{uid}
-    </select>
-
 </mapper>

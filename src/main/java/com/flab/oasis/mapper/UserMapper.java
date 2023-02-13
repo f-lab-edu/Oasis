@@ -9,8 +9,8 @@ import java.util.List;
 
 @Mapper
 public interface UserMapper {
-    public List<UserCategory> findUserCategoryByUid(String uid);
     public void insertUserAuth(UserAuth userAuth);
     public void insertUserInfo(UserInfo userInfo);
     public void insertUserCategory(UserCategory userCategory);
+    public List<UserCategory> findUserCategoryByUid(String uid);
 }
