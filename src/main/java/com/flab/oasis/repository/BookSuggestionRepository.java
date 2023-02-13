@@ -1,14 +1,13 @@
-package com.flab.oasis.repository.home;
+package com.flab.oasis.repository;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flab.oasis.constant.SuggestionType;
-import com.flab.oasis.mapper.home.HomeMapper;
-import com.flab.oasis.model.home.BookSuggestion;
+import com.flab.oasis.mapper.HomeMapper;
+import com.flab.oasis.model.BookSuggestion;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;

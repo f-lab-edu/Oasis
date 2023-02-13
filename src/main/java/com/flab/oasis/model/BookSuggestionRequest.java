@@ -1,4 +1,4 @@
-package com.flab.oasis.model.home;
+package com.flab.oasis.model;
 
 import com.flab.oasis.constant.SuggestionType;
 import lombok.Getter;

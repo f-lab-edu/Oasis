@@ -1,9 +1,11 @@
-package com.flab.oasis.model.home;
+package com.flab.oasis.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flab.oasis.constant.SuggestionType;
-import com.flab.oasis.model.Book;
-import lombok.*;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter

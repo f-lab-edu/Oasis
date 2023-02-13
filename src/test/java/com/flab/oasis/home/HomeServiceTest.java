@@ -1,9 +1,8 @@
 package com.flab.oasis.home;
 
-import com.flab.oasis.mapper.home.HomeMapper;
-import com.flab.oasis.model.Book;
-import com.flab.oasis.model.home.BookSuggestion;
-import com.flab.oasis.service.home.HomeService;
+import com.flab.oasis.mapper.HomeMapper;
+import com.flab.oasis.model.BookSuggestion;
+import com.flab.oasis.service.HomeService;
 import com.flab.oasis.constant.SuggestionType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
