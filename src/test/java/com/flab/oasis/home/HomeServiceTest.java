@@ -1,44 +1,45 @@
 package com.flab.oasis.home;
 
-import com.flab.oasis.mapper.HomeMapper;
-import com.flab.oasis.mapper.UserMapper;
-import com.flab.oasis.model.BookSuggestion;
-import com.flab.oasis.model.UserAuth;
-import com.flab.oasis.model.UserCategory;
-import com.flab.oasis.model.UserInfo;
-import com.flab.oasis.service.HomeService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flab.oasis.constant.SuggestionType;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import com.flab.oasis.mapper.UserMapper;
+import com.flab.oasis.model.*;
+import com.flab.oasis.service.HomeService;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.cache.Cache;
-import org.springframework.cache.CacheManager;
+import org.springframework.cache.ehcache.EhCacheCacheManager;
 import org.springframework.cache.support.SimpleValueWrapper;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import javax.annotation.Resource;
 import java.util.List;
+import java.util.Objects;
 
 @SpringBootTest
+@AutoConfigureMockMvc
 class HomeServiceTest {
+    @Autowired
+    ObjectMapper objectMapper;
+
     @Autowired
     HomeService homeService;
 
     @Autowired
-    HomeMapper homeMapper;
-
-    @Autowired
     UserMapper userMapper;
 
-    @Resource
-    CacheManager cacheManager;
+    @Autowired
+    EhCacheCacheManager ehCacheCacheManager;
 
-    String uid = "test@naver.com";
+    @Autowired
+    MockMvc mockMvc;
 
     @BeforeEach
     void setup() {
+        String uid = "test@naver.com";
         userMapper.insertUserAuth(
                 new UserAuth(uid, "1234", 'N', null, null)
         );
@@ -54,29 +55,38 @@ class HomeServiceTest {
 
     @AfterEach
     void clear() {
+        String uid = "test@naver.com";
         userMapper.deleteUserCategoryByUid(uid);
         userMapper.deleteUserInfoByUid(uid);
         userMapper.deleteUserAuthByUid(uid);
     }
 
+    @DisplayName("/home/suggestion request 결과 비교")
+    @Test
+    void suggestionTest() throws Exception {
+        String uid = "test@naver.com";
+        BookSuggestionRequest bookSuggestionRequest = new BookSuggestionRequest(uid, SuggestionType.NEWBOOK);
+        String expected = objectMapper.writeValueAsString(homeService.suggestion(bookSuggestionRequest));
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.post("/home/suggestion")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(bookSuggestionRequest))
+        ).andExpect(MockMvcResultMatchers.status().isOk()).andExpect(MockMvcResultMatchers.content().json(expected));
+    }
+
+    @DisplayName("캐싱된 값과 실제 결과 값 비교")
     @Test
     void ehCacheTest() {
+        String uid = "test@naver.com";
         List<BookSuggestion> bookList =  homeService.suggestion(
-                uid, SuggestionType.valueOf("newBook".toUpperCase())
+                new BookSuggestionRequest(uid, SuggestionType.NEWBOOK)
         );
 
-        Cache cache = cacheManager.getCache("homeCache");
+        SimpleValueWrapper bookCache =
+                (SimpleValueWrapper) Objects.requireNonNull(ehCacheCacheManager.getCache("homeCache"))
+                        .get(String.format("%s_%s_%s", "suggestion", uid, SuggestionType.NEWBOOK));
 
-        Assertions.assertNotNull(cache);
-
-        Object bookCache = cache.get(
-                String.format(
-                        "suggestion_%s_%s",
-                        uid,
-                        SuggestionType.valueOf("newBook".toUpperCase())
-                )
-        );
-
-        Assertions.assertEquals(bookList, ((SimpleValueWrapper) bookCache).get());
+        Assertions.assertEquals(bookList, Objects.requireNonNull(bookCache).get());
     }
 }

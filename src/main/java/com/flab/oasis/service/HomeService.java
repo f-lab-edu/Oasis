@@ -42,7 +42,6 @@ public class HomeService {
 
             return bookList;
         }
-
     }
 
     private static Map<Integer, List<BookSuggestion>> groupByCategoryId(List<BookSuggestion> bookSuggestionList) {
