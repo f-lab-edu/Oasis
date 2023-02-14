@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flab.oasis.mapper.UserAuthMapper">
+
+    <insert id="insertUserAuth" parameterType="com.flab.oasis.model.UserAuth">
+        INSERT INTO USER_AUTH
+            (UID, PASSWORD, SOCIAL_YN, ACCESS_TOKEN, REFRESH_TOKEN, CREATE_DATETIME, MODIFY_DATETIME)
+        VALUES
+            (#{uid}, #{password}, #{socialYN}, #{accessToken}, #{refreshToken}, NOW(), NOW())
+    </insert>
+
+    <delete id="deleteUserAuthByUid" parameterType="java.lang.String">
+        DELETE FROM USER_AUTH
+        WHERE UID=#{uid}
+    </delete>
+
+</mapper>

@@ -2,7 +2,9 @@ package com.flab.oasis.home;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flab.oasis.constant.SuggestionType;
-import com.flab.oasis.mapper.UserMapper;
+import com.flab.oasis.mapper.UserAuthMapper;
+import com.flab.oasis.mapper.UserCategoryMapper;
+import com.flab.oasis.mapper.UserInfoMapper;
 import com.flab.oasis.model.*;
 import com.flab.oasis.service.HomeService;
 import org.junit.jupiter.api.*;
@@ -29,7 +31,13 @@ class HomeServiceTest {
     HomeService homeService;
 
     @Autowired
-    UserMapper userMapper;
+    UserAuthMapper userAuthMapper;
+
+    @Autowired
+    UserInfoMapper userInfoMapper;
+
+    @Autowired
+    UserCategoryMapper userCategoryMapper;
 
     @Autowired
     EhCacheCacheManager ehCacheCacheManager;
@@ -40,14 +48,14 @@ class HomeServiceTest {
     @BeforeEach
     void setup() {
         String uid = "test@naver.com";
-        userMapper.insertUserAuth(
+        userAuthMapper.insertUserAuth(
                 new UserAuth(uid, "1234", 'N', null, null)
         );
-        userMapper.insertUserInfo(
+        userInfoMapper.insertUserInfo(
                 new UserInfo(uid, "test_user", "hello world!", "www.test.com")
         );
         for (int categoryId : new int[] {101, 102, 103}) {
-            userMapper.insertUserCategory(
+            userCategoryMapper.insertUserCategory(
                     new UserCategory(uid, categoryId)
             );
         }
@@ -56,9 +64,9 @@ class HomeServiceTest {
     @AfterEach
     void clear() {
         String uid = "test@naver.com";
-        userMapper.deleteUserCategoryByUid(uid);
-        userMapper.deleteUserInfoByUid(uid);
-        userMapper.deleteUserAuthByUid(uid);
+        userCategoryMapper.deleteUserCategoryByUid(uid);
+        userInfoMapper.deleteUserInfoByUid(uid);
+        userAuthMapper.deleteUserAuthByUid(uid);
     }
 
     @DisplayName("/home/suggestion request 결과 비교")

@@ -3,7 +3,7 @@ package com.flab.oasis.repository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flab.oasis.constant.SuggestionType;
-import com.flab.oasis.mapper.HomeMapper;
+import com.flab.oasis.mapper.BookSuggestionMapper;
 import com.flab.oasis.model.BookSuggestion;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -18,7 +18,7 @@ public class BookSuggestionRepository {
     private final RedisTemplate<SuggestionType, Object> redisTemplate;
     private final ObjectMapper objectMapper;
 
-    private final HomeMapper homeMapper;
+    private final BookSuggestionMapper bookSuggestionMapper;
 
     public List<BookSuggestion> getBookSuggestionList(SuggestionType suggestionType) {
         Object stringValue = redisTemplate.opsForValue().get(suggestionType);
@@ -31,7 +31,8 @@ public class BookSuggestionRepository {
     }
 
     private List<BookSuggestion> pushBookSuggestionToRedis(SuggestionType suggestionType) {
-        List<BookSuggestion> bookSuggestionList = homeMapper.getBookSuggestion(suggestionType);
+        List<BookSuggestion> bookSuggestionList =
+                bookSuggestionMapper.findBookSuggestionBySuggestionType(suggestionType);
         redisTemplate.opsForValue().set(suggestionType, bookSuggestionList);
 
         return bookSuggestionList;

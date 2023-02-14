@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flab.oasis.mapper.UserInfoMapper">
+
+    <insert id="insertUserInfo" parameterType="com.flab.oasis.model.UserInfo">
+        INSERT INTO USER_INFO
+            (UID, NICKNAME, INTRODUCE, AVATAR_URL, CREATE_DATETIME, MODIFY_DATETIME)
+        VALUES
+            (#{uid}, #{nickName}, #{introduce}, #{avatarUrl}, NOW(), NOW())
+    </insert>
+
+    <delete id="deleteUserInfoByUid" parameterType="java.lang.String">
+        DELETE FROM USER_INFO
+        WHERE UID=#{uid}
+    </delete>
+
+</mapper>
