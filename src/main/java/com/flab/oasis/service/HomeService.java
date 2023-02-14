@@ -3,6 +3,7 @@ package com.flab.oasis.service;
 import com.flab.oasis.constant.SuggestionType;
 import com.flab.oasis.mapper.UserMapper;
 import com.flab.oasis.model.BookSuggestion;
+import com.flab.oasis.model.BookSuggestionRequest;
 import com.flab.oasis.model.UserCategory;
 import com.flab.oasis.repository.BookSuggestionRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,9 +22,10 @@ public class HomeService {
     private final UserMapper userMapper;
 
     @Cacheable(cacheNames = "homeCache", keyGenerator = "oasisKeyGenerator", cacheManager = "ehCacheCacheManager")
-    public List<BookSuggestion> suggestion(String uid, SuggestionType suggestionType) {
+    public List<BookSuggestion> suggestion(BookSuggestionRequest bookSuggestionRequest) {
         return getBookSuggestionListByUserCategory(
-                uid, bookSuggestionRepository.getBookSuggestionList(suggestionType)
+                bookSuggestionRequest.getUid(),
+                bookSuggestionRepository.getBookSuggestionList(bookSuggestionRequest.getSuggestionType())
         );
     }
 

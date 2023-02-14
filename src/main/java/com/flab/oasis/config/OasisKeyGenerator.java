@@ -1,5 +1,6 @@
 package com.flab.oasis.config;
 
+import com.flab.oasis.model.BookSuggestionRequest;
 import org.springframework.cache.interceptor.KeyGenerator;
 
 import java.lang.reflect.Method;
@@ -15,7 +16,10 @@ public class OasisKeyGenerator implements KeyGenerator {
     private String joinParams(Object... params) {
         List<String> stringList = new ArrayList<>();
         for (Object obj : params) {
-            stringList.add(obj.toString());
+            if (obj instanceof BookSuggestionRequest) {
+                stringList.add(((BookSuggestionRequest) obj).getUid());
+                stringList.add(((BookSuggestionRequest) obj).getSuggestionType().name());
+            }
         }
 
         return String.join("_", stringList);
