@@ -1,26 +1,13 @@
-<config
-        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
-        xmlns='http://www.ehcache.org/v3'
-        xmlns:jsr107="http://www.ehcache.org/v3/jsr107"
-        xsi:schemaLocation="http://www.ehcache.org/v3 http://www.ehcache.org/schema/ehcache-core.xsd
-        http://www.ehcache.org/v3/jsr107 http://www.ehcache.org/schema/ehcache-107-ext-3.0.xsd">
+<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="ehcache.xsd"
+         updateCheck="true"
+         monitoring="autodetect"
+         dynamicConfig="true">
 
-    <service>
-        <jsr107:defaults enable-management="true" enable-statistics="true"/>
-    </service>
+    <cache name="homeCache" maxEntriesLocalHeap="1000" eternal="false" overflowToDisk="false"
+           diskPersistent="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" memoryStoreEvictionPolicy="LRU"/>
 
-    <cache-template name="defaultTemplate">
-        <expiry>
-            <ttl unit="seconds">600</ttl>
-        </expiry>
+    <cache name="testCache" maxEntriesLocalHeap="1000" eternal="false" overflowToDisk="false"
+           diskPersistent="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" memoryStoreEvictionPolicy="LRU"/>
 
-        <heap>20</heap>
-    </cache-template>
-
-    <cache alias="homeCache" uses-template="defaultTemplate">
-    </cache>
-
-    <cache alias="testCache" uses-template="defaultTemplate">
-    </cache>
-
-</config>
+</ehcache>
