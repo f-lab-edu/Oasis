@@ -20,11 +20,10 @@ public class HomeService {
     private final BookSuggestionRepository bookSuggestionRepository;
     private final UserMapper userMapper;
 
-    @Cacheable(cacheNames = "homeCache", keyGenerator = "oasisKeyGenerator")
+    @Cacheable(cacheNames = "homeCache", keyGenerator = "oasisKeyGenerator", cacheManager = "ehCacheCacheManager")
     public List<BookSuggestion> suggestion(String uid, SuggestionType suggestionType) {
         return getBookSuggestionListByUserCategory(
-                uid,
-                bookSuggestionRepository.getBookSuggestionList(suggestionType)
+                uid, bookSuggestionRepository.getBookSuggestionList(suggestionType)
         );
     }
 

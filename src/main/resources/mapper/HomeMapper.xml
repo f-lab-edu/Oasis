@@ -3,7 +3,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.flab.oasis.mapper.HomeMapper">
 
-    <select id="getBookSuggestion" resultType="com.flab.oasis.model.BookSuggestion">
+    <select id="getBookSuggestion" parameterType="com.flab.oasis.constant.SuggestionType" resultType="com.flab.oasis.model.BookSuggestion">
         SELECT UCASE(A.SUGGESTION_TYPE) AS suggestionType, B.BOOK_ID AS bookId,
             B.TITLE, B.AUTHOR, B.TRANSLATOR, B.PUBLISHER, B.PUBLISH_DATE AS publishDate,
             B.IMAGE_URL AS imageUrl, B.DESCRIPTION, B.CATEGORY_ID AS categoryId, B.categoryName
@@ -12,7 +12,7 @@
             FROM BOOK_LIST X, BOOK_CATEGORY Y
             WHERE X.CATEGORY_ID = Y.CATEGORY_ID
         ) B
-        WHERE A.BOOK_ID = B.BOOK_ID
+        WHERE A.BOOK_ID = B.BOOK_ID AND UCASE(A.SUGGESTION_TYPE) = #{suggestionType}
     </select>
 
 </mapper>
