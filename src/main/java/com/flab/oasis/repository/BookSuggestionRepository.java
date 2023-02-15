@@ -17,7 +17,6 @@ import java.util.Objects;
 public class BookSuggestionRepository {
     private final RedisTemplate<SuggestionType, Object> redisTemplate;
     private final ObjectMapper objectMapper;
-
     private final BookSuggestionMapper bookSuggestionMapper;
 
     public List<BookSuggestion> getBookSuggestionList(SuggestionType suggestionType) {
