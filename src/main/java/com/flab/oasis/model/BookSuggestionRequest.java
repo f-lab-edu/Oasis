@@ -12,7 +12,12 @@ import java.io.Serializable;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class BookSuggestionRequest implements Serializable {
+public class BookSuggestionRequest implements BaseRequest, Serializable {
     private String uid;
     private SuggestionType suggestionType;
+
+    @Override
+    public String combineKeyWithUnderBar() {
+        return String.format("%s_%s", uid, suggestionType.name());
+    }
 }
