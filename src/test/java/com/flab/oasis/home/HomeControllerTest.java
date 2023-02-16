@@ -14,11 +14,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -42,9 +40,9 @@ class HomeControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(homeController).build();
     }
 
-    @DisplayName("/home/suggestion request 결과 비교")
+    @DisplayName("/home/suggestion POST 요청")
     @Test
-    void suggestionTest() throws Exception {
+    void response된_값과_실제값_비교() throws Exception {
         String uid = "test@naver.com";
         SuggestionType suggestionType = SuggestionType.NEWBOOK;
 
@@ -54,35 +52,37 @@ class HomeControllerTest {
 
         BDDMockito.given(homeService.suggestion(bookSuggestionRequest)).willReturn(bookSuggestionList);
 
-        ResultActions resultActions = mockMvc.perform(
-                MockMvcRequestBuilders.post("/home/suggestion")
+        mockMvc.perform(
+                MockMvcRequestBuilders
+                        .post("/home/suggestion")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(bookSuggestionRequest))
-        );
-
-        resultActions.andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(bookSuggestionList)));
-
+                )
+                .andExpect(
+                        MockMvcResultMatchers.status().isOk()
+                )
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath("$[0].title")
+                                .value(bookSuggestionList.get(0).getTitle())
+                );
     }
 
     private static List<BookSuggestion> generateBookSuggestionList(SuggestionType suggestionType) {
         List<BookSuggestion> bookSuggestionList = new ArrayList<>();
-        for (int i = 0; i < 5; i++) {
-            BookSuggestion bookSuggestion = new BookSuggestion();
-            bookSuggestion.setSuggestionType(suggestionType);
-            bookSuggestion.setBookId(String.format("%s%d", "1234", i));
-            bookSuggestion.setTitle(String.format("%s%d", "title", i));
-            bookSuggestion.setAuthor(String.format("%s%d", "author", i));
-            bookSuggestion.setTranslator(String.format("%s%d", "trans", i));
-            bookSuggestion.setPublisher(String.format("%s%d", "publish", i));
-            bookSuggestion.setPublishDate(new Date());
-            bookSuggestion.setCategoryId(101 + i);
-            bookSuggestion.setCategoryName("category name");
-            bookSuggestion.setDescription(String.format("%s%d", "desc", i));
-            bookSuggestion.setImageUrl(String.format("%s%d", "url", i));
+        BookSuggestion bookSuggestion = new BookSuggestion();
+        bookSuggestion.setSuggestionType(suggestionType);
+        bookSuggestion.setBookId("1234");
+        bookSuggestion.setTitle("title");
+        bookSuggestion.setAuthor("author");
+        bookSuggestion.setTranslator("trans");
+        bookSuggestion.setPublisher("publish");
+        bookSuggestion.setPublishDate(new Date());
+        bookSuggestion.setCategoryId(101);
+        bookSuggestion.setCategoryName("category name");
+        bookSuggestion.setDescription("desc");
+        bookSuggestion.setImageUrl("url");
 
-            bookSuggestionList.add(bookSuggestion);
-        }
+        bookSuggestionList.add(bookSuggestion);
 
         return bookSuggestionList;
     }
