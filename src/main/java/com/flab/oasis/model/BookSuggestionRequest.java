@@ -16,7 +16,7 @@ public class BookSuggestionRequest implements BaseRequest, Serializable {
     private SuggestionType suggestionType;
 
     @Override
-    public String combineKeyWithUnderBar() {
+    public String generateEhCacheKey() {
         return String.format("%s_%s", uid, suggestionType);
     }
 }

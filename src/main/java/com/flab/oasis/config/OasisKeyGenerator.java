@@ -15,7 +15,7 @@ public class OasisKeyGenerator implements KeyGenerator {
         StringBuilder stringBuilder = new StringBuilder();
         for (Object obj : params) {
             if (obj instanceof BaseRequest) {
-                stringBuilder.append(((BaseRequest) obj).combineKeyWithUnderBar());
+                stringBuilder.append(((BaseRequest) obj).generateEhCacheKey());
             }
         }
 
