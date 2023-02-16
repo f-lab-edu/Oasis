@@ -49,7 +49,7 @@ class HomeControllerTest {
         SuggestionType suggestionType = SuggestionType.NEWBOOK;
 
         ObjectMapper objectMapper = new ObjectMapper();
-        BookSuggestionRequest bookSuggestionRequest = generateBookSuggestionRequest(uid, suggestionType);
+        BookSuggestionRequest bookSuggestionRequest = new BookSuggestionRequest(uid, suggestionType);
         List<BookSuggestion> bookSuggestionList = generateBookSuggestionList(suggestionType);
 
         BDDMockito.given(homeService.suggestion(bookSuggestionRequest)).willReturn(bookSuggestionList);
@@ -63,14 +63,6 @@ class HomeControllerTest {
         resultActions.andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(bookSuggestionList)));
 
-    }
-
-    private static BookSuggestionRequest generateBookSuggestionRequest(String uid, SuggestionType suggestionType) {
-        BookSuggestionRequest bookSuggestionRequest = new BookSuggestionRequest();
-        bookSuggestionRequest.setUid(uid);
-        bookSuggestionRequest.setSuggestionType(suggestionType);
-
-        return bookSuggestionRequest;
     }
 
     private static List<BookSuggestion> generateBookSuggestionList(SuggestionType suggestionType) {

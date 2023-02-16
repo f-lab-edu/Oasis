@@ -45,7 +45,7 @@ class HomeServiceTest {
                 .willReturn(generateBookSuggestionList(suggestionType, bookSuggestionCount));
 
         Assertions.assertEquals(
-                categoryCount, homeService.suggestion(generateBookSuggestionRequest(uid, suggestionType)).size()
+                categoryCount, homeService.suggestion(new BookSuggestionRequest(uid, suggestionType)).size()
         );
     }
 
@@ -63,16 +63,8 @@ class HomeServiceTest {
                 .willReturn(generateBookSuggestionList(suggestionType, bookSuggestionCount));
 
         Assertions.assertEquals(
-                bookSuggestionCount, homeService.suggestion(generateBookSuggestionRequest(uid, suggestionType)).size()
+                bookSuggestionCount, homeService.suggestion(new BookSuggestionRequest(uid, suggestionType)).size()
         );
-    }
-
-    private BookSuggestionRequest generateBookSuggestionRequest(String uid, SuggestionType suggestionType) {
-        BookSuggestionRequest bookSuggestionRequest = new BookSuggestionRequest();
-        bookSuggestionRequest.setUid(uid);
-        bookSuggestionRequest.setSuggestionType(SuggestionType.NEWBOOK);
-
-        return bookSuggestionRequest;
     }
 
     private List<BookSuggestion> generateBookSuggestionList(SuggestionType suggestionType, int bookSuggestionCount) {
