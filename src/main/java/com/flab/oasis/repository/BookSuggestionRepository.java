@@ -10,7 +10,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Objects;
+import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
@@ -20,13 +20,14 @@ public class BookSuggestionRepository {
     private final BookSuggestionMapper bookSuggestionMapper;
 
     public List<BookSuggestion> getBookSuggestionList(SuggestionType suggestionType) {
-        Object stringValue = redisTemplate.opsForValue().get(suggestionType);
-
-        if (Objects.isNull(stringValue)) {
-            return pushBookSuggestionToRedis(suggestionType);
-        }
-
-        return objectMapper.convertValue(stringValue, new TypeReference<List<BookSuggestion>>() {});
+        return objectMapper.convertValue(
+                Optional.ofNullable(
+                        redisTemplate.opsForValue().get(suggestionType)
+                ).orElse(
+                        pushBookSuggestionToRedis(suggestionType)
+                ),
+                new TypeReference<List<BookSuggestion>>() {}
+        );
     }
 
     private List<BookSuggestion> pushBookSuggestionToRedis(SuggestionType suggestionType) {
