@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class HomeService {
     private final BookSuggestionRepository bookSuggestionRepository;
-    private final UserCategoryMapper userMapper;
+    private final UserCategoryMapper userCategoryMapper;
 
     @Cacheable(cacheNames = "homeCache", keyGenerator = "oasisKeyGenerator", cacheManager = "ehCacheCacheManager")
     public List<BookSuggestion> suggestion(BookSuggestionRequest bookSuggestionRequest) {
@@ -30,7 +30,7 @@ public class HomeService {
 
     private List<BookSuggestion> getBookSuggestionListByUserCategory(
             String uid, List<BookSuggestion> bookSuggestionList) {
-        List<UserCategory> userCategory = userMapper.findUserCategoryByUid(uid);
+        List<UserCategory> userCategory = userCategoryMapper.findUserCategoryByUid(uid);
 
         if (userCategory.isEmpty()) {
             return bookSuggestionList;
