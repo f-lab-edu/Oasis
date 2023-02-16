@@ -15,7 +15,6 @@ import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.cache.ehcache.EhCacheCacheManager;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -32,23 +31,39 @@ class HomeServiceTest {
     @Mock
     UserCategoryMapper userCategoryMapper;
 
-    @Mock
-    EhCacheCacheManager ehCacheCacheManager;
-
-    @DisplayName("/home/suggestion request 결과 비교")
+    @DisplayName("User Category가 존재할 때")
     @Test
-    void suggestionTest() throws Exception {
+    void userCategoryExistTest() throws Exception {
         String uid = "test@naver.com";
         SuggestionType suggestionType = SuggestionType.NEWBOOK;
-        int categoryCount = 3;
+        int categoryCount = 1;
+        int bookSuggestionCount = 2;
 
         BDDMockito.given(userCategoryMapper.findUserCategoryByUid(uid))
                 .willReturn(generateUserCategory(uid, categoryCount));
         BDDMockito.given(bookSuggestionRepository.getBookSuggestionList(suggestionType))
-                .willReturn(generateBookSuggestionList(suggestionType));
+                .willReturn(generateBookSuggestionList(suggestionType, bookSuggestionCount));
 
         Assertions.assertEquals(
                 categoryCount, homeService.suggestion(generateBookSuggestionRequest(uid, suggestionType)).size()
+        );
+    }
+
+    @DisplayName("User Category가 존재하지 않을 때")
+    @Test
+    void userCategoryNotExistTest() throws Exception {
+        String uid = "test@naver.com";
+        SuggestionType suggestionType = SuggestionType.NEWBOOK;
+        int categoryCount = 0;
+        int bookSuggestionCount = 1;
+
+        BDDMockito.given(userCategoryMapper.findUserCategoryByUid(uid))
+                .willReturn(generateUserCategory(uid, categoryCount));
+        BDDMockito.given(bookSuggestionRepository.getBookSuggestionList(suggestionType))
+                .willReturn(generateBookSuggestionList(suggestionType, bookSuggestionCount));
+
+        Assertions.assertEquals(
+                bookSuggestionCount, homeService.suggestion(generateBookSuggestionRequest(uid, suggestionType)).size()
         );
     }
 
@@ -60,9 +75,9 @@ class HomeServiceTest {
         return bookSuggestionRequest;
     }
 
-    private List<BookSuggestion> generateBookSuggestionList(SuggestionType suggestionType) {
+    private List<BookSuggestion> generateBookSuggestionList(SuggestionType suggestionType, int bookSuggestionCount) {
         List<BookSuggestion> bookSuggestionList = new ArrayList<>();
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < bookSuggestionCount; i++) {
             BookSuggestion bookSuggestion = new BookSuggestion();
             bookSuggestion.setSuggestionType(suggestionType);
             bookSuggestion.setBookId(String.format("%s%d", "1234", i));
@@ -94,25 +109,4 @@ class HomeServiceTest {
 
         return userCategoryList;
     }
-
-//    @DisplayName("캐싱된 값과 실제 결과 값 비교")
-//    @Test
-//    void ehCacheTest() {
-//        String uid = "test@naver.com";
-//        SuggestionType suggestionType = SuggestionType.NEWBOOK;
-//        int categoryCount = 3;
-//
-//        BDDMockito.given(userCategoryMapper.findUserCategoryByUid(uid))
-//                .willReturn(generateUserCategoryMock(uid, categoryCount));
-//        BDDMockito.given(bookSuggestionRepository.getBookSuggestionList(suggestionType))
-//                .willReturn(generateBookSuggestionListMock(suggestionType));
-//
-//        List<BookSuggestion> expected =  homeService.suggestion(generateBookSuggestionRequest(uid, suggestionType));
-//
-//        SimpleValueWrapper actual =
-//                (SimpleValueWrapper) Objects.requireNonNull(ehCacheCacheManager.getCache("homeCache"))
-//                        .get(String.format("%s_%s_%s", "suggestion", uid, suggestionType));
-//
-//        Assertions.assertEquals(expected, Objects.requireNonNull(actual).get());
-//    }
 }
