@@ -17,7 +17,7 @@ import org.springframework.data.redis.cache.RedisCacheManager;
 import java.util.Objects;
 
 @SpringBootTest
-class ConnectionTest {
+class CommonTest {
 
     @Autowired
     RedisCacheManager redisCacheManager;
