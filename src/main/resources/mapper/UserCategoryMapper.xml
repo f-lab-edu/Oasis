@@ -3,22 +3,10 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.flab.oasis.mapper.UserCategoryMapper">
 
-    <insert id="insertUserCategory" parameterType="com.flab.oasis.model.UserCategory">
-        INSERT INTO USER_CATEGORY
-            (UID, CATEGORY_ID, CREATE_DATETIME, MODIFY_DATETIME)
-        VALUES
-            (#{uid}, #{categoryId}, NOW(), NOW())
-    </insert>
-
     <select id="findUserCategoryByUid" parameterType="java.lang.String" resultType="com.flab.oasis.model.UserCategory">
         SELECT UID, CATEGORY_ID AS categoryId
         FROM USER_CATEGORY
         WHERE UID=#{uid}
     </select>
-
-    <delete id="deleteUserCategoryByUid" parameterType="java.lang.String">
-        DELETE FROM USER_CATEGORY
-        WHERE UID=#{uid}
-    </delete>
 
 </mapper>
