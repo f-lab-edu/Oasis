@@ -33,7 +33,7 @@ class HomeServiceTest {
 
     @DisplayName("User Category가 존재할 때")
     @Test
-    void 유저_카테고리에_해당하는_카테고리만_반환하는지_확인() {
+    void 유저_카테고리에_해당하는_카테고리만_반환() {
         String uid = "test@naver.com";
         SuggestionType suggestionType = SuggestionType.NEWBOOK;
         int categoryCount = 1;
@@ -51,7 +51,7 @@ class HomeServiceTest {
 
     @DisplayName("User Category가 존재하지 않을 때")
     @Test
-    void 유저_카테고리가_없을_때_모든_카테고리를_반환하는지_확인() {
+    void 유저_카테고리가_없을_때_모든_카테고리를_반환() {
         String uid = "test@naver.com";
         SuggestionType suggestionType = SuggestionType.NEWBOOK;
         int categoryCount = 0;
