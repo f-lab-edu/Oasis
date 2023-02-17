@@ -50,7 +50,8 @@ class HomeServiceTest {
                 .willReturn(generateBookSuggestionList(suggestionType));
 
         Assertions.assertEquals(
-                1, homeService.suggestion(new BookSuggestionRequest(uid, suggestionType)).size()
+                userCategoryList.get(0).getCategoryId(),
+                homeService.suggestion(new BookSuggestionRequest(uid, suggestionType)).get(0).getCategoryId()
         );
     }
 
@@ -59,14 +60,16 @@ class HomeServiceTest {
     void 유저_카테고리가_없을_때_모든_카테고리를_반환() {
         String uid = "test@naver.com";
         SuggestionType suggestionType = SuggestionType.NEWBOOK;
+        List<BookSuggestion> bookSuggestionList = generateBookSuggestionList(suggestionType);
 
         BDDMockito.given(userCategoryMapper.findUserCategoryByUid(uid))
                 .willReturn(new ArrayList<>());
         BDDMockito.given(bookSuggestionRepository.getBookSuggestionList(suggestionType))
-                .willReturn(generateBookSuggestionList(suggestionType));
+                .willReturn(bookSuggestionList);
 
         Assertions.assertEquals(
-                1, homeService.suggestion(new BookSuggestionRequest(uid, suggestionType)).size()
+                bookSuggestionList.get(0).getCategoryId(),
+                homeService.suggestion(new BookSuggestionRequest(uid, suggestionType)).get(0).getCategoryId()
         );
     }
 
