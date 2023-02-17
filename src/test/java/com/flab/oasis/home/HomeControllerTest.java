@@ -42,7 +42,7 @@ class HomeControllerTest {
 
     @DisplayName("/home/suggestion POST 요청")
     @Test
-    void response된_값과_실제값_비교() throws Exception {
+    void testRequestSuggestion() throws Exception {
         String uid = "test@naver.com";
         SuggestionType suggestionType = SuggestionType.NEWBOOK;
 
