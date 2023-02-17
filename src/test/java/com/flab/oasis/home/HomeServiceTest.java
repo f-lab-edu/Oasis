@@ -36,16 +36,21 @@ class HomeServiceTest {
     void 유저_카테고리에_해당하는_카테고리만_반환() {
         String uid = "test@naver.com";
         SuggestionType suggestionType = SuggestionType.NEWBOOK;
-        int categoryCount = 1;
-        int bookSuggestionCount = 2;
+
+        List<UserCategory> userCategoryList = new ArrayList<>();
+        UserCategory userCategory = new UserCategory();
+        userCategory.setUid(uid);
+        userCategory.setCategoryId(101);
+
+        userCategoryList.add(userCategory);
 
         BDDMockito.given(userCategoryMapper.findUserCategoryByUid(uid))
-                .willReturn(generateUserCategory(uid, categoryCount));
+                .willReturn(userCategoryList);
         BDDMockito.given(bookSuggestionRepository.getBookSuggestionList(suggestionType))
-                .willReturn(generateBookSuggestionList(suggestionType, bookSuggestionCount));
+                .willReturn(generateBookSuggestionList(suggestionType));
 
         Assertions.assertEquals(
-                categoryCount, homeService.suggestion(new BookSuggestionRequest(uid, suggestionType)).size()
+                1, homeService.suggestion(new BookSuggestionRequest(uid, suggestionType)).size()
         );
     }
 
@@ -54,51 +59,34 @@ class HomeServiceTest {
     void 유저_카테고리가_없을_때_모든_카테고리를_반환() {
         String uid = "test@naver.com";
         SuggestionType suggestionType = SuggestionType.NEWBOOK;
-        int categoryCount = 0;
-        int bookSuggestionCount = 1;
 
         BDDMockito.given(userCategoryMapper.findUserCategoryByUid(uid))
-                .willReturn(generateUserCategory(uid, categoryCount));
+                .willReturn(new ArrayList<>());
         BDDMockito.given(bookSuggestionRepository.getBookSuggestionList(suggestionType))
-                .willReturn(generateBookSuggestionList(suggestionType, bookSuggestionCount));
+                .willReturn(generateBookSuggestionList(suggestionType));
 
         Assertions.assertEquals(
-                bookSuggestionCount, homeService.suggestion(new BookSuggestionRequest(uid, suggestionType)).size()
+                1, homeService.suggestion(new BookSuggestionRequest(uid, suggestionType)).size()
         );
     }
 
-    private List<BookSuggestion> generateBookSuggestionList(SuggestionType suggestionType, int bookSuggestionCount) {
+    private static List<BookSuggestion> generateBookSuggestionList(SuggestionType suggestionType) {
         List<BookSuggestion> bookSuggestionList = new ArrayList<>();
-        for (int i = 0; i < bookSuggestionCount; i++) {
-            BookSuggestion bookSuggestion = new BookSuggestion();
-            bookSuggestion.setSuggestionType(suggestionType);
-            bookSuggestion.setBookId(String.format("%s%d", "1234", i));
-            bookSuggestion.setTitle(String.format("%s%d", "title", i));
-            bookSuggestion.setAuthor(String.format("%s%d", "author", i));
-            bookSuggestion.setTranslator(String.format("%s%d", "trans", i));
-            bookSuggestion.setPublisher(String.format("%s%d", "publish", i));
-            bookSuggestion.setPublishDate(new Date());
-            bookSuggestion.setCategoryId(101 + i);
-            bookSuggestion.setCategoryName("category name");
-            bookSuggestion.setDescription(String.format("%s%d", "desc", i));
-            bookSuggestion.setImageUrl(String.format("%s%d", "url", i));
+        BookSuggestion bookSuggestion = new BookSuggestion();
+        bookSuggestion.setSuggestionType(suggestionType);
+        bookSuggestion.setBookId("1234");
+        bookSuggestion.setTitle("title");
+        bookSuggestion.setAuthor("author");
+        bookSuggestion.setTranslator("trans");
+        bookSuggestion.setPublisher("publish");
+        bookSuggestion.setPublishDate(new Date());
+        bookSuggestion.setCategoryId(101);
+        bookSuggestion.setCategoryName("category name");
+        bookSuggestion.setDescription("desc");
+        bookSuggestion.setImageUrl("url");
 
-            bookSuggestionList.add(bookSuggestion);
-        }
+        bookSuggestionList.add(bookSuggestion);
 
         return bookSuggestionList;
-    }
-
-    private List<UserCategory> generateUserCategory(String uid, int categoryCount) {
-        List<UserCategory> userCategoryList = new ArrayList<>();
-        for (int i = 0; i < categoryCount; i++) {
-            UserCategory userCategory = new UserCategory();
-            userCategory.setUid(uid);
-            userCategory.setCategoryId(101 + i);
-
-            userCategoryList.add(userCategory);
-        }
-
-        return userCategoryList;
     }
 }
