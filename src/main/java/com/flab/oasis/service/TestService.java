@@ -16,8 +16,13 @@ public class TestService {
         return testMapper.dbConnectionTest();
     }
 
-    @Cacheable(cacheNames = "testCache")
-    public Book cacheTest() {
+    @Cacheable(cacheNames = "testCache", cacheManager = "ehCacheCacheManager")
+    public Book ehCacheTest() {
+        return testMapper.cacheTest();
+    }
+
+    @Cacheable(cacheNames = "testCache", cacheManager = "redisCacheManager")
+    public Book redisCacheTest() {
         return testMapper.cacheTest();
     }
 }

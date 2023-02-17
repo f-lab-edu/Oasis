@@ -1,46 +1,95 @@
 package com.flab.oasis.home;
 
-import com.flab.oasis.mapper.home.HomeMapper;
-import com.flab.oasis.model.Book;
-import com.flab.oasis.model.home.BookSuggestion;
-import com.flab.oasis.service.home.HomeService;
 import com.flab.oasis.constant.SuggestionType;
+import com.flab.oasis.mapper.UserCategoryMapper;
+import com.flab.oasis.model.BookSuggestion;
+import com.flab.oasis.model.BookSuggestionRequest;
+import com.flab.oasis.model.UserCategory;
+import com.flab.oasis.repository.BookSuggestionRepository;
+import com.flab.oasis.service.HomeService;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.cache.Cache;
-import org.springframework.cache.CacheManager;
-import org.springframework.cache.support.SimpleValueWrapper;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.BDDMockito;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class HomeServiceTest {
-    @Autowired
+    @InjectMocks
     HomeService homeService;
 
-    @Autowired
-    HomeMapper homeMapper;
+    @Mock
+    BookSuggestionRepository bookSuggestionRepository;
 
-    @Resource
-    CacheManager cacheManager;
+    @Mock
+    UserCategoryMapper userCategoryMapper;
 
+    @DisplayName("User Category가 존재할 때")
     @Test
-    void ehCacheTest() {
-        List<BookSuggestion> bookList =  homeService.suggestion(
-                "test@naver.com", SuggestionType.valueOf("newBook".toUpperCase())
+    void testSuggestionExistUserCategory() {
+        String uid = "test@naver.com";
+        SuggestionType suggestionType = SuggestionType.NEWBOOK;
+
+        List<UserCategory> userCategoryList = new ArrayList<>();
+        UserCategory userCategory = new UserCategory();
+        userCategory.setUid(uid);
+        userCategory.setCategoryId(101);
+
+        userCategoryList.add(userCategory);
+
+        BDDMockito.given(userCategoryMapper.findUserCategoryByUid(uid))
+                .willReturn(userCategoryList);
+        BDDMockito.given(bookSuggestionRepository.getBookSuggestionList(suggestionType))
+                .willReturn(generateBookSuggestionList(suggestionType));
+
+        Assertions.assertEquals(
+                userCategoryList.get(0).getCategoryId(),
+                homeService.suggestion(new BookSuggestionRequest(uid, suggestionType)).get(0).getCategoryId()
         );
+    }
 
-        Cache cache = cacheManager.getCache("homeCache");
+    @DisplayName("User Category가 존재하지 않을 때")
+    @Test
+    void testSuggestionNotExistUserCategory() {
+        String uid = "test@naver.com";
+        SuggestionType suggestionType = SuggestionType.NEWBOOK;
+        List<BookSuggestion> bookSuggestionList = generateBookSuggestionList(suggestionType);
 
-        Assertions.assertNotNull(cache);
+        BDDMockito.given(userCategoryMapper.findUserCategoryByUid(uid))
+                .willReturn(new ArrayList<>());
+        BDDMockito.given(bookSuggestionRepository.getBookSuggestionList(suggestionType))
+                .willReturn(bookSuggestionList);
 
-        Object bookCache = cache.get(
-                "suggestion_test@naver.com_" + SuggestionType.valueOf("newBook".toUpperCase()).toString()
+        Assertions.assertEquals(
+                bookSuggestionList.get(0).getCategoryId(),
+                homeService.suggestion(new BookSuggestionRequest(uid, suggestionType)).get(0).getCategoryId()
         );
+    }
 
-        Assertions.assertEquals(bookList, ((SimpleValueWrapper) bookCache).get());
+    private static List<BookSuggestion> generateBookSuggestionList(SuggestionType suggestionType) {
+        List<BookSuggestion> bookSuggestionList = new ArrayList<>();
+        BookSuggestion bookSuggestion = new BookSuggestion();
+        bookSuggestion.setSuggestionType(suggestionType);
+        bookSuggestion.setBookId("1234");
+        bookSuggestion.setTitle("title");
+        bookSuggestion.setAuthor("author");
+        bookSuggestion.setTranslator("trans");
+        bookSuggestion.setPublisher("publish");
+        bookSuggestion.setPublishDate(new Date());
+        bookSuggestion.setCategoryId(101);
+        bookSuggestion.setCategoryName("category name");
+        bookSuggestion.setDescription("desc");
+        bookSuggestion.setImageUrl("url");
+
+        bookSuggestionList.add(bookSuggestion);
+
+        return bookSuggestionList;
     }
 }

@@ -1,10 +1,8 @@
-package com.flab.oasis.controller.home;
+package com.flab.oasis.controller;
 
-import com.flab.oasis.model.Book;
-import com.flab.oasis.model.home.BookSuggestion;
-import com.flab.oasis.model.home.BookSuggestionRequest;
-import com.flab.oasis.service.home.HomeService;
-import com.flab.oasis.constant.SuggestionType;
+import com.flab.oasis.model.BookSuggestion;
+import com.flab.oasis.model.BookSuggestionRequest;
+import com.flab.oasis.service.HomeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -12,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/home")
@@ -21,7 +18,7 @@ public class HomeController {
     private final HomeService homeService;
 
     @PostMapping("/suggestion")
-    public List<BookSuggestion> bookSuggestion(@RequestBody BookSuggestionRequest request) {
-        return homeService.suggestion(request.getUid(), request.getSuggestionType());
+    public List<BookSuggestion> bookSuggestion(@RequestBody BookSuggestionRequest bookSuggestionRequest) {
+        return homeService.suggestion(bookSuggestionRequest);
     }
 }

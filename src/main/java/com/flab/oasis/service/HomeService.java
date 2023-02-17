@@ -1,10 +1,10 @@
-package com.flab.oasis.service.home;
+package com.flab.oasis.service;
 
-import com.flab.oasis.constant.SuggestionType;
-import com.flab.oasis.mapper.home.HomeMapper;
-import com.flab.oasis.model.home.BookSuggestion;
-import com.flab.oasis.model.home.UserCategory;
-import com.flab.oasis.repository.home.BookSuggestionRepository;
+import com.flab.oasis.mapper.UserCategoryMapper;
+import com.flab.oasis.model.BookSuggestion;
+import com.flab.oasis.model.BookSuggestionRequest;
+import com.flab.oasis.model.UserCategory;
+import com.flab.oasis.repository.BookSuggestionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -18,19 +18,19 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class HomeService {
     private final BookSuggestionRepository bookSuggestionRepository;
-    private final HomeMapper homeMapper;
+    private final UserCategoryMapper userCategoryMapper;
 
-    @Cacheable(cacheNames = "homeCache", keyGenerator = "oasisKeyGenerator")
-    public List<BookSuggestion> suggestion(String uid, SuggestionType suggestionType) {
+    @Cacheable(cacheNames = "homeCache", keyGenerator = "oasisKeyGenerator", cacheManager = "ehCacheCacheManager")
+    public List<BookSuggestion> suggestion(BookSuggestionRequest bookSuggestionRequest) {
         return getBookSuggestionListByUserCategory(
-                uid,
-                bookSuggestionRepository.getBookSuggestionList(suggestionType)
+                bookSuggestionRequest.getUid(),
+                bookSuggestionRepository.getBookSuggestionList(bookSuggestionRequest.getSuggestionType())
         );
     }
 
     private List<BookSuggestion> getBookSuggestionListByUserCategory(
             String uid, List<BookSuggestion> bookSuggestionList) {
-        List<UserCategory> userCategory = homeMapper.findUserCategoryByUid(uid);
+        List<UserCategory> userCategory = userCategoryMapper.findUserCategoryByUid(uid);
 
         if (userCategory.isEmpty()) {
             return bookSuggestionList;
@@ -41,7 +41,6 @@ public class HomeService {
 
             return bookList;
         }
-
     }
 
     private static Map<Integer, List<BookSuggestion>> groupByCategoryId(List<BookSuggestion> bookSuggestionList) {
