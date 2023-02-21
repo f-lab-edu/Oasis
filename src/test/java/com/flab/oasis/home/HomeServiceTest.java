@@ -46,7 +46,7 @@ class HomeServiceTest {
 
         BDDMockito.given(userCategoryMapper.findUserCategoryByUid(uid))
                 .willReturn(userCategoryList);
-        BDDMockito.given(bookSuggestionRepository.getBookSuggestionList(suggestionType))
+        BDDMockito.given(bookSuggestionRepository.getBookSuggestionListBySuggestionType(suggestionType))
                 .willReturn(generateBookSuggestionList(suggestionType));
 
         Assertions.assertEquals(
@@ -66,7 +66,7 @@ class HomeServiceTest {
 
         BDDMockito.given(userCategoryMapper.findUserCategoryByUid(uid))
                 .willReturn(new ArrayList<>());
-        BDDMockito.given(bookSuggestionRepository.getBookSuggestionList(suggestionType))
+        BDDMockito.given(bookSuggestionRepository.getBookSuggestionListBySuggestionType(suggestionType))
                 .willReturn(bookSuggestionList);
 
         Assertions.assertEquals(
