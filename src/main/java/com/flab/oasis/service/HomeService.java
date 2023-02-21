@@ -21,7 +21,8 @@ public class HomeService {
     private final UserCategoryMapper userCategoryMapper;
 
     @Cacheable(cacheNames = "homeCache", keyGenerator = "oasisKeyGenerator", cacheManager = "ehCacheCacheManager")
-    public List<BookSuggestion> suggestion(BookSuggestionRequest bookSuggestionRequest) {
+    public List<BookSuggestion> getBookSuggestionListByBookSuggestionRequest(
+            BookSuggestionRequest bookSuggestionRequest) {
         return getBookSuggestionListByUserCategory(
                 bookSuggestionRequest.getUid(),
                 bookSuggestionRepository.getBookSuggestionList(bookSuggestionRequest.getSuggestionType())

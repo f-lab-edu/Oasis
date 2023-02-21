@@ -51,7 +51,9 @@ class HomeServiceTest {
 
         Assertions.assertEquals(
                 userCategoryList.get(0).getCategoryId(),
-                homeService.suggestion(new BookSuggestionRequest(uid, suggestionType)).get(0).getCategoryId()
+                homeService.getBookSuggestionListByBookSuggestionRequest(
+                        new BookSuggestionRequest(uid, suggestionType)
+                ).get(0).getCategoryId()
         );
     }
 
@@ -69,7 +71,9 @@ class HomeServiceTest {
 
         Assertions.assertEquals(
                 bookSuggestionList.get(0).getCategoryId(),
-                homeService.suggestion(new BookSuggestionRequest(uid, suggestionType)).get(0).getCategoryId()
+                homeService.getBookSuggestionListByBookSuggestionRequest(
+                        new BookSuggestionRequest(uid, suggestionType)
+                ).get(0).getCategoryId()
         );
     }
 
