@@ -33,7 +33,7 @@ public class TokenInterceptor implements HandlerInterceptor {
         if (jwtHeader != null && jwtHeader.startsWith("Bearer ")) {
             try {
                 DecodedJWT decodedJWT = jwtService.decodeJWT(jwtHeader.substring(7));
-                if (!jwtService.checkTokenInfoExistInDB(decodedJWT)) {
+                if (jwtService.checkTokenInfoExistInDB(decodedJWT)) {
                     response.sendError(404, "Access Token ID doesn't exist in DB.");
                 }
 
