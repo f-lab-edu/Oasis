@@ -4,6 +4,7 @@ import com.auth0.jwt.exceptions.InvalidClaimException;
 import com.auth0.jwt.exceptions.SignatureVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.flab.oasis.constant.ErrorCode;
 import com.flab.oasis.service.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -36,16 +37,16 @@ public class TokenInterceptor implements HandlerInterceptor {
 
                 if (jwtService.checkTokenInfoExistInDB(decodedJWT)) {
                     System.out.printf("Access Token ID doesn't exist in DB. - %s\n", decodedJWT.getId());
-                    response.sendError(404, "Access Token ID doesn't exist in DB.");
+                    response.sendError(ErrorCode.NOT_FOUND.getCode(), "Access Token ID doesn't exist in DB.");
                 }
 
                 return true;
             } catch (TokenExpiredException e) {
                 System.out.printf("Access Token is Expired - %s\n", jwtHeader.substring(7));
-                response.sendError(205, "Access Token is Expired.");
+                response.sendError(ErrorCode.RESET_CONTENT.getCode(), "Access Token is Expired.");
             } catch (SignatureVerificationException | InvalidClaimException e) {
                 System.out.printf("Invalid Access Token - %s\n", jwtHeader.substring(7));
-                response.sendError(401, "Invalid Access Token.");
+                response.sendError(ErrorCode.UNAUTHORIZED.getCode(), "Invalid Access Token.");
             }
         }
 
