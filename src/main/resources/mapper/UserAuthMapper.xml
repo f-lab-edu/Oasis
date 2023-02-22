@@ -8,7 +8,6 @@
             PASSWORD,
             SALT,
             SOCIAL_YN     AS socialYN,
-            ACCESS_TOKEN  AS accessToken,
             REFRESH_TOKEN AS refreshToken
         FROM USER_AUTH
         WHERE UID = #{uid}
@@ -20,7 +19,6 @@
                PASSWORD,
                SALT,
                SOCIAL_YN     AS socialYN,
-               ACCESS_TOKEN  AS accessToken,
                REFRESH_TOKEN AS refreshToken
             FROM USER_AUTH
             WHERE UID = #{uid}) AS result
@@ -33,7 +31,6 @@
                 PASSWORD,
                 SALT,
                 SOCIAL_YN     AS socialYN,
-                ACCESS_TOKEN  AS accessToken,
                 REFRESH_TOKEN AS refreshToken
             FROM USER_AUTH
             WHERE UID = #{uid} AND REFRESH_TOKEN = #{refreshToken}) AS result
