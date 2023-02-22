@@ -56,6 +56,16 @@ public class JwtService {
         }
     }
 
+    public DecodedJWT decodeJWT(String token)
+            throws TokenExpiredException, SignatureVerificationException, InvalidClaimException {
+        Algorithm algorithm = Algorithm.HMAC256(JwtProperty.SECRET_KEY);
+        JWTVerifier verifier = JWT.require(algorithm)
+                .withIssuer(JwtProperty.ISSUER)
+                .build();
+
+        return verifier.verify(token);
+    }
+
     private String generateToken(String uid, String subject) {
         Algorithm algorithm = Algorithm.HMAC256(JwtProperty.SECRET_KEY);
         Date issueDate = new Date();
@@ -69,16 +79,6 @@ public class JwtService {
                 .withIssuedAt(issueDate)
                 .withExpiresAt(new Date(issueDate.getTime() + expireTime))
                 .sign(algorithm);
-    }
-
-    public DecodedJWT decodeJWT(String token)
-            throws TokenExpiredException, SignatureVerificationException, InvalidClaimException {
-        Algorithm algorithm = Algorithm.HMAC256(JwtProperty.SECRET_KEY);
-        JWTVerifier verifier = JWT.require(algorithm)
-                .withIssuer(JwtProperty.ISSUER)
-                .build();
-
-        return verifier.verify(token);
     }
 
     public boolean validateToken(DecodedJWT decodedJWT) {
