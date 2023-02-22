@@ -33,15 +33,19 @@ public class TokenInterceptor implements HandlerInterceptor {
         if (jwtHeader != null && jwtHeader.startsWith("Bearer ")) {
             try {
                 DecodedJWT decodedJWT = jwtService.decodeJWT(jwtHeader.substring(7));
+
                 if (jwtService.checkTokenInfoExistInDB(decodedJWT)) {
+                    System.out.printf("Access Token ID doesn't exist in DB. - %s\n", decodedJWT.getId());
                     response.sendError(404, "Access Token ID doesn't exist in DB.");
                 }
 
                 return true;
             } catch (TokenExpiredException e) {
+                System.out.printf("Access Token is Expired - %s\n", jwtHeader.substring(7));
                 response.sendError(205, "Access Token is Expired.");
             } catch (SignatureVerificationException | InvalidClaimException e) {
-                response.sendError(401, "Invalid Refresh Token.");
+                System.out.printf("Invalid Access Token - %s\n", jwtHeader.substring(7));
+                response.sendError(401, "Invalid Access Token.");
             }
         }
 

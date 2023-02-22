@@ -41,17 +41,22 @@ public class JwtService {
             DecodedJWT decodedJWT = decodeJWT(refreshToken);
 
             if (checkTokenInfoExistInDB(decodedJWT)) {
+                System.out.printf("Refresh Token doesn't exist in DB - %s", refreshToken);
                 throw new AuthorizationException("Refresh Token doesn't exist in DB.");
             }
 
+            // refresh token 만료 1일 전이면 토큰을 새로 발급한다.
             if (willExpire(decodedJWT)) {
                 return createJwtToken(decodedJWT.getId());
             }
 
+            // 유효한 refresh token이면 access token만 새로 발급한다.
             return new JwtToken(generateToken(decodedJWT.getId(), ACCESS_TOKEN), refreshToken);
         } catch (TokenExpiredException e) {
+            System.out.printf("Refresh Token is Expired - %s\n", refreshToken);
             throw new AuthorizationException("Refresh Token is Expired.");
         } catch (SignatureVerificationException | InvalidClaimException e) {
+            System.out.printf("Invalid Refresh Token. - %s\n", refreshToken);
             throw new AuthorizationException("Invalid Refresh Token.");
         }
     }

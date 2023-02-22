@@ -24,6 +24,10 @@ public class UserAuthService {
         UserAuth userAuth = userAuthMapper.getUserAuthByUid(userLoginRequest.getUid());
 
         if (!userAuth.getPassword().equals(hashingPassword)) {
+            System.out.printf(
+                    "Password doesn't match - uid : %s - password : %s",
+                    userLoginRequest.getUid(), userLoginRequest.getPassword()
+            );
             throw new AuthorizationException("Password doesn't match.");
         }
 
@@ -34,7 +38,7 @@ public class UserAuthService {
         try {
             MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
 
-            // password에 salt 더하여 key-stretch를 3회 반복한다.
+            // password에 salt를 더하며 key-stretch를 3회 반복한다.
             for (int i = 0; i < 3; i++) {
                 String passwordSalt = password + salt;
                 messageDigest.update(passwordSalt.getBytes());
