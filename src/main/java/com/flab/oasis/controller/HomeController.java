@@ -18,7 +18,8 @@ public class HomeController {
     private final HomeService homeService;
 
     @PostMapping("/suggestion")
-    public List<BookSuggestion> bookSuggestion(@RequestBody BookSuggestionRequest bookSuggestionRequest) {
-        return homeService.suggestion(bookSuggestionRequest);
+    public List<BookSuggestion> getBookSuggestionListByBookSuggestionRequest(
+            @RequestBody BookSuggestionRequest bookSuggestionRequest) {
+        return homeService.getBookSuggestionListByBookSuggestionRequest(bookSuggestionRequest);
     }
 }

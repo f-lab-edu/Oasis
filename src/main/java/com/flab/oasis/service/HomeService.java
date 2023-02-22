@@ -21,10 +21,13 @@ public class HomeService {
     private final UserCategoryMapper userCategoryMapper;
 
     @Cacheable(cacheNames = "homeCache", keyGenerator = "oasisKeyGenerator", cacheManager = "ehCacheCacheManager")
-    public List<BookSuggestion> suggestion(BookSuggestionRequest bookSuggestionRequest) {
+    public List<BookSuggestion> getBookSuggestionListByBookSuggestionRequest(
+            BookSuggestionRequest bookSuggestionRequest) {
         return getBookSuggestionListByUserCategory(
                 bookSuggestionRequest.getUid(),
-                bookSuggestionRepository.getBookSuggestionList(bookSuggestionRequest.getSuggestionType())
+                bookSuggestionRepository.getBookSuggestionListBySuggestionType(
+                        bookSuggestionRequest.getSuggestionType()
+                )
         );
     }
 
@@ -43,7 +46,7 @@ public class HomeService {
         }
     }
 
-    private static Map<Integer, List<BookSuggestion>> groupByCategoryId(List<BookSuggestion> bookSuggestionList) {
+    private Map<Integer, List<BookSuggestion>> groupByCategoryId(List<BookSuggestion> bookSuggestionList) {
         return bookSuggestionList.stream().collect(Collectors.groupingBy(BookSuggestion::getCategoryId));
     }
 }

@@ -19,7 +19,7 @@ public class BookSuggestionRepository {
     private final ObjectMapper objectMapper;
     private final BookSuggestionMapper bookSuggestionMapper;
 
-    public List<BookSuggestion> getBookSuggestionList(SuggestionType suggestionType) {
+    public List<BookSuggestion> getBookSuggestionListBySuggestionType(SuggestionType suggestionType) {
         return objectMapper.convertValue(
                 Optional.ofNullable(
                         redisTemplate.opsForValue().get(suggestionType)
