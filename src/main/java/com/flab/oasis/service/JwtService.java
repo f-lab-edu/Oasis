@@ -1,59 +1,97 @@
 package com.flab.oasis.service;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.InvalidClaimException;
+import com.auth0.jwt.exceptions.SignatureVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.flab.oasis.constant.JwtExpiredState;
+import com.flab.oasis.constant.JwtProperty;
 import com.flab.oasis.mapper.UserAuthMapper;
 import com.flab.oasis.model.JwtToken;
+import com.flab.oasis.model.UserAuth;
+import com.flab.oasis.model.exception.AuthorizationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.Date;
 
 @Service
 @RequiredArgsConstructor
 public class JwtService {
     private final UserAuthMapper userAuthMapper;
 
-    public JwtToken createJwtToken(String uid) {
-        // 신규 토큰을 발급한다.
-        // 발급된 토큰의 refresh token은 UserAuth 테이블에 반영한다. -> userAuthMapper.updateRefreshToken() 호출
+    private static final String ACCESS_TOKEN = "AccessToken";
+    private static final String REFRESH_TOKEN = "RefreshToken";
 
-        return null;
+    public JwtToken createJwtToken(String uid) {
+        String accessToken = generateToken(uid, ACCESS_TOKEN);
+        String refreshToken = generateToken(uid, REFRESH_TOKEN);
+
+        userAuthMapper.updateRefreshToken(
+                UserAuth.builder().uid(uid).refreshToken(refreshToken).build()
+        );
+
+        return new JwtToken(accessToken, refreshToken);
     }
 
     public JwtToken reissueJwtToken(String refreshToken) {
-        // Refresh Token을 decode한다.
-        // Refresh Token이 유효한지 검사한다. -> validateToken() 호출
-        // Refresh Token이 만료되었는지 확인한다. -> isExpired() 호출
-        // isExpired의 결과가 WILL_EXPIRED면 토큰을 신규 발급한다. -> createJwtToken() 호출
-        // isExpired의 결과가 NOT_EXPIRED면, Access Token을 신규 발급한다. -> generateToken() 호출
-        // isExpired의 결과가 EXPIRED면 TokenExpiredException을 던진다.
+        try {
+            DecodedJWT decodedJWT = decodeJWT(refreshToken);
 
-        return null;
+            if (!validateToken(decodedJWT)) {
+                throw new AuthorizationException("Refresh Token doesn't exist.");
+            }
+
+            if (willExpire(decodedJWT)) {
+                return createJwtToken(decodedJWT.getId());
+            }
+
+            return new JwtToken(generateToken(decodedJWT.getId(), ACCESS_TOKEN), refreshToken);
+        } catch (TokenExpiredException e) {
+            throw new AuthorizationException("Refresh Token is Expired.");
+        } catch (SignatureVerificationException | InvalidClaimException e) {
+            throw new AuthorizationException("Invalid Refresh Token.");
+        }
     }
 
-    private String generateToken(String uid, String subject, int expireTime) {
-        // token을 발급한다.
-        // jti(JWI ID)는 uid다.
-        // sub(subject)는 AccessToken 또는 RefreshToken이다.
-        return null;
+    private String generateToken(String uid, String subject) {
+        Algorithm algorithm = Algorithm.HMAC256(JwtProperty.SECRET_KEY);
+        Date issueDate = new Date();
+        int expireTime = subject.equals(ACCESS_TOKEN) ?
+                JwtProperty.ACCESS_TOKEN_EXPIRE_TIME : JwtProperty.REFRESH_TOKEN_EXPIRE_TIME;
+
+        return JWT.create()
+                .withIssuer(JwtProperty.ISSUER)
+                .withJWTId(uid)
+                .withSubject(subject)
+                .withIssuedAt(issueDate)
+                .withExpiresAt(new Date(issueDate.getTime() + expireTime))
+                .sign(algorithm);
     }
 
-    private DecodedJWT decodeJWT(String token) throws TokenExpiredException {
-        return null;
+    public DecodedJWT decodeJWT(String token)
+            throws TokenExpiredException, SignatureVerificationException, InvalidClaimException {
+        Algorithm algorithm = Algorithm.HMAC256(JwtProperty.SECRET_KEY);
+        JWTVerifier verifier = JWT.require(algorithm)
+                .withIssuer(JwtProperty.ISSUER)
+                .build();
+
+        return verifier.verify(token);
     }
 
     public boolean validateToken(DecodedJWT decodedJWT) {
-        // Token payload의 issuer가 유효한지 확인한다.
-        // Token payload의 subject가 Access Token이면 jit에 해당하는 정보가 USER_AUTH 테이블에 존재하는지 확인한다. -> userAuthMapper.existUserAuthByUid() 호출
-        // Token payload의 subject가 Refresh Token이면 jit와 refresh token이 USER_AUTH 테이블에 존재하는지 확인한다. -> userAuthMapper.existUserAuthByUidAndRefreshToken() 호출
-        // 위 조건들에 해당하지 않으면 AuthorizationException을 던진다.
-        return true;
+        if (decodedJWT.getSubject().equals(ACCESS_TOKEN)) {
+            return userAuthMapper.existUserAuthByUid(decodedJWT.getId());
+        }
+
+        return userAuthMapper.existUserAuthByUidAndRefreshToken(
+                UserAuth.builder().uid(decodedJWT.getId()).refreshToken(decodedJWT.getToken()).build()
+        );
     }
 
-    public JwtExpiredState isExpired(DecodedJWT decodedJWT) {
-        // Token payload의 subject에 해당하는 token의 만료여부를 검사한다.
-        // subject가 Refresh Token이고, NOT_EXPIRED면 만료 1일 전인지 확인한다.
-        // 만료 1일 전이면 WILL_EXPIRED를 반환한다.
-        return JwtExpiredState.NOT_EXPIRED;
+    private boolean willExpire(DecodedJWT decodedJWT) {
+        return (decodedJWT.getExpiresAt().getTime() - new Date().getTime()) < JwtProperty.REFRESH_TOKEN_REISSUE_TIME;
     }
 }
