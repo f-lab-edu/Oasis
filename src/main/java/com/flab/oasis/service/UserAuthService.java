@@ -19,9 +19,8 @@ public class UserAuthService {
     private final JwtService jwtService;
 
     public JwtToken loginAuthFromUserLoginRequest(UserLoginRequest userLoginRequest) {
-        String salt = String.valueOf(new Date().getTime());
-        String hashingPassword = hashingPassword(userLoginRequest.getPassword(), salt);
         UserAuth userAuth = userAuthMapper.getUserAuthByUid(userLoginRequest.getUid());
+        String hashingPassword = hashingPassword(userLoginRequest.getPassword(), userAuth.getSalt());
 
         if (!userAuth.getPassword().equals(hashingPassword)) {
             System.out.printf(
