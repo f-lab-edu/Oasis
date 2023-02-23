@@ -71,6 +71,16 @@ public class JwtService {
         return verifier.verify(token);
     }
 
+    public boolean checkTokenInfoExistInDB(DecodedJWT decodedJWT) {
+        if (decodedJWT.getSubject().equals(ACCESS_TOKEN)) {
+            return !userAuthMapper.existUserAuthByUid(decodedJWT.getId());
+        }
+
+        return !userAuthMapper.existUserAuthByUidAndRefreshToken(
+                UserAuth.builder().uid(decodedJWT.getId()).refreshToken(decodedJWT.getToken()).build()
+        );
+    }
+
     private String generateToken(String uid, String subject) {
         Algorithm algorithm = Algorithm.HMAC256(JwtProperty.SECRET_KEY);
         Date issueDate = new Date();
@@ -84,16 +94,6 @@ public class JwtService {
                 .withIssuedAt(issueDate)
                 .withExpiresAt(new Date(issueDate.getTime() + expireTime))
                 .sign(algorithm);
-    }
-
-    public boolean checkTokenInfoExistInDB(DecodedJWT decodedJWT) {
-        if (decodedJWT.getSubject().equals(ACCESS_TOKEN)) {
-            return !userAuthMapper.existUserAuthByUid(decodedJWT.getId());
-        }
-
-        return !userAuthMapper.existUserAuthByUidAndRefreshToken(
-                UserAuth.builder().uid(decodedJWT.getId()).refreshToken(decodedJWT.getToken()).build()
-        );
     }
 
     private boolean willExpire(DecodedJWT decodedJWT) {
