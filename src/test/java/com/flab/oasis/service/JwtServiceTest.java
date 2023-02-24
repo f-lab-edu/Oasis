@@ -92,7 +92,7 @@ class JwtServiceTest {
 
     @DisplayName("만료된 토큰일 경우")
     @Test
-    void testDecodeJwtThrowExpired() throws InterruptedException {
+    void testDecodeJwtThrowExpired() {
         Algorithm algorithm = Algorithm.HMAC256(JwtProperty.SECRET_KEY);
         Date issueDate = new Date();
 
@@ -101,8 +101,6 @@ class JwtServiceTest {
                 .withIssuedAt(issueDate)
                 .withExpiresAt(new Date(issueDate.getTime() + 1))
                 .sign(algorithm);
-
-        Thread.sleep(1);
 
         Assertions.assertThrows(TokenExpiredException.class, () -> jwtService.decodeJWT(accessToken));
     }
