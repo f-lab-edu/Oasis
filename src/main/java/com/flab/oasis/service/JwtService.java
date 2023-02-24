@@ -38,7 +38,7 @@ public class JwtService {
 
     public JwtToken reissueJwtToken(String refreshToken) {
         try {
-            DecodedJWT decodedJWT = decodeJWT(refreshToken);
+            DecodedJWT decodedJWT = verifyJwt(refreshToken);
 
             if (!checkTokenInfoExistInDB(decodedJWT)) {
                 System.out.printf("Refresh Token doesn't exist in DB - %s", refreshToken);
@@ -61,7 +61,7 @@ public class JwtService {
         }
     }
 
-    public DecodedJWT decodeJWT(String token)
+    public DecodedJWT verifyJwt(String token)
             throws TokenExpiredException, SignatureVerificationException, InvalidClaimException {
         Algorithm algorithm = Algorithm.HMAC256(JwtProperty.SECRET_KEY);
         JWTVerifier verifier = JWT.require(algorithm)

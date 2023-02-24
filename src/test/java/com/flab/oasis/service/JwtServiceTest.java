@@ -77,7 +77,7 @@ class JwtServiceTest {
                 .withIssuer("OtherIssuer")
                 .sign(algorithm);
 
-        Assertions.assertThrows(InvalidClaimException.class, () -> jwtService.decodeJWT(accessToken));
+        Assertions.assertThrows(InvalidClaimException.class, () -> jwtService.verifyJwt(accessToken));
     }
 
     @DisplayName("알고리즘 Secret Key가 다를 경우")
@@ -87,7 +87,7 @@ class JwtServiceTest {
         String accessToken = JWT.create()
                 .sign(algorithm);
 
-        Assertions.assertThrows(SignatureVerificationException.class, () -> jwtService.decodeJWT(accessToken));
+        Assertions.assertThrows(SignatureVerificationException.class, () -> jwtService.verifyJwt(accessToken));
     }
 
     @DisplayName("만료된 토큰일 경우")
@@ -102,6 +102,6 @@ class JwtServiceTest {
                 .withExpiresAt(issueDate)
                 .sign(algorithm);
 
-        Assertions.assertThrows(TokenExpiredException.class, () -> jwtService.decodeJWT(accessToken));
+        Assertions.assertThrows(TokenExpiredException.class, () -> jwtService.verifyJwt(accessToken));
     }
 }
