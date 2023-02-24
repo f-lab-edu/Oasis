@@ -1,4 +1,4 @@
-package com.flab.oasis.service;
+package com.flab.oasis.login;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -10,6 +10,7 @@ import com.flab.oasis.mapper.UserAuthMapper;
 import com.flab.oasis.model.JwtToken;
 import com.flab.oasis.model.UserAuth;
 import com.flab.oasis.model.exception.AuthorizationException;
+import com.flab.oasis.service.JwtService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
