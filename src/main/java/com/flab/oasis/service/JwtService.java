@@ -38,20 +38,22 @@ public class JwtService {
 
     public JwtToken reissueJwtToken(String refreshToken) {
         try {
-            DecodedJWT decodedJWT = decodeJWT(refreshToken);
+            DecodedJWT decodedJWT = verifyJwt(refreshToken);
 
-            if (checkTokenInfoExistInDB(decodedJWT)) {
+            if (!checkTokenInfoExistInDB(decodedJWT)) {
                 System.out.printf("Refresh Token doesn't exist in DB - %s", refreshToken);
                 throw new AuthorizationException("Refresh Token doesn't exist in DB.");
             }
 
             // refresh token 만료 1일 전이면 토큰을 새로 발급한다.
             if (willExpire(decodedJWT)) {
-                return createJwtToken(decodedJWT.getId());
+                return createJwtToken(decodedJWT.getClaim("uid").asString());
             }
 
             // 유효한 refresh token이면 access token만 새로 발급한다.
-            return new JwtToken(generateToken(decodedJWT.getId(), ACCESS_TOKEN), refreshToken);
+            return new JwtToken(
+                    generateToken(decodedJWT.getClaim("uid").asString(), ACCESS_TOKEN), refreshToken
+            );
         } catch (TokenExpiredException e) {
             System.out.printf("Refresh Token is Expired - %s\n", refreshToken);
             throw new AuthorizationException("Refresh Token is Expired.");
@@ -61,7 +63,7 @@ public class JwtService {
         }
     }
 
-    public DecodedJWT decodeJWT(String token)
+    public DecodedJWT verifyJwt(String token)
             throws TokenExpiredException, SignatureVerificationException, InvalidClaimException {
         Algorithm algorithm = Algorithm.HMAC256(JwtProperty.SECRET_KEY);
         JWTVerifier verifier = JWT.require(algorithm)
@@ -69,6 +71,15 @@ public class JwtService {
                 .build();
 
         return verifier.verify(token);
+    }
+
+    private boolean checkTokenInfoExistInDB(DecodedJWT decodedJWT) throws InvalidClaimException {
+        return userAuthMapper.existUserAuthByUidAndRefreshToken(
+                UserAuth.builder()
+                        .uid(decodedJWT.getClaim("uid").asString())
+                        .refreshToken(decodedJWT.getToken())
+                        .build()
+        );
     }
 
     private String generateToken(String uid, String subject) {
@@ -79,21 +90,11 @@ public class JwtService {
 
         return JWT.create()
                 .withIssuer(JwtProperty.ISSUER)
-                .withJWTId(uid)
                 .withSubject(subject)
+                .withClaim("uid", uid)
                 .withIssuedAt(issueDate)
                 .withExpiresAt(new Date(issueDate.getTime() + expireTime))
                 .sign(algorithm);
-    }
-
-    public boolean checkTokenInfoExistInDB(DecodedJWT decodedJWT) {
-        if (decodedJWT.getSubject().equals(ACCESS_TOKEN)) {
-            return !userAuthMapper.existUserAuthByUid(decodedJWT.getId());
-        }
-
-        return !userAuthMapper.existUserAuthByUidAndRefreshToken(
-                UserAuth.builder().uid(decodedJWT.getId()).refreshToken(decodedJWT.getToken()).build()
-        );
     }
 
     private boolean willExpire(DecodedJWT decodedJWT) {

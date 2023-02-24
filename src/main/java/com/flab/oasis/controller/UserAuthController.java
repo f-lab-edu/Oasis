@@ -1,5 +1,6 @@
 package com.flab.oasis.controller;
 
+import com.flab.oasis.constant.JwtProperty;
 import com.flab.oasis.model.JwtToken;
 import com.flab.oasis.model.UserLoginRequest;
 import com.flab.oasis.service.JwtService;
@@ -10,6 +11,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
+
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
@@ -18,12 +22,31 @@ public class UserAuthController {
     private final JwtService jwtService;
 
     @PostMapping("/refresh")
-    public JwtToken reissueJwtToken(@CookieValue("refreshToken") String refreshToken) {
-        return jwtService.reissueJwtToken(refreshToken);
+    public HttpServletResponse reissueJwtToken(
+            @CookieValue("refreshToken") String refreshToken, HttpServletResponse response) {
+        JwtToken jwtToken = jwtService.reissueJwtToken(refreshToken);
+
+        response.setHeader("Authorization", String.format("%s %s", "Bearer", jwtToken.getAccessToken()));
+        response.addCookie(createCookie(jwtToken.getRefreshToken()));
+
+        return response;
     }
 
     @PostMapping("/login/default")
-    public JwtToken loginAuthFromUserLoginRequest(UserLoginRequest userLoginRequest) {
-        return userAuthService.loginAuthFromUserLoginRequest(userLoginRequest);
+    public HttpServletResponse loginAuthFromUserLoginRequest(
+            UserLoginRequest userLoginRequest, HttpServletResponse response) {
+        JwtToken jwtToken = userAuthService.loginAuthFromUserLoginRequest(userLoginRequest);
+
+        response.setHeader("Authorization", String.format("%s %s", "Bearer", jwtToken.getAccessToken()));
+        response.addCookie(createCookie(jwtToken.getRefreshToken()));
+
+        return response;
+    }
+
+    private static Cookie createCookie(String refreshToken) {
+        Cookie cookie = new Cookie("RefreshToken", refreshToken);
+        cookie.setMaxAge(JwtProperty.REFRESH_TOKEN_EXPIRE_TIME / 1000); // 초 단위로 변경
+
+        return cookie;
     }
 }

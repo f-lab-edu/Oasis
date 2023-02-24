@@ -3,7 +3,6 @@ package com.flab.oasis.interceptor;
 import com.auth0.jwt.exceptions.InvalidClaimException;
 import com.auth0.jwt.exceptions.SignatureVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
-import com.auth0.jwt.interfaces.DecodedJWT;
 import com.flab.oasis.constant.ErrorCode;
 import com.flab.oasis.service.JwtService;
 import lombok.RequiredArgsConstructor;
@@ -30,17 +29,11 @@ public class TokenInterceptor implements HandlerInterceptor {
 
     private boolean authJwtToken(
             HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        String jwtHeader = request.getHeader("authorization");
+        String jwtHeader = request.getHeader("Authorization");
         if (jwtHeader != null && jwtHeader.startsWith("Bearer ")) {
             try {
-                DecodedJWT decodedJWT = jwtService.decodeJWT(jwtHeader.substring(7));
-
-                if (jwtService.checkTokenInfoExistInDB(decodedJWT)) {
-                    System.out.printf("Access Token ID doesn't exist in DB. - %s\n", decodedJWT.getId());
-                    response.sendError(ErrorCode.NOT_FOUND.getCode(), "Access Token ID doesn't exist in DB.");
-                }
-
-                return true;
+                return jwtService.verifyJwt(jwtHeader.substring(7))
+                        .getSubject().equals("AccessToken");
             } catch (TokenExpiredException e) {
                 System.out.printf("Access Token is Expired - %s\n", jwtHeader.substring(7));
                 response.sendError(ErrorCode.RESET_CONTENT.getCode(), "Access Token is Expired.");
