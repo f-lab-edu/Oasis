@@ -40,7 +40,7 @@ public class JwtService {
         try {
             DecodedJWT decodedJWT = decodeJWT(refreshToken);
 
-            if (checkTokenInfoExistInDB(decodedJWT)) {
+            if (!checkTokenInfoExistInDB(decodedJWT)) {
                 System.out.printf("Refresh Token doesn't exist in DB - %s", refreshToken);
                 throw new AuthorizationException("Refresh Token doesn't exist in DB.");
             }
@@ -71,13 +71,12 @@ public class JwtService {
         return verifier.verify(token);
     }
 
-    public boolean checkTokenInfoExistInDB(DecodedJWT decodedJWT) {
-        if (decodedJWT.getSubject().equals(ACCESS_TOKEN)) {
-            return !userAuthMapper.existUserAuthByUid(decodedJWT.getId());
-        }
-
-        return !userAuthMapper.existUserAuthByUidAndRefreshToken(
-                UserAuth.builder().uid(decodedJWT.getId()).refreshToken(decodedJWT.getToken()).build()
+    private boolean checkTokenInfoExistInDB(DecodedJWT decodedJWT) throws InvalidClaimException {
+        return userAuthMapper.existUserAuthByUidAndRefreshToken(
+                UserAuth.builder()
+                        .uid(decodedJWT.getClaim("uid").asString())
+                        .refreshToken(decodedJWT.getToken())
+                        .build()
         );
     }
 
