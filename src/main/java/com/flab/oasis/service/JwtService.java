@@ -47,11 +47,13 @@ public class JwtService {
 
             // refresh token 만료 1일 전이면 토큰을 새로 발급한다.
             if (willExpire(decodedJWT)) {
-                return createJwtToken(decodedJWT.getId());
+                return createJwtToken(decodedJWT.getClaim("uid").asString());
             }
 
             // 유효한 refresh token이면 access token만 새로 발급한다.
-            return new JwtToken(generateToken(decodedJWT.getId(), ACCESS_TOKEN), refreshToken);
+            return new JwtToken(
+                    generateToken(decodedJWT.getClaim("uid").asString(), ACCESS_TOKEN), refreshToken
+            );
         } catch (TokenExpiredException e) {
             System.out.printf("Refresh Token is Expired - %s\n", refreshToken);
             throw new AuthorizationException("Refresh Token is Expired.");
@@ -88,8 +90,8 @@ public class JwtService {
 
         return JWT.create()
                 .withIssuer(JwtProperty.ISSUER)
-                .withJWTId(uid)
                 .withSubject(subject)
+                .withClaim("uid", uid)
                 .withIssuedAt(issueDate)
                 .withExpiresAt(new Date(issueDate.getTime() + expireTime))
                 .sign(algorithm);
