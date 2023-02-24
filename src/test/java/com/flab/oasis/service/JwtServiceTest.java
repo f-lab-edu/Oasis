@@ -99,7 +99,7 @@ class JwtServiceTest {
         String accessToken = JWT.create()
                 .withIssuer(JwtProperty.ISSUER)
                 .withIssuedAt(issueDate)
-                .withExpiresAt(new Date(issueDate.getTime() + 1))
+                .withExpiresAt(issueDate)
                 .sign(algorithm);
 
         Assertions.assertThrows(TokenExpiredException.class, () -> jwtService.decodeJWT(accessToken));
