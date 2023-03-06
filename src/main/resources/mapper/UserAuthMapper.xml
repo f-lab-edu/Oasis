@@ -13,17 +13,6 @@
         WHERE UID = #{uid}
     </select>
 
-    <select id="existUserAuthByUid" parameterType="java.lang.String" resultType="java.lang.Boolean">
-        SELECT EXISTS (
-            SELECT UID,
-                PASSWORD,
-                SALT,
-                SOCIAL_YN     AS socialYN,
-                REFRESH_TOKEN AS refreshToken
-            FROM USER_AUTH
-            WHERE UID = #{uid})
-    </select>
-
     <select id="existUserAuthByUidAndRefreshToken" parameterType="com.flab.oasis.model.UserAuth" resultType="java.lang.Boolean">
         SELECT EXISTS (
             SELECT UID,
