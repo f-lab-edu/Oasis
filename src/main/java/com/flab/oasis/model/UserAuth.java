@@ -12,5 +12,4 @@ public class UserAuth {
     private String password;
     private String salt;
     private char socialYN;
-    private String refreshToken;
 }
