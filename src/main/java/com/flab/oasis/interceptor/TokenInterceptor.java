@@ -31,14 +31,17 @@ public class TokenInterceptor implements HandlerInterceptor {
             HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String jwtHeader = request.getHeader("Authorization");
         if (jwtHeader != null && jwtHeader.startsWith("Bearer ")) {
+            String accessToken = jwtHeader.substring(7);
+
             try {
-                return jwtService.verifyJwt(jwtHeader.substring(7))
-                        .getSubject().equals("AccessToken");
+                jwtService.verifyJwt(accessToken);
+
+                return true;
             } catch (TokenExpiredException e) {
-                System.out.printf("Access Token is Expired - %s\n", jwtHeader.substring(7));
+                System.out.printf("Access Token is Expired - %s%n", accessToken);
                 response.sendError(ErrorCode.RESET_CONTENT.getCode(), "Access Token is Expired.");
             } catch (SignatureVerificationException | InvalidClaimException e) {
-                System.out.printf("Invalid Access Token - %s\n", jwtHeader.substring(7));
+                System.out.printf("Invalid Access Token - %s%n", accessToken);
                 response.sendError(ErrorCode.UNAUTHORIZED.getCode(), "Invalid Access Token.");
             }
         }
