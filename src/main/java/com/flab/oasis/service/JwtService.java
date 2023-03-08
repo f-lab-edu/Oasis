@@ -46,7 +46,7 @@ public class JwtService {
                 );
             }
 
-            // refresh token 만료 1일 전이면 토큰을 새로 발급한다.
+            // refresh token 만료 3일 전이면 토큰을 새로 발급한다.
             if (willExpire(decodedJWT)) {
                 System.out.println(LogUtils.makeLog(
                         "Access/Refresh Token wes Reissued.", decodedJWT.getSubject()
