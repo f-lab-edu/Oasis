@@ -6,12 +6,9 @@ import com.flab.oasis.model.UserLoginRequest;
 import com.flab.oasis.service.JwtService;
 import com.flab.oasis.service.UserAuthService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseCookie;
+import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
 @RestController
@@ -21,32 +18,41 @@ public class UserAuthController {
     private final UserAuthService userAuthService;
     private final JwtService jwtService;
 
+    private static final String AUTHORIZATION_HEADER = "Authorization";
+    private static final String SET_COOKIE = "Set-Cookie";
+
     @PostMapping("/refresh")
-    public HttpServletResponse reissueJwtToken(
-            @CookieValue("refreshToken") String refreshToken, HttpServletResponse response) {
+    public boolean reissueJwtToken(@CookieValue("RefreshToken") String refreshToken, HttpServletResponse response) {
         JwtToken jwtToken = jwtService.reissueJwtToken(refreshToken);
 
-        response.setHeader("Authorization", String.format("%s %s", "Bearer", jwtToken.getAccessToken()));
-        response.addCookie(createCookie(jwtToken.getRefreshToken()));
+        response.setHeader(AUTHORIZATION_HEADER, makeAuthorizationValue(jwtToken.getAccessToken()));
+        response.setHeader(SET_COOKIE, createCookie(jwtToken.getRefreshToken()));
 
-        return response;
+        return true;
     }
 
     @PostMapping("/login/default")
-    public HttpServletResponse loginAuthFromUserLoginRequest(
-            UserLoginRequest userLoginRequest, HttpServletResponse response) {
-        JwtToken jwtToken = userAuthService.loginAuthFromUserLoginRequest(userLoginRequest);
+    public boolean loginAuthFromUserLoginRequest(
+            @RequestBody UserLoginRequest userLoginRequest, HttpServletResponse response) {
+        JwtToken jwtToken = userAuthService.createJwtTokenByUserLoginRequest(userLoginRequest);
 
-        response.setHeader("Authorization", String.format("%s %s", "Bearer", jwtToken.getAccessToken()));
-        response.addCookie(createCookie(jwtToken.getRefreshToken()));
+        response.setHeader(AUTHORIZATION_HEADER, makeAuthorizationValue(jwtToken.getAccessToken()));
+        response.setHeader(SET_COOKIE, createCookie(jwtToken.getRefreshToken()));
 
-        return response;
+        return true;
     }
 
-    private static Cookie createCookie(String refreshToken) {
-        Cookie cookie = new Cookie("RefreshToken", refreshToken);
-        cookie.setMaxAge(JwtProperty.REFRESH_TOKEN_EXPIRE_TIME / 1000); // 초 단위로 변경
+    private String makeAuthorizationValue(String accessToken) {
+        return String.format("%s %s", "Bearer", accessToken);
+    }
 
-        return cookie;
+    private String createCookie(String refreshToken) {
+        return ResponseCookie.from("RefreshToken", refreshToken)
+                .maxAge(JwtProperty.REFRESH_TOKEN_EXPIRE_TIME / 1000)
+                .httpOnly(true)
+                .path("/")
+                .sameSite("Lax")
+                .build()
+                .toString();
     }
 }

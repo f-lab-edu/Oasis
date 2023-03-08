@@ -1,5 +1,6 @@
 package com.flab.oasis.service;
 
+import com.flab.oasis.constant.ErrorCode;
 import com.flab.oasis.mapper.UserAuthMapper;
 import com.flab.oasis.model.JwtToken;
 import com.flab.oasis.model.UserAuth;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -17,16 +19,17 @@ public class UserAuthService {
     private final UserAuthMapper userAuthMapper;
     private final JwtService jwtService;
 
-    public JwtToken loginAuthFromUserLoginRequest(UserLoginRequest userLoginRequest) {
-        UserAuth userAuth = userAuthMapper.getUserAuthByUid(userLoginRequest.getUid());
+    public JwtToken createJwtTokenByUserLoginRequest(UserLoginRequest userLoginRequest) {
+        UserAuth userAuth = Optional.ofNullable(userAuthMapper.getUserAuthByUid(userLoginRequest.getUid()))
+                .orElseThrow(() -> new AuthorizationException(
+                        ErrorCode.UNAUTHORIZED, "User does not exist.", userLoginRequest.getUid()
+                ));
         String hashingPassword = hashingPassword(userLoginRequest.getPassword(), userAuth.getSalt());
 
         if (!userAuth.getPassword().equals(hashingPassword)) {
-            System.out.printf(
-                    "Password doesn't match - uid : %s - password : %s",
-                    userLoginRequest.getUid(), userLoginRequest.getPassword()
+            throw new AuthorizationException(
+                    ErrorCode.UNAUTHORIZED, "Password does not match.", userLoginRequest.toString()
             );
-            throw new AuthorizationException("Password doesn't match.");
         }
 
         return jwtService.createJwtToken(userAuth.getUid());
