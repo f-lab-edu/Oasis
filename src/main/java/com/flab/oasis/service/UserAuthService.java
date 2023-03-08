@@ -22,16 +22,14 @@ public class UserAuthService {
     public JwtToken createJwtTokenByUserLoginRequest(UserLoginRequest userLoginRequest) {
         UserAuth userAuth = Optional.ofNullable(userAuthMapper.getUserAuthByUid(userLoginRequest.getUid()))
                 .orElseThrow(() -> new AuthorizationException(
-                        String.format("User(%s) does not exist", userLoginRequest.getUid()), ErrorCode.UNAUTHORIZED
+                        ErrorCode.UNAUTHORIZED, "User does not exist.", userLoginRequest.getUid()
                 ));
         String hashingPassword = hashingPassword(userLoginRequest.getPassword(), userAuth.getSalt());
 
         if (!userAuth.getPassword().equals(hashingPassword)) {
-            System.out.printf(
-                    "Password doesn't match - uid : %s - password : %s",
-                    userLoginRequest.getUid(), userLoginRequest.getPassword()
+            throw new AuthorizationException(
+                    ErrorCode.UNAUTHORIZED, "Password does not match.", userLoginRequest.toString()
             );
-            throw new AuthorizationException("Password doesn't match.", ErrorCode.UNAUTHORIZED);
         }
 
         return jwtService.createJwtToken(userAuth.getUid());

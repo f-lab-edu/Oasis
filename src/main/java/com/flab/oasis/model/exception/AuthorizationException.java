@@ -1,6 +1,7 @@
 package com.flab.oasis.model.exception;
 
 import com.flab.oasis.constant.ErrorCode;
+import com.flab.oasis.utils.LogUtils;
 import lombok.Getter;
 
 @Getter
@@ -9,8 +10,17 @@ public class AuthorizationException extends RuntimeException {
 
     private final ErrorCode errorCode;
 
-    public AuthorizationException(String message, ErrorCode errorCode) {
+    public AuthorizationException(ErrorCode errorCode, String message) {
         super(message);
         this.errorCode = errorCode;
+
+        System.out.println(LogUtils.makeErrorLog(errorCode, message));
+    }
+
+    public AuthorizationException(ErrorCode errorCode, String message, String value) {
+        super(message);
+        this.errorCode = errorCode;
+
+        System.out.println(LogUtils.makeErrorLog(errorCode, message, value));
     }
 }
