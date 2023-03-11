@@ -20,16 +20,6 @@ public class UserAuthController {
 
     private static final String SET_COOKIE = "Set-Cookie";
 
-    @PostMapping("/refresh")
-    public boolean reissueJwtToken(@CookieValue("RefreshToken") String refreshToken, HttpServletResponse response) {
-        JwtToken jwtToken = jwtService.reissueJwtToken(refreshToken);
-
-        response.setHeader(AUTHORIZATION_HEADER, makeAuthorizationValue(jwtToken.getAccessToken()));
-        response.setHeader(SET_COOKIE, createCookie(jwtToken.getRefreshToken()));
-
-        return true;
-    }
-
     @PostMapping("/login/default")
     public boolean loginAuthFromUserLoginRequest(
             @RequestBody UserLoginRequest userLoginRequest, HttpServletResponse response) {
