@@ -2,6 +2,7 @@ package com.flab.oasis.controller;
 
 import com.flab.oasis.constant.JwtProperty;
 import com.flab.oasis.model.JwtToken;
+import com.flab.oasis.model.UserGoogleAuthToken;
 import com.flab.oasis.model.UserLoginRequest;
 import com.flab.oasis.service.JwtService;
 import com.flab.oasis.service.UserAuthService;
@@ -18,15 +19,16 @@ public class UserAuthController {
     private final UserAuthService userAuthService;
     private final JwtService jwtService;
 
-    private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String SET_COOKIE = "Set-Cookie";
+    private static final String ACCESS_TOKEN = "AccessToken";
+    private static final String REFRESH_TOKEN = "RefreshToken";
 
     @PostMapping("/refresh")
     public boolean reissueJwtToken(@CookieValue("RefreshToken") String refreshToken, HttpServletResponse response) {
         JwtToken jwtToken = jwtService.reissueJwtToken(refreshToken);
 
-        response.setHeader(AUTHORIZATION_HEADER, makeAuthorizationValue(jwtToken.getAccessToken()));
-        response.setHeader(SET_COOKIE, createCookie(jwtToken.getRefreshToken()));
+        response.setHeader(SET_COOKIE, createCookie(ACCESS_TOKEN, jwtToken.getAccessToken()));
+        response.setHeader(SET_COOKIE, createCookie(REFRESH_TOKEN, jwtToken.getRefreshToken()));
 
         return true;
     }
@@ -36,19 +38,30 @@ public class UserAuthController {
             @RequestBody UserLoginRequest userLoginRequest, HttpServletResponse response) {
         JwtToken jwtToken = userAuthService.createJwtTokenByUserLoginRequest(userLoginRequest);
 
-        response.setHeader(AUTHORIZATION_HEADER, makeAuthorizationValue(jwtToken.getAccessToken()));
-        response.setHeader(SET_COOKIE, createCookie(jwtToken.getRefreshToken()));
+        response.setHeader(SET_COOKIE, createCookie(ACCESS_TOKEN, jwtToken.getAccessToken()));
+        response.setHeader(SET_COOKIE, createCookie(REFRESH_TOKEN, jwtToken.getRefreshToken()));
 
         return true;
     }
 
-    private String makeAuthorizationValue(String accessToken) {
-        return String.format("%s %s", "Bearer", accessToken);
+    @PostMapping("/login/google")
+    public boolean loginGoogleByUserGoogleAuthInfo(
+            @RequestBody UserGoogleAuthToken userGoogleAuthToken, HttpServletResponse response) {
+        System.out.println("controller");
+        JwtToken jwtToken = userAuthService.createJwtTokenByUserGoogleAuthToken(userGoogleAuthToken);
+
+        response.setHeader(SET_COOKIE, createCookie(ACCESS_TOKEN, jwtToken.getAccessToken()));
+        response.setHeader(SET_COOKIE, createCookie(REFRESH_TOKEN, jwtToken.getRefreshToken()));
+
+        return true;
     }
 
-    private String createCookie(String refreshToken) {
-        return ResponseCookie.from("RefreshToken", refreshToken)
-                .maxAge(JwtProperty.REFRESH_TOKEN_EXPIRE_TIME / 1000)
+    private String createCookie(String tokenType, String token) {
+        int expireTime = tokenType.equals(ACCESS_TOKEN) ?
+                JwtProperty.ACCESS_TOKEN_EXPIRE_TIME : JwtProperty.REFRESH_TOKEN_EXPIRE_TIME;
+
+        return ResponseCookie.from(tokenType, token)
+                .maxAge(expireTime / 1000)
                 .httpOnly(true)
                 .path("/")
                 .sameSite("Lax")
