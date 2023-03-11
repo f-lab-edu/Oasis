@@ -18,7 +18,6 @@ public class UserAuthController {
     private final UserAuthService userAuthService;
     private final JwtService jwtService;
 
-    private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String SET_COOKIE = "Set-Cookie";
 
     @PostMapping("/refresh")
@@ -36,19 +35,18 @@ public class UserAuthController {
             @RequestBody UserLoginRequest userLoginRequest, HttpServletResponse response) {
         JwtToken jwtToken = userAuthService.createJwtTokenByUserLoginRequest(userLoginRequest);
 
-        response.setHeader(AUTHORIZATION_HEADER, makeAuthorizationValue(jwtToken.getAccessToken()));
-        response.setHeader(SET_COOKIE, createCookie(jwtToken.getRefreshToken()));
+        response.setHeader(SET_COOKIE, createCookie("AccessToken", jwtToken.getAccessToken()));
+        response.setHeader(SET_COOKIE, createCookie("RefreshToken", jwtToken.getRefreshToken()));
 
         return true;
     }
 
-    private String makeAuthorizationValue(String accessToken) {
-        return String.format("%s %s", "Bearer", accessToken);
-    }
+    private String createCookie(String tokenType, String token) {
+        int expireTime = tokenType.equals("AccessToken") ?
+                JwtProperty.ACCESS_TOKEN_EXPIRE_TIME : JwtProperty.REFRESH_TOKEN_EXPIRE_TIME;
 
-    private String createCookie(String refreshToken) {
-        return ResponseCookie.from("RefreshToken", refreshToken)
-                .maxAge(JwtProperty.REFRESH_TOKEN_EXPIRE_TIME / 1000)
+        return ResponseCookie.from(tokenType, token)
+                .maxAge(expireTime / 1000)
                 .httpOnly(true)
                 .path("/")
                 .sameSite("Lax")
