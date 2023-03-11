@@ -37,10 +37,11 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 	implementation group: 'com.zaxxer', name: 'HikariCP', version: '5.0.1'
-	testImplementation group: 'org.mockito', name: 'mockito-all', version: '1.10.15'
+	testImplementation group: 'org.mockito', name: 'mockito-all', version: '1.10.19'
 	implementation group: 'net.sf.ehcache', name: 'ehcache', version: '2.10.9.2'
 	implementation group: 'com.auth0', name: 'java-jwt', version: '4.3.0'
-
+	implementation group: 'com.google.api-client', name: 'google-api-client', version: '2.2.0'
+	implementation group: 'com.google.api-client', name: 'google-api-client-jackson2', version: '2.2.0'
 }
 
 tasks.named('test') {
