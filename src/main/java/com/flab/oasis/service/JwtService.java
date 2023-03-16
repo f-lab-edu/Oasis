@@ -73,7 +73,7 @@ public class JwtService {
 
             if (!refreshToken.equals(userSession.getRefreshToken())) {
                 throw new AuthorizationException(
-                        ErrorCode.UNAUTHORIZED, "Refresh Token doesn't exist.", refreshToken
+                        ErrorCode.UNAUTHORIZED, "Refresh Token doesn't match.", refreshToken
                 );
             }
 
