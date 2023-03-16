@@ -13,7 +13,7 @@
         WHERE UID = #{uid}
     </select>
 
-    <select id="updateRefreshToken" parameterType="com.flab.oasis.model.UserAuth">
+    <select id="updateRefreshToken" parameterType="com.flab.oasis.model.UserSession">
         UPDATE USER_AUTH SET REFRESH_TOKEN = #{refreshToken}
         WHERE UID = #{uid}
     </select>
