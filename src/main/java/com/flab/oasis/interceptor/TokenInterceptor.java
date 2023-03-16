@@ -50,9 +50,7 @@ public class TokenInterceptor implements HandlerInterceptor {
 
             return true;
         } catch (TokenExpiredException e) {
-            System.out.println(LogUtils.makeErrorLog(
-                    ErrorCode.UNAUTHORIZED, "Access Token is Expired.", accessToken
-            ));
+            LogUtils.error(ErrorCode.UNAUTHORIZED, "Access Token is Expired.", accessToken);
 
             String refreshToken = Optional.ofNullable(WebUtils.getCookie(request, REFRESH_TOKEN))
                     .orElseThrow(() -> new AuthorizationException(
@@ -69,9 +67,7 @@ public class TokenInterceptor implements HandlerInterceptor {
                     "The token was reissued because the access token expired."
             );
         } catch (SignatureVerificationException | InvalidClaimException e) {
-            System.out.println(LogUtils.makeErrorLog(
-                    ErrorCode.UNAUTHORIZED, "Invalid Access Token.", accessToken
-            ));
+            LogUtils.error(ErrorCode.UNAUTHORIZED, "Invalid Access Token.", accessToken);
 
             response.sendError(ErrorCode.UNAUTHORIZED.getCode(), "Invalid Access Token.");
         }
