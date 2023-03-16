@@ -35,7 +35,7 @@ public class UserAuthRepository {
                     Optional.ofNullable(
                             redisTemplate.opsForValue().get(makeKey(uid))
                     ).orElse(
-                            getUserAuthByUid(uid).parseUserSession()
+                            parseUserAuthToUserSession(getUserAuthByUid(uid))
                     ),
                     new TypeReference<UserSession>() {}
             );
@@ -47,7 +47,7 @@ public class UserAuthRepository {
             LogUtils.error(ErrorCode.SERVICE_UNAVAILABLE, e.getMessage());
 
             // redis에 문제가 생겨 연결할 수 없을 경우 DB에서 직접 가져온다.
-            return getUserAuthByUid(uid).parseUserSession();
+            return parseUserAuthToUserSession(getUserAuthByUid(uid));
         }
     }
 
