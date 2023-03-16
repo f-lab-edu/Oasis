@@ -7,5 +7,6 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface UserAuthMapper {
     public UserAuth getUserAuthByUid(String uid);
+    public UserSession getUserSessionByUid(String uid);
     public void updateRefreshToken(UserSession userSession);
 }

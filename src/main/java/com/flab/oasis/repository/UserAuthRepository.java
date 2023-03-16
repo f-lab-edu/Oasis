@@ -27,15 +27,14 @@ public class UserAuthRepository {
                         ErrorCode.UNAUTHORIZED, "User does not exist.", uid
                 ));
     }
-
     public UserSession getUserSessionByUid(String uid) {
         try {
-            // redis에 없으면 DB에서 가져온다.
+            // redis에 없으면 DB에서 가져온 후 redis에 등록한다.
             UserSession userSession = objectMapper.convertValue(
                     Optional.ofNullable(
                             redisTemplate.opsForValue().get(makeKey(uid))
                     ).orElse(
-                            parseUserAuthToUserSession(getUserAuthByUid(uid))
+                             getUserSessionByUidFromDB(uid)
                     ),
                     new TypeReference<UserSession>() {}
             );
@@ -47,7 +46,7 @@ public class UserAuthRepository {
             LogUtils.error(ErrorCode.SERVICE_UNAVAILABLE, e.getMessage());
 
             // redis에 문제가 생겨 연결할 수 없을 경우 DB에서 직접 가져온다.
-            return parseUserAuthToUserSession(getUserAuthByUid(uid));
+            return getUserSessionByUidFromDB(uid);
         }
     }
 
@@ -61,11 +60,11 @@ public class UserAuthRepository {
         userAuthMapper.updateRefreshToken(userSession);
     }
 
-    private UserSession parseUserAuthToUserSession(UserAuth userAuth) {
-        return UserSession.builder()
-                .uid(userAuth.getUid())
-                .refreshToken(userAuth.getRefreshToken())
-                .build();
+    private UserSession getUserSessionByUidFromDB(String uid) {
+        return Optional.ofNullable(userAuthMapper.getUserSessionByUid(uid))
+                .orElseThrow(() -> new AuthorizationException(
+                        ErrorCode.UNAUTHORIZED, "User does not exist.", uid
+                ));
     }
 
     private String makeKey(String uid) {
