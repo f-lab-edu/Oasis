@@ -1,7 +1,7 @@
 package com.flab.oasis.mapper;
 
-import com.flab.oasis.model.UserAuth;
 import com.flab.oasis.model.UserSession;
+import com.flab.oasis.model.dao.UserAuth;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
