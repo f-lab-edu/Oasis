@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flab.oasis.constant.ErrorCode;
 import com.flab.oasis.mapper.UserAuthMapper;
 import com.flab.oasis.model.UserSession;
-import com.flab.oasis.model.dao.UserAuth;
+import com.flab.oasis.model.dao.UserAuthDAO;
 import com.flab.oasis.model.exception.AuthorizationException;
 import com.flab.oasis.utils.LogUtils;
 import lombok.RequiredArgsConstructor;
@@ -21,8 +21,8 @@ public class UserAuthRepository {
     private final UserAuthMapper userAuthMapper;
     private final ObjectMapper objectMapper;
 
-    public UserAuth getUserAuthByUid(String uid) {
-        return Optional.ofNullable(userAuthMapper.getUserAuthByUid(uid))
+    public UserAuthDAO getUserAuthDAOByUid(String uid) {
+        return Optional.ofNullable(userAuthMapper.getUserAuthDAOByUid(uid))
                 .orElseThrow(() -> new AuthorizationException(
                         ErrorCode.UNAUTHORIZED, "User does not exist.", uid
                 ));
@@ -35,7 +35,7 @@ public class UserAuthRepository {
                     Optional.ofNullable(
                             redisTemplate.opsForValue().get(makeKey(uid))
                     ).orElse(
-                            getUserAuthByUid(uid).parseUserSession()
+                            getUserAuthDAOByUid(uid).parseUserSession()
                     ),
                     new TypeReference<UserSession>() {}
             );
@@ -47,7 +47,7 @@ public class UserAuthRepository {
             LogUtils.error(ErrorCode.SERVICE_UNAVAILABLE, e.getMessage());
 
             // redis에 문제가 생겨 연결할 수 없을 경우 DB에서 직접 가져온다.
-            return getUserAuthByUid(uid).parseUserSession();
+            return getUserAuthDAOByUid(uid).parseUserSession();
         }
     }
 

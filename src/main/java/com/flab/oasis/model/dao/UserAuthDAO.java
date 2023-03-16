@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class UserAuth {
+public class UserAuthDAO {
     private String uid;
     private String password;
     private String salt;
