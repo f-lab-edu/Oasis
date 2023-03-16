@@ -4,8 +4,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flab.oasis.constant.ErrorCode;
 import com.flab.oasis.mapper.UserAuthMapper;
-import com.flab.oasis.model.UserAuth;
 import com.flab.oasis.model.UserSession;
+import com.flab.oasis.model.dao.UserAuth;
 import com.flab.oasis.model.exception.AuthorizationException;
 import com.flab.oasis.utils.LogUtils;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +35,7 @@ public class UserAuthRepository {
                     Optional.ofNullable(
                             redisTemplate.opsForValue().get(makeKey(uid))
                     ).orElse(
-                            parseUserAuthToUserSession(getUserAuthByUid(uid))
+                            getUserAuthByUid(uid).parseUserSession()
                     ),
                     new TypeReference<UserSession>() {}
             );
@@ -47,7 +47,7 @@ public class UserAuthRepository {
             LogUtils.error(ErrorCode.SERVICE_UNAVAILABLE, e.getMessage());
 
             // redis에 문제가 생겨 연결할 수 없을 경우 DB에서 직접 가져온다.
-            return parseUserAuthToUserSession(getUserAuthByUid(uid));
+            return getUserAuthByUid(uid).parseUserSession();
         }
     }
 
@@ -59,13 +59,6 @@ public class UserAuthRepository {
         }
 
         userAuthMapper.updateRefreshToken(userSession);
-    }
-
-    private UserSession parseUserAuthToUserSession(UserAuth userAuth) {
-        return UserSession.builder()
-                .uid(userAuth.getUid())
-                .refreshToken(userAuth.getRefreshToken())
-                .build();
     }
 
     private String makeKey(String uid) {
