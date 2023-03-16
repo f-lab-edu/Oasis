@@ -16,14 +16,18 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class UserAuthService {
-    private final UserAuthMapper userAuthMapper;
     private final JwtService jwtService;
+    private final UserAuthMapper userAuthMapper;
+
+    public UserAuth getUserAuthByUid(String uid) {
+        return Optional.ofNullable(userAuthMapper.getUserAuthByUid(uid))
+                .orElseThrow(() -> new AuthorizationException(
+                        ErrorCode.UNAUTHORIZED, "User does not exist.", uid
+                ));
+    }
 
     public JwtToken createJwtTokenByUserLoginRequest(UserLoginRequest userLoginRequest) {
-        UserAuth userAuth = Optional.ofNullable(userAuthMapper.getUserAuthByUid(userLoginRequest.getUid()))
-                .orElseThrow(() -> new AuthorizationException(
-                        ErrorCode.UNAUTHORIZED, "User does not exist.", userLoginRequest.getUid()
-                ));
+        UserAuth userAuth = getUserAuthByUid(userLoginRequest.getUid());
         String hashingPassword = hashingPassword(userLoginRequest.getPassword(), userAuth.getSalt());
 
         if (!userAuth.getPassword().equals(hashingPassword)) {
@@ -33,6 +37,10 @@ public class UserAuthService {
         }
 
         return jwtService.createJwtToken(userAuth.getUid());
+    }
+
+    public void updateRefreshToken(UserAuth userAuth) {
+        userAuthMapper.updateRefreshToken(userAuth);
     }
 
     private String hashingPassword(String password, String salt) {
