@@ -44,7 +44,7 @@ public class JwtService {
     public void verifyAccessToken(String accessToken) {
         try {
             DecodedJWT decodedJWT = getDecodedJwtWithVerifySignature(accessToken);
-            String uid = String.valueOf(decodedJWT.getClaim("uid"));
+            String uid = decodedJWT.getClaim("uid").asString();
             UserSession userSession = userAuthRepository.getUserSessionByUid(uid);
 
             if (!uid.equals(userSession.getUid())) {
@@ -62,7 +62,7 @@ public class JwtService {
     public UserSession verifyRefreshToken(String refreshToken) {
         try {
             DecodedJWT decodedJWT = getDecodedJwtWithVerifySignature(refreshToken);
-            String uid = String.valueOf(decodedJWT.getClaim("uid"));
+            String uid = decodedJWT.getClaim("uid").asString();
             UserSession userSession = userAuthRepository.getUserSessionByUid(uid);
 
             if (!uid.equals(userSession.getUid())) {
