@@ -3,7 +3,7 @@ package com.flab.oasis.service;
 import com.flab.oasis.constant.ErrorCode;
 import com.flab.oasis.model.JwtToken;
 import com.flab.oasis.model.UserLoginRequest;
-import com.flab.oasis.model.dao.UserAuthDAO;
+import com.flab.oasis.model.UserAuth;
 import com.flab.oasis.model.exception.AuthorizationException;
 import com.flab.oasis.repository.UserAuthRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,16 +19,16 @@ public class UserAuthService {
     private final JwtService jwtService;
 
     public JwtToken createJwtTokenByUserLoginRequest(UserLoginRequest userLoginRequest) {
-        UserAuthDAO userAuthDAO = userAuthRepository.getUserAuthDAOByUid(userLoginRequest.getUid());
-        String hashingPassword = hashingPassword(userLoginRequest.getPassword(), userAuthDAO.getSalt());
+        UserAuth userAuth = userAuthRepository.getUserAuthByUid(userLoginRequest.getUid());
+        String hashingPassword = hashingPassword(userLoginRequest.getPassword(), userAuth.getSalt());
 
-        if (!userAuthDAO.comparePassword(hashingPassword)) {
+        if (!userAuth.getPassword().equals(hashingPassword)) {
             throw new AuthorizationException(
                     ErrorCode.UNAUTHORIZED, "Password does not match.", userLoginRequest.toString()
             );
         }
 
-        return jwtService.createJwtToken(userAuthDAO.getUid());
+        return jwtService.createJwtToken(userAuth.getUid());
     }
 
     private String hashingPassword(String password, String salt) {
