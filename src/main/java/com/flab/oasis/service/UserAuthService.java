@@ -2,8 +2,8 @@ package com.flab.oasis.service;
 
 import com.flab.oasis.constant.ErrorCode;
 import com.flab.oasis.model.JwtToken;
-import com.flab.oasis.model.UserAuth;
 import com.flab.oasis.model.UserLoginRequest;
+import com.flab.oasis.model.dao.UserAuth;
 import com.flab.oasis.model.exception.AuthorizationException;
 import com.flab.oasis.repository.UserAuthRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +22,7 @@ public class UserAuthService {
         UserAuth userAuth = userAuthRepository.getUserAuthByUid(userLoginRequest.getUid());
         String hashingPassword = hashingPassword(userLoginRequest.getPassword(), userAuth.getSalt());
 
-        if (!userAuth.getPassword().equals(hashingPassword)) {
+        if (!userAuth.comparePassword(hashingPassword)) {
             throw new AuthorizationException(
                     ErrorCode.UNAUTHORIZED, "Password does not match.", userLoginRequest.toString()
             );
