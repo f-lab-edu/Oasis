@@ -7,8 +7,14 @@
         SELECT UID,
             PASSWORD,
             SALT,
-            SOCIAL_YN     AS socialYN
+            SOCIAL_YN AS socialYN,
+            REFRESH_TOKEN AS refreshToken
         FROM USER_AUTH
+        WHERE UID = #{uid}
+    </select>
+
+    <select id="updateRefreshToken" parameterType="com.flab.oasis.model.UserAuth">
+        UPDATE USER_AUTH SET REFRESH_TOKEN = #{refreshToken}
         WHERE UID = #{uid}
     </select>
 
