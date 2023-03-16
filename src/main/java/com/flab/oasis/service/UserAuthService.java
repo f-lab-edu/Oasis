@@ -1,33 +1,25 @@
 package com.flab.oasis.service;
 
 import com.flab.oasis.constant.ErrorCode;
-import com.flab.oasis.mapper.UserAuthMapper;
 import com.flab.oasis.model.JwtToken;
 import com.flab.oasis.model.UserAuth;
 import com.flab.oasis.model.UserLoginRequest;
 import com.flab.oasis.model.exception.AuthorizationException;
+import com.flab.oasis.repository.UserAuthRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class UserAuthService {
+    private final UserAuthRepository userAuthRepository;
     private final JwtService jwtService;
-    private final UserAuthMapper userAuthMapper;
-
-    public UserAuth getUserAuthByUid(String uid) {
-        return Optional.ofNullable(userAuthMapper.getUserAuthByUid(uid))
-                .orElseThrow(() -> new AuthorizationException(
-                        ErrorCode.UNAUTHORIZED, "User does not exist.", uid
-                ));
-    }
 
     public JwtToken createJwtTokenByUserLoginRequest(UserLoginRequest userLoginRequest) {
-        UserAuth userAuth = getUserAuthByUid(userLoginRequest.getUid());
+        UserAuth userAuth = userAuthRepository.getUserAuthByUid(userLoginRequest.getUid());
         String hashingPassword = hashingPassword(userLoginRequest.getPassword(), userAuth.getSalt());
 
         if (!userAuth.getPassword().equals(hashingPassword)) {
@@ -37,10 +29,6 @@ public class UserAuthService {
         }
 
         return jwtService.createJwtToken(userAuth.getUid());
-    }
-
-    public void updateRefreshToken(UserAuth userAuth) {
-        userAuthMapper.updateRefreshToken(userAuth);
     }
 
     private String hashingPassword(String password, String salt) {
