@@ -1,27 +1,25 @@
 package com.flab.oasis.utils;
 
 import com.flab.oasis.constant.ErrorCode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LogUtils {
-    public static String makeLog(String message) {
-        return String.format("Message: %s", message);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LogUtils.class);
+
+    public static void info(String message) {
+        LOGGER.info("Message: {}", message);
     }
 
-    public static String makeLog(String message, String value) {
-        return String.format("Message: %s%nValue: %s", message, value);
+    public static void info(String message, String value) {
+        LOGGER.info("Message: {}\nValue: {}", message, value);
     }
 
-    public static String makeErrorLog(ErrorCode errorCode, String message) {
-        return String.format(
-                "ErrorCode: %s(%d)%nMessage: %s",
-                errorCode, errorCode.getCode(), message
-        );
+    public static void error(ErrorCode errorCode, String message) {
+        LOGGER.error("ErrorCode: {}({})\nMessage: {}", errorCode, errorCode.getCode(), message);
     }
 
-    public static String makeErrorLog(ErrorCode errorCode, String message, String value) {
-        return String.format(
-                "ErrorCode: %s(%d)%nMessage: %s%nValue: %s",
-                errorCode, errorCode.getCode(), message, value
-        );
+    public static void error(ErrorCode errorCode, String message, String value) {
+        LOGGER.error("ErrorCode: {}({})\nMessage: {}\nValue: {}", errorCode, errorCode.getCode(), message, value);
     }
 }

@@ -4,11 +4,13 @@ import com.flab.oasis.constant.JwtProperty;
 import com.flab.oasis.model.JwtToken;
 import com.flab.oasis.model.UserGoogleAuthToken;
 import com.flab.oasis.model.UserLoginRequest;
-import com.flab.oasis.service.JwtService;
 import com.flab.oasis.service.UserAuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseCookie;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -17,21 +19,10 @@ import javax.servlet.http.HttpServletResponse;
 @RequiredArgsConstructor
 public class UserAuthController {
     private final UserAuthService userAuthService;
-    private final JwtService jwtService;
 
     private static final String SET_COOKIE = "Set-Cookie";
     private static final String ACCESS_TOKEN = "AccessToken";
     private static final String REFRESH_TOKEN = "RefreshToken";
-
-    @PostMapping("/refresh")
-    public boolean reissueJwtToken(@CookieValue("RefreshToken") String refreshToken, HttpServletResponse response) {
-        JwtToken jwtToken = jwtService.reissueJwtToken(refreshToken);
-
-        response.setHeader(SET_COOKIE, createCookie(ACCESS_TOKEN, jwtToken.getAccessToken()));
-        response.setHeader(SET_COOKIE, createCookie(REFRESH_TOKEN, jwtToken.getRefreshToken()));
-
-        return true;
-    }
 
     @PostMapping("/login/default")
     public boolean loginAuthFromUserLoginRequest(
@@ -47,7 +38,6 @@ public class UserAuthController {
     @PostMapping("/login/google")
     public boolean loginGoogleByUserGoogleAuthInfo(
             @RequestBody UserGoogleAuthToken userGoogleAuthToken, HttpServletResponse response) {
-        System.out.println("controller");
         JwtToken jwtToken = userAuthService.createJwtTokenByUserGoogleAuthToken(userGoogleAuthToken);
 
         response.setHeader(SET_COOKIE, createCookie(ACCESS_TOKEN, jwtToken.getAccessToken()));

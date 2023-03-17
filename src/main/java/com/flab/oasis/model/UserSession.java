@@ -4,13 +4,14 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
+
 @Getter
 @Setter
 @Builder
-public class UserAuth {
+public class UserSession implements Serializable {
+    private static final long serialVersionUID = -5705851952729691741L;
+
     private String uid;
-    private String password;
-    private String salt;
-    private char socialYN;
     private String refreshToken;
 }

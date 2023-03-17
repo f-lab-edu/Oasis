@@ -10,6 +10,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.flab.oasis.constant.ErrorCode;
 import com.flab.oasis.constant.JwtProperty;
 import com.flab.oasis.model.JwtToken;
+import com.flab.oasis.model.UserSession;
 import com.flab.oasis.model.exception.AuthorizationException;
 import com.flab.oasis.repository.UserAuthRepository;
 import com.flab.oasis.utils.LogUtils;
@@ -30,38 +31,53 @@ public class JwtService {
         String accessToken = generateToken(uid, ACCESS_TOKEN);
         String refreshToken = generateToken(uid, REFRESH_TOKEN);
 
-        userAuthRepository.setUserRefreshToken(uid, refreshToken);
+        userAuthRepository.updateRefreshToken(
+                UserSession.builder()
+                        .uid(uid)
+                        .refreshToken(refreshToken)
+                        .build()
+        );
 
         return new JwtToken(accessToken, refreshToken);
     }
 
-    public JwtToken reissueJwtToken(String refreshToken) {
+    public void verifyAccessToken(String accessToken) {
         try {
-            DecodedJWT decodedJWT = verifyJwt(refreshToken);
+            DecodedJWT decodedJWT = getDecodedJwtWithVerifySignature(accessToken);
+            String uid = decodedJWT.getClaim("uid").asString();
+            UserSession userSession = userAuthRepository.getUserSessionByUid(uid);
 
-            // refresh token이 redis에 존재하지 않으면 다시 로그인을 하도록 한다.
-            if (!userAuthRepository.existUserRefreshToken(decodedJWT.getSubject(), refreshToken)) {
+            if (!uid.equals(userSession.getUid())) {
                 throw new AuthorizationException(
-                        ErrorCode.NOT_FOUND, "Refresh Token doesn't exist in Redis.", refreshToken
+                        ErrorCode.UNAUTHORIZED, "Invalid user.", uid
+                );
+            }
+        } catch (TokenExpiredException e) {
+            throw new AuthorizationException(ErrorCode.UNAUTHORIZED, "Access Token is Expired.", accessToken);
+        } catch (SignatureVerificationException | InvalidClaimException e) {
+            throw new AuthorizationException(ErrorCode.UNAUTHORIZED, "Invalid Access Token.", accessToken);
+        }
+    }
+
+    public UserSession verifyRefreshToken(String refreshToken) {
+        try {
+            DecodedJWT decodedJWT = getDecodedJwtWithVerifySignature(refreshToken);
+            String uid = decodedJWT.getClaim("uid").asString();
+            UserSession userSession = userAuthRepository.getUserSessionByUid(uid);
+
+            if (!uid.equals(userSession.getUid())) {
+                throw new AuthorizationException(
+                        ErrorCode.UNAUTHORIZED, "Invalid user.", uid
                 );
             }
 
-            // refresh token 만료 3일 전이면 토큰을 새로 발급한다.
-            if (willExpire(decodedJWT)) {
-                System.out.println(LogUtils.makeLog(
-                        "Access/Refresh Token wes Reissued.", decodedJWT.getSubject()
-                ));
-
-                return createJwtToken(decodedJWT.getSubject());
+            if (!refreshToken.equals(userSession.getRefreshToken())) {
+                throw new AuthorizationException(
+                        ErrorCode.UNAUTHORIZED, "Refresh Token doesn't match.", refreshToken
+                );
             }
 
-            // 유효한 refresh token이면 access token만 새로 발급한다.
-            System.out.println(LogUtils.makeLog("Access Token wes Reissued.", decodedJWT.getSubject()));
-
-            return new JwtToken(
-                    generateToken(decodedJWT.getSubject(), ACCESS_TOKEN),
-                    refreshToken
-            );
+            return userSession;
         } catch (TokenExpiredException e) {
             throw new AuthorizationException(ErrorCode.UNAUTHORIZED, "Refresh Token is Expired.", refreshToken);
         } catch (SignatureVerificationException | InvalidClaimException e) {
@@ -69,7 +85,23 @@ public class JwtService {
         }
     }
 
-    public DecodedJWT verifyJwt(String token)
+    public JwtToken reissueJwtToken(UserSession userSession) {
+        DecodedJWT decodedJWT = JWT.decode(userSession.getRefreshToken());
+
+        // refresh token 만료 3일 전이면 신규 토큰을 발급한다.
+        if (willExpire(decodedJWT.getExpiresAt())) {
+            LogUtils.info("Access/Refresh Token wes Reissued.", userSession.getUid());
+
+            return createJwtToken(userSession.getUid());
+        }
+
+        // 유효한 refresh token이면 access token만 새로 발급한다.
+        LogUtils.info("Access Token wes Reissued.", userSession.getUid());
+
+        return new JwtToken(generateToken(userSession.getUid(), ACCESS_TOKEN), userSession.getRefreshToken());
+    }
+
+    private DecodedJWT getDecodedJwtWithVerifySignature(String token)
             throws TokenExpiredException, SignatureVerificationException, InvalidClaimException {
         Algorithm algorithm = Algorithm.HMAC256(JwtProperty.SECRET_KEY);
         JWTVerifier verifier = JWT.require(algorithm)
@@ -88,12 +120,13 @@ public class JwtService {
         return JWT.create()
                 .withIssuer(JwtProperty.ISSUER)
                 .withSubject(uid)
+                .withClaim("uid", uid)
                 .withIssuedAt(issueDate)
                 .withExpiresAt(new Date(issueDate.getTime() + expireTime))
                 .sign(algorithm);
     }
 
-    private boolean willExpire(DecodedJWT decodedJWT) {
-        return (decodedJWT.getExpiresAt().getTime() - new Date().getTime()) < JwtProperty.REFRESH_TOKEN_REISSUE_TIME;
+    private boolean willExpire(Date expiresAt) {
+        return (expiresAt.getTime() - new Date().getTime()) < JwtProperty.REFRESH_TOKEN_REISSUE_TIME;
     }
 }

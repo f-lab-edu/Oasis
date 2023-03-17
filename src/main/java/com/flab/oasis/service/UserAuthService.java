@@ -1,12 +1,13 @@
 package com.flab.oasis.service;
 
+
 import com.flab.oasis.constant.ErrorCode;
-import com.flab.oasis.mapper.UserAuthMapper;
 import com.flab.oasis.model.JwtToken;
 import com.flab.oasis.model.UserAuth;
 import com.flab.oasis.model.UserGoogleAuthToken;
 import com.flab.oasis.model.UserLoginRequest;
 import com.flab.oasis.model.exception.AuthorizationException;
+import com.flab.oasis.repository.UserAuthRepository;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.HttpTransport;
@@ -27,17 +28,14 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class UserAuthService {
-    private final UserAuthMapper userAuthMapper;
+    private final UserAuthRepository userAuthRepository;
     private final JwtService jwtService;
 
     @Value("${spring.security.oauth2.client.registration.google.client-id}")
     private String googleClientId;
 
     public JwtToken createJwtTokenByUserLoginRequest(UserLoginRequest userLoginRequest) {
-        UserAuth userAuth = Optional.ofNullable(userAuthMapper.getUserAuthByUid(userLoginRequest.getUid()))
-                .orElseThrow(() -> new AuthorizationException(
-                        ErrorCode.UNAUTHORIZED, "User does not exist.", userLoginRequest.getUid()
-                ));
+        UserAuth userAuth = userAuthRepository.getUserAuthByUid(userLoginRequest.getUid());
         String hashingPassword = hashingPassword(userLoginRequest.getPassword(), userAuth.getSalt());
 
         if (!userAuth.getPassword().equals(hashingPassword)) {
@@ -59,7 +57,7 @@ public class UserAuthService {
         try {
             GoogleIdToken googleIdToken = verifier.verify(userGoogleAuthToken.getToken());
             UserAuth userAuth = Optional.ofNullable(
-                    userAuthMapper.getUserAuthByUid(googleIdToken.getPayload().getEmail())
+                    userAuthRepository.getUserAuthByUid(googleIdToken.getPayload().getEmail())
                     ).orElseThrow(() -> new AuthorizationException(
                             ErrorCode.UNAUTHORIZED, "User does not exist.", googleIdToken.getPayload().getEmail()
                     ));
