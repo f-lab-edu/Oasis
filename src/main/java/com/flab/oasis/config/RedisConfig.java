@@ -47,6 +47,19 @@ public class RedisConfig {
     }
 
     @Bean
+    public RedisTemplate<String, Object> defaultTemplate(ObjectMapper objectMapper) {
+        GenericJackson2JsonRedisSerializer serializer = new GenericJackson2JsonRedisSerializer(objectMapper);
+        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setValueSerializer(serializer);
+        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
+        redisTemplate.setHashValueSerializer(serializer);
+        redisTemplate.setConnectionFactory(redisConnectionFactory());
+
+        return redisTemplate;
+    }
+
+    @Bean
     public RedisTemplate<SuggestionType, Object> bookSuggestionTemplate(ObjectMapper objectMapper) {
         GenericJackson2JsonRedisSerializer serializer = new GenericJackson2JsonRedisSerializer(objectMapper);
         RedisTemplate<SuggestionType, Object> redisTemplate = new RedisTemplate<>();
@@ -62,7 +75,12 @@ public class RedisConfig {
     @Bean
     public RedisCacheManager redisCacheManager(
             RedisConnectionFactory redisConnectionFactory, ObjectMapper objectMapper) {
-        RedisCacheConfiguration configuration = RedisCacheConfiguration.defaultCacheConfig()
+        return RedisCacheManager.RedisCacheManagerBuilder.fromConnectionFactory(redisConnectionFactory)
+                .cacheDefaults(createDefaultConfiguration(objectMapper)).build();
+    }
+
+    private static RedisCacheConfiguration createDefaultConfiguration(ObjectMapper objectMapper) {
+        return RedisCacheConfiguration.defaultCacheConfig()
                 .disableCachingNullValues()
                 .serializeKeysWith(
                         RedisSerializationContext.SerializationPair
@@ -71,8 +89,5 @@ public class RedisConfig {
                         RedisSerializationContext.SerializationPair
                                 .fromSerializer(new GenericJackson2JsonRedisSerializer(objectMapper))
                 );
-
-        return RedisCacheManager.RedisCacheManagerBuilder.fromConnectionFactory(redisConnectionFactory)
-                .cacheDefaults(configuration).build();
     }
 }
