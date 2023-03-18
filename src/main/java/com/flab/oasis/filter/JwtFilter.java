@@ -7,25 +7,28 @@ import com.flab.oasis.model.UserSession;
 import com.flab.oasis.model.exception.AuthorizationException;
 import com.flab.oasis.service.JwtService;
 import com.flab.oasis.utils.LogUtils;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseCookie;
-import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.web.util.WebUtils;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Optional;
 
-@RequiredArgsConstructor
-public class JwtFilter extends OncePerRequestFilter {
+public class JwtFilter extends BasicAuthenticationFilter {
     private final JwtService jwtService;
 
     private static final String ACCESS_TOKEN = "AccessToken";
     private static final String REFRESH_TOKEN = "RefreshToken";
+
+    public JwtFilter(AuthenticationManager authenticationManager, JwtService jwtService) {
+        super(authenticationManager);
+        this.jwtService = jwtService;
+    }
 
     @Override
     public void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
