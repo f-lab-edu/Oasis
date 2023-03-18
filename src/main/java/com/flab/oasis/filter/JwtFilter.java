@@ -1,11 +1,9 @@
 package com.flab.oasis.filter;
 
-import com.auth0.jwt.exceptions.InvalidClaimException;
-import com.auth0.jwt.exceptions.SignatureVerificationException;
-import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.flab.oasis.constant.ErrorCode;
 import com.flab.oasis.constant.JwtProperty;
 import com.flab.oasis.model.JwtToken;
+import com.flab.oasis.model.UserSession;
 import com.flab.oasis.model.exception.AuthorizationException;
 import com.flab.oasis.service.JwtService;
 import com.flab.oasis.utils.LogUtils;
@@ -16,6 +14,7 @@ import org.springframework.web.util.WebUtils;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -35,36 +34,35 @@ public class JwtFilter extends OncePerRequestFilter {
                 .orElseThrow(() -> new AuthorizationException(
                         ErrorCode.UNAUTHORIZED, "Access Token does not exist in cookie.")
                 ).getValue();
+        String refreshToken = Optional.ofNullable(WebUtils.getCookie(request, REFRESH_TOKEN))
+                .orElseThrow(() -> new AuthorizationException(
+                        ErrorCode.UNAUTHORIZED, "Refresh Token does not exist in cookie.")
+                ).getValue();
 
         try {
-            jwtService.verifyJwt(accessToken);
+            jwtService.verifyAccessToken(accessToken);
+            jwtService.verifyRefreshToken(refreshToken);
 
             chain.doFilter(request, response);
-        } catch (TokenExpiredException e) {
-            System.out.println(LogUtils.makeErrorLog(
-                    ErrorCode.UNAUTHORIZED, "Access Token is Expired.", accessToken
-            ));
+        } catch (AuthorizationException e) {
+            if (e.getMessage().equals("Access Token is Expired.")) {
+                LogUtils.error(
+                        ErrorCode.UNAUTHORIZED, "Access Token is Expired.", accessToken
+                );
 
-            String refreshToken = Optional.ofNullable(WebUtils.getCookie(request, REFRESH_TOKEN))
-                    .orElseThrow(() -> new AuthorizationException(
-                            ErrorCode.UNAUTHORIZED, "Refresh Token does not exist in cookie."
-                    )).getValue();
+                UserSession userSession = jwtService.verifyRefreshToken(refreshToken);
+                JwtToken jwtToken = jwtService.reissueJwtToken(userSession);
 
-            JwtToken jwtToken = jwtService.reissueJwtToken(refreshToken);
+                response.setHeader("Set-Cookie", createCookie(ACCESS_TOKEN, jwtToken.getAccessToken()));
+                response.setHeader("Set-Cookie", createCookie(REFRESH_TOKEN, jwtToken.getRefreshToken()));
 
-            response.setHeader("Set-Cookie", createCookie(ACCESS_TOKEN, jwtToken.getAccessToken()));
-            response.setHeader("Set-Cookie", createCookie(REFRESH_TOKEN, jwtToken.getRefreshToken()));
-
-            response.sendError(
-                    ErrorCode.RESET_CONTENT.getCode(),
-                    "The token was reissued because the access token expired."
-            );
-        } catch (SignatureVerificationException | InvalidClaimException e) {
-            System.out.println(LogUtils.makeErrorLog(
-                    ErrorCode.UNAUTHORIZED, "Invalid Access Token.", accessToken
-            ));
-
-            response.sendError(ErrorCode.UNAUTHORIZED.getCode(), "Invalid Access Token.");
+                response.sendError(
+                        ErrorCode.RESET_CONTENT.getCode(),
+                        "The token was reissued because the access token expired."
+                );
+            } else {
+                response.sendError(e.getErrorCode().getCode(), e.getMessage());
+            }
         }
     }
 
