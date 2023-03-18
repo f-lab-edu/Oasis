@@ -2,10 +2,7 @@ package com.flab.oasis.service;
 
 
 import com.flab.oasis.constant.ErrorCode;
-import com.flab.oasis.model.JwtToken;
-import com.flab.oasis.model.UserAuth;
-import com.flab.oasis.model.UserGoogleAuthToken;
-import com.flab.oasis.model.UserLoginRequest;
+import com.flab.oasis.model.*;
 import com.flab.oasis.model.exception.AuthorizationException;
 import com.flab.oasis.repository.UserAuthRepository;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
@@ -47,7 +44,7 @@ public class UserAuthService {
         return jwtService.createJwtToken(userAuth.getUid());
     }
 
-    public JwtToken createJwtTokenByUserGoogleAuthToken(UserGoogleAuthToken userGoogleAuthToken) {
+    public UserGoogleAuthResult createJwtTokenByUserGoogleAuthToken(UserGoogleAuthToken userGoogleAuthToken) {
         HttpTransport transport = new NetHttpTransport();
         JsonFactory jsonFactory = GsonFactory.getDefaultInstance();
 
@@ -62,7 +59,10 @@ public class UserAuthService {
                             ErrorCode.UNAUTHORIZED, "User does not exist.", googleIdToken.getPayload().getEmail()
                     ));
 
-            return jwtService.createJwtToken(userAuth.getUid());
+            return UserGoogleAuthResult.builder()
+                    .uid(userAuth.getUid())
+                    .jwtToken(jwtService.createJwtToken(userAuth.getUid()))
+                    .build();
 
         } catch (GeneralSecurityException e) {
             throw new AuthorizationException(

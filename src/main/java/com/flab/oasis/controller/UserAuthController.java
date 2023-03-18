@@ -2,6 +2,7 @@ package com.flab.oasis.controller;
 
 import com.flab.oasis.constant.JwtProperty;
 import com.flab.oasis.model.JwtToken;
+import com.flab.oasis.model.UserGoogleAuthResult;
 import com.flab.oasis.model.UserGoogleAuthToken;
 import com.flab.oasis.model.UserLoginRequest;
 import com.flab.oasis.service.UserAuthService;
@@ -24,7 +25,7 @@ public class UserAuthController {
     private static final String ACCESS_TOKEN = "AccessToken";
     private static final String REFRESH_TOKEN = "RefreshToken";
 
-    @PostMapping("/login/default")
+    @PostMapping("/login-default")
     public boolean loginAuthFromUserLoginRequest(
             @RequestBody UserLoginRequest userLoginRequest, HttpServletResponse response) {
         JwtToken jwtToken = userAuthService.createJwtTokenByUserLoginRequest(userLoginRequest);
@@ -35,15 +36,15 @@ public class UserAuthController {
         return true;
     }
 
-    @PostMapping("/login/google")
-    public boolean loginGoogleByUserGoogleAuthInfo(
+    @PostMapping("/login-google")
+    public String loginGoogleByUserGoogleAuthInfo(
             @RequestBody UserGoogleAuthToken userGoogleAuthToken, HttpServletResponse response) {
-        JwtToken jwtToken = userAuthService.createJwtTokenByUserGoogleAuthToken(userGoogleAuthToken);
+        UserGoogleAuthResult userGoogleAuthResult = userAuthService.createJwtTokenByUserGoogleAuthToken(userGoogleAuthToken);
 
-        response.setHeader(SET_COOKIE, createCookie(ACCESS_TOKEN, jwtToken.getAccessToken()));
-        response.setHeader(SET_COOKIE, createCookie(REFRESH_TOKEN, jwtToken.getRefreshToken()));
+        response.setHeader(SET_COOKIE, createCookie(ACCESS_TOKEN, userGoogleAuthResult.getJwtToken().getAccessToken()));
+        response.setHeader(SET_COOKIE, createCookie(REFRESH_TOKEN, userGoogleAuthResult.getJwtToken().getRefreshToken()));
 
-        return true;
+        return userGoogleAuthResult.getUid();
     }
 
     private String createCookie(String tokenType, String token) {
