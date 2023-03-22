@@ -48,8 +48,8 @@ public class TokenInterceptor implements HandlerInterceptor {
                 UserSession userSession = jwtService.verifyRefreshToken(refreshToken);
                 JwtToken jwtToken = jwtService.reissueJwtToken(userSession);
 
-                response.setHeader("Set-Cookie", createCookie(ACCESS_TOKEN, jwtToken.getAccessToken()));
-                response.setHeader("Set-Cookie", createCookie(REFRESH_TOKEN, jwtToken.getRefreshToken()));
+                response.addHeader("Set-Cookie", createCookie(ACCESS_TOKEN, jwtToken.getAccessToken()));
+                response.addHeader("Set-Cookie", createCookie(REFRESH_TOKEN, jwtToken.getRefreshToken()));
                 response.sendError(
                         ErrorCode.RESET_CONTENT.getCode(),
                         "The token was reissued because the access token expired."
