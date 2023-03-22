@@ -10,12 +10,11 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
-@EnableWebSecurity(debug = true) // 스프링 시큐리티 필터를 스프링 필터체인에 등록
+@EnableWebSecurity(debug = false) // 스프링 시큐리티 필터를 스프링 필터체인에 등록
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final JwtService jwtService;
@@ -31,8 +30,8 @@ public class SecurityConfig {
                 .apply(new OasisAuthFilter())
                 .and()
                 .authorizeRequests(auth -> auth
-                        .antMatchers("/api/auth/**").permitAll()
-                        .anyRequest().authenticated()
+                        .antMatchers("/api/auth/**").permitAll() // '/api/auth' 경로는 인증 안함
+                        .anyRequest().authenticated() // 그 외 경로는 모두 인증 필요
                 )
                 .build();
     }
