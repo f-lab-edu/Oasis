@@ -30,8 +30,8 @@ public class UserAuthController {
             @RequestBody UserLoginRequest userLoginRequest, HttpServletResponse response) {
         JwtToken jwtToken = userAuthService.createJwtTokenByUserLoginRequest(userLoginRequest);
 
-        response.setHeader(SET_COOKIE, createCookie(ACCESS_TOKEN, jwtToken.getAccessToken()));
-        response.setHeader(SET_COOKIE, createCookie(REFRESH_TOKEN, jwtToken.getRefreshToken()));
+        response.addHeader(SET_COOKIE, createCookie(ACCESS_TOKEN, jwtToken.getAccessToken()));
+        response.addHeader(SET_COOKIE, createCookie(REFRESH_TOKEN, jwtToken.getRefreshToken()));
 
         return true;
     }
@@ -41,8 +41,8 @@ public class UserAuthController {
             @RequestBody UserGoogleAuthToken userGoogleAuthToken, HttpServletResponse response) {
         UserGoogleAuthResult userGoogleAuthResult = userAuthService.createJwtTokenByUserGoogleAuthToken(userGoogleAuthToken);
 
-        response.setHeader(SET_COOKIE, createCookie(ACCESS_TOKEN, userGoogleAuthResult.getJwtToken().getAccessToken()));
-        response.setHeader(SET_COOKIE, createCookie(REFRESH_TOKEN, userGoogleAuthResult.getJwtToken().getRefreshToken()));
+        response.addHeader(SET_COOKIE, createCookie(ACCESS_TOKEN, userGoogleAuthResult.getJwtToken().getAccessToken()));
+        response.addHeader(SET_COOKIE, createCookie(REFRESH_TOKEN, userGoogleAuthResult.getJwtToken().getRefreshToken()));
 
         return userGoogleAuthResult.getUid();
     }
