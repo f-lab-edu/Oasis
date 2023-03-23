@@ -33,7 +33,8 @@ public class JwtFilter extends BasicAuthenticationFilter {
     @Override
     public void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws IOException, ServletException {
-        if (!request.getRequestURI().contains("/api/auth")) {
+        // 인증 요청은 JwtFilter 과정을 생략한다.
+        if (!request.getRequestURI().contains("auth")) {
             String accessToken = Optional.ofNullable(WebUtils.getCookie(request, CookieUtils.ACCESS_TOKEN))
                     .orElseThrow(() -> new AuthorizationException(
                             ErrorCode.UNAUTHORIZED, "Access Token does not exist in cookie.")
