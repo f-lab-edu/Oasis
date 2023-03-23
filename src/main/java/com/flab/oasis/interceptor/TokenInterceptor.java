@@ -1,13 +1,12 @@
 package com.flab.oasis.interceptor;
 
 import com.flab.oasis.constant.ErrorCode;
-import com.flab.oasis.constant.JwtProperty;
 import com.flab.oasis.model.JwtToken;
 import com.flab.oasis.model.UserSession;
 import com.flab.oasis.model.exception.AuthorizationException;
 import com.flab.oasis.service.JwtService;
+import com.flab.oasis.utils.CookieUtils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.util.WebUtils;
@@ -21,17 +20,14 @@ import java.util.Optional;
 public class TokenInterceptor implements HandlerInterceptor {
     private final JwtService jwtService;
 
-    private static final String ACCESS_TOKEN = "AccessToken";
-    private static final String REFRESH_TOKEN = "RefreshToken";
-
     @Override
     public boolean preHandle(
             HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        String accessToken = Optional.ofNullable(WebUtils.getCookie(request, ACCESS_TOKEN))
+        String accessToken = Optional.ofNullable(WebUtils.getCookie(request, CookieUtils.ACCESS_TOKEN))
                 .orElseThrow(() -> new AuthorizationException(
                         ErrorCode.UNAUTHORIZED, "Access Token does not exist in cookie.")
                 ).getValue();
-        String refreshToken = Optional.ofNullable(WebUtils.getCookie(request, REFRESH_TOKEN))
+        String refreshToken = Optional.ofNullable(WebUtils.getCookie(request, CookieUtils.REFRESH_TOKEN))
                 .orElseThrow(() -> new AuthorizationException(
                         ErrorCode.UNAUTHORIZED, "Refresh Token does not exist in cookie.")
                 ).getValue();
@@ -48,8 +44,14 @@ public class TokenInterceptor implements HandlerInterceptor {
                 UserSession userSession = jwtService.verifyRefreshToken(refreshToken);
                 JwtToken jwtToken = jwtService.reissueJwtToken(userSession);
 
-                response.addHeader("Set-Cookie", createCookie(ACCESS_TOKEN, jwtToken.getAccessToken()));
-                response.addHeader("Set-Cookie", createCookie(REFRESH_TOKEN, jwtToken.getRefreshToken()));
+                response.addHeader(
+                        CookieUtils.SET_COOKIE,
+                        CookieUtils.createCookie(CookieUtils.ACCESS_TOKEN, jwtToken.getAccessToken())
+                );
+                response.addHeader(
+                        CookieUtils.SET_COOKIE,
+                        CookieUtils.createCookie(CookieUtils.REFRESH_TOKEN, jwtToken.getRefreshToken())
+                );
                 response.sendError(
                         ErrorCode.RESET_CONTENT.getCode(),
                         "The token was reissued because the access token expired."
@@ -61,18 +63,5 @@ public class TokenInterceptor implements HandlerInterceptor {
             return false;
         }
 
-    }
-
-    private String createCookie(String tokenType, String token) {
-        int expireTime = tokenType.equals(ACCESS_TOKEN) ?
-                JwtProperty.ACCESS_TOKEN_EXPIRE_TIME : JwtProperty.REFRESH_TOKEN_EXPIRE_TIME;
-
-        return ResponseCookie.from(tokenType, token)
-                .maxAge(expireTime / 1000)
-                .httpOnly(true)
-                .path("/")
-                .sameSite("Lax")
-                .build()
-                .toString();
     }
 }
