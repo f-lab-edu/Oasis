@@ -2,6 +2,9 @@ package com.flab.oasis.config;
 
 import com.flab.oasis.filter.JwtFilter;
 import com.flab.oasis.service.JwtService;
+import com.flab.oasis.service.OAuth2Service;
+import com.flab.oasis.service.handler.OAuth2FailureHandler;
+import com.flab.oasis.service.handler.OAuth2SuccessHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -18,10 +21,13 @@ import org.springframework.web.filter.CorsFilter;
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final JwtService jwtService;
+    private final OAuth2Service oAuth2Service;
+    private final OAuth2SuccessHandler successHandler;
+    private final OAuth2FailureHandler failureHandler;
 
     @Bean
     public SecurityFilterChain configure(HttpSecurity httpSecurity) throws Exception {
-        return httpSecurity
+        httpSecurity
                 .csrf().disable() // csrf 인증 토큰 비활성
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) // 시큐리티 세션 비활성
                 .and()
@@ -33,7 +39,14 @@ public class SecurityConfig {
                         .antMatchers("/api/auth/**").permitAll() // '/api/auth' 경로는 인증 안함
                         .anyRequest().authenticated() // 그 외 경로는 모두 인증 필요
                 )
-                .build();
+                .oauth2Login()
+                .userInfoEndpoint()
+                .userService(oAuth2Service)
+                .and()
+                .successHandler(successHandler)
+                .failureHandler(failureHandler);
+
+        return httpSecurity.build();
     }
 
     public class OasisAuthFilter extends AbstractHttpConfigurer<OasisAuthFilter, HttpSecurity> {
