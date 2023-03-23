@@ -1,8 +1,6 @@
 package com.flab.oasis.controller;
 
 import com.flab.oasis.model.JwtToken;
-import com.flab.oasis.model.UserGoogleAuthResult;
-import com.flab.oasis.model.UserGoogleAuthToken;
 import com.flab.oasis.model.UserLoginRequest;
 import com.flab.oasis.service.UserAuthService;
 import com.flab.oasis.utils.CookieUtils;
@@ -38,23 +36,7 @@ public class UserAuthController {
     }
 
     @PostMapping("/login-google")
-    public String loginGoogleByUserGoogleAuthInfo(
-            @RequestBody UserGoogleAuthToken userGoogleAuthToken, HttpServletResponse response) {
-        UserGoogleAuthResult userGoogleAuthResult = userAuthService.createJwtTokenByUserGoogleAuthToken(userGoogleAuthToken);
-
-        response.addHeader(
-                CookieUtils.SET_COOKIE,
-                CookieUtils.createCookie(
-                        CookieUtils.ACCESS_TOKEN, userGoogleAuthResult.getJwtToken().getAccessToken()
-                )
-        );
-        response.addHeader(
-                CookieUtils.SET_COOKIE,
-                CookieUtils.createCookie(
-                        CookieUtils.REFRESH_TOKEN, userGoogleAuthResult.getJwtToken().getRefreshToken()
-                )
-        );
-
-        return userGoogleAuthResult.getUid();
+    public String loginGoogleByUserGoogleAuthInfo() {
+        return "/oauth2/authorization/google";
     }
 }
