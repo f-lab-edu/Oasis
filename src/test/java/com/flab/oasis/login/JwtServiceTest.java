@@ -37,7 +37,7 @@ class JwtServiceTest {
     void testReissueAccessToken() {
         String originUid = "test@test.com";
         String refreshToken = jwtService.createJwtToken(originUid).getRefreshToken();
-        UserSession userSession = UserSession.builder().uid(originUid).refreshToken(refreshToken).build();
+        UserSession userSession = new UserSession(originUid, refreshToken);
 
         String accessToken = jwtService.reissueJwtToken(userSession).getAccessToken();
         String actualUid = JWT.decode(accessToken).getClaim("uid").asString();
@@ -51,7 +51,7 @@ class JwtServiceTest {
     void testVerifyRefreshTokenThrowError() {
         String uid = "test@test.com";
         String refreshToken = jwtService.createJwtToken(uid).getRefreshToken();
-        UserSession willReturn = UserSession.builder().uid(uid).refreshToken("actualRefreshToken").build();
+        UserSession willReturn = new UserSession(uid, refreshToken);
 
         BDDMockito.given(userAuthRepository.getUserSessionByUid(uid))
                 .willReturn(willReturn);

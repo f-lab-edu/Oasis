@@ -12,5 +12,6 @@ import java.io.Serializable;
 public class ResponseError implements Serializable {
     private static final long serialVersionUID = 1772002427691231525L;
 
+    private int code;
     private String message;
 }

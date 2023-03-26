@@ -32,10 +32,7 @@ public class JwtService {
         String refreshToken = generateToken(uid, REFRESH_TOKEN);
 
         userAuthRepository.updateRefreshToken(
-                UserSession.builder()
-                        .uid(uid)
-                        .refreshToken(refreshToken)
-                        .build()
+                new UserSession(uid, refreshToken)
         );
 
         return new JwtToken(accessToken, refreshToken);
