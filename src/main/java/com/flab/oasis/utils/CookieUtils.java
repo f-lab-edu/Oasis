@@ -1,6 +1,7 @@
 package com.flab.oasis.utils;
 
 import com.flab.oasis.constant.JwtProperty;
+import org.springframework.boot.web.server.Cookie;
 import org.springframework.http.ResponseCookie;
 
 public class CookieUtils {
@@ -16,7 +17,7 @@ public class CookieUtils {
                 .maxAge(expireTime / 1000)
                 .httpOnly(true)
                 .path("/")
-                .sameSite("Lax")
+                .sameSite(Cookie.SameSite.LAX.toString())
                 .build()
                 .toString();
     }
