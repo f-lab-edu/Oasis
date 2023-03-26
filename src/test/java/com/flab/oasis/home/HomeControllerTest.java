@@ -50,7 +50,8 @@ class HomeControllerTest {
         BookSuggestionRequest bookSuggestionRequest = new BookSuggestionRequest(uid, suggestionType);
         List<BookSuggestion> bookSuggestionList = generateBookSuggestionList(suggestionType);
 
-        BDDMockito.given(homeService.suggestion(bookSuggestionRequest)).willReturn(bookSuggestionList);
+        BDDMockito.given(homeService.getBookSuggestionListByBookSuggestionRequest(bookSuggestionRequest))
+                .willReturn(bookSuggestionList);
 
         mockMvc.perform(
                 MockMvcRequestBuilders
