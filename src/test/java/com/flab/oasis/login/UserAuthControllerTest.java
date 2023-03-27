@@ -1,15 +1,15 @@
 package com.flab.oasis.login;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flab.oasis.controller.UserAuthController;
 import com.flab.oasis.model.JwtToken;
 import com.flab.oasis.model.UserLoginRequest;
-import com.flab.oasis.service.JwtService;
 import com.flab.oasis.service.UserAuthService;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -20,8 +20,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 @ExtendWith(MockitoExtension.class)
 class UserAuthControllerTest {
     @InjectMocks
@@ -30,9 +28,6 @@ class UserAuthControllerTest {
     @Mock
     UserAuthService userAuthService;
 
-    @Mock
-    JwtService jwtService;
-
     MockMvc mockMvc;
 
     @BeforeEach
@@ -40,19 +35,24 @@ class UserAuthControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(userAuthController).build();
     }
 
+    @DisplayName("기본 로그인 테스트")
     @Test
     void testLoginDefault() throws Exception {
-        ObjectMapper objectMapper = new ObjectMapper();
-        UserLoginRequest userLoginRequest = new UserLoginRequest("test@test.com", "1234");
-        JwtToken jwtToken = new JwtToken("accessToken", "refreshToken");
+        UserLoginRequest userLoginRequest = new UserLoginRequest();
 
-        BDDMockito.given(userAuthService.createJwtTokenByUserLoginRequest(userLoginRequest)).willReturn(jwtToken);
+        JwtToken jwtToken = new JwtToken(null, "");
+
+        BDDMockito.doReturn(jwtToken)
+                .when(userAuthService)
+                .createJwtTokenByUserLoginRequest(
+                        ArgumentMatchers.any(UserLoginRequest.class)
+                );
 
         mockMvc.perform(
                 MockMvcRequestBuilders
-                        .post("/api/auth/login/default")
+                        .post("/api/auth/login-default")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(userLoginRequest))
+                        .content(new ObjectMapper().writeValueAsString(userLoginRequest))
         ).andExpect(
                 MockMvcResultMatchers.status().isOk()
         ).andExpect(
