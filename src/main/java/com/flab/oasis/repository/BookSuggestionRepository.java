@@ -2,9 +2,11 @@ package com.flab.oasis.repository;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.flab.oasis.constant.ErrorCode;
 import com.flab.oasis.constant.SuggestionType;
 import com.flab.oasis.mapper.BookSuggestionMapper;
 import com.flab.oasis.model.BookSuggestion;
+import com.flab.oasis.utils.LogUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
@@ -20,21 +22,28 @@ public class BookSuggestionRepository {
     private final BookSuggestionMapper bookSuggestionMapper;
 
     public List<BookSuggestion> getBookSuggestionListBySuggestionType(SuggestionType suggestionType) {
-        return objectMapper.convertValue(
-                Optional.ofNullable(
-                        redisTemplate.opsForValue().get(suggestionType)
-                ).orElse(
-                        pushBookSuggestionToRedis(suggestionType)
-                ),
-                new TypeReference<List<BookSuggestion>>() {}
-        );
+        try{
+            List<BookSuggestion> bookSuggestionList = objectMapper.convertValue(
+                    Optional.ofNullable(
+                            redisTemplate.opsForValue().get(suggestionType)
+                    ).orElse(
+                            getBookSuggestionListBySuggestionTypeFromDB(suggestionType)
+                    ),
+                    new TypeReference<List<BookSuggestion>>() {}
+
+            );
+
+            redisTemplate.opsForValue().set(suggestionType, bookSuggestionList);
+
+            return bookSuggestionList;
+        } catch (Exception e) {
+            LogUtils.error(ErrorCode.SERVICE_UNAVAILABLE, e.getMessage());
+
+            return getBookSuggestionListBySuggestionTypeFromDB(suggestionType);
+        }
     }
 
-    private List<BookSuggestion> pushBookSuggestionToRedis(SuggestionType suggestionType) {
-        List<BookSuggestion> bookSuggestionList =
-                bookSuggestionMapper.findBookSuggestionBySuggestionType(suggestionType);
-        redisTemplate.opsForValue().set(suggestionType, bookSuggestionList);
-
-        return bookSuggestionList;
+    private List<BookSuggestion> getBookSuggestionListBySuggestionTypeFromDB(SuggestionType suggestionType) {
+        return bookSuggestionMapper.findBookSuggestionBySuggestionType(suggestionType);
     }
 }

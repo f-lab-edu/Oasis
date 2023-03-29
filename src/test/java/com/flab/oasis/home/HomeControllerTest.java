@@ -55,7 +55,7 @@ class HomeControllerTest {
 
         mockMvc.perform(
                 MockMvcRequestBuilders
-                        .post("/home/suggestion")
+                        .post("/api/home/suggestion")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(bookSuggestionRequest))
                 )
