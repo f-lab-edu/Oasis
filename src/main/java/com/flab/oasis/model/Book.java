@@ -1,5 +1,6 @@
 package com.flab.oasis.model;
 
+import com.flab.oasis.constant.BookCategory;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,6 +21,6 @@ public class Book {
     private Date publishDate;
     private String imageUrl;
     private String description;
-    private int categoryId;
-    private String categoryName;
+    private BookCategory bookCategory;
+    private String bookCategoryName;
 }

@@ -1,5 +1,6 @@
 package com.flab.oasis.service;
 
+import com.flab.oasis.constant.BookCategory;
 import com.flab.oasis.mapper.UserCategoryMapper;
 import com.flab.oasis.model.BookSuggestion;
 import com.flab.oasis.model.BookSuggestionRequest;
@@ -23,12 +24,21 @@ public class HomeService {
     @Cacheable(cacheNames = "homeCache", keyGenerator = "oasisKeyGenerator", cacheManager = "ehCacheCacheManager")
     public List<BookSuggestion> getBookSuggestionListByBookSuggestionRequest(
             BookSuggestionRequest bookSuggestionRequest) {
-        return getBookSuggestionListByUserCategory(
-                bookSuggestionRequest.getUid(),
-                bookSuggestionRepository.getBookSuggestionListBySuggestionType(
-                        bookSuggestionRequest.getSuggestionType()
+        return setBookCategoryName(
+                getBookSuggestionListByUserCategory(
+                        bookSuggestionRequest.getUid(),
+                        bookSuggestionRepository.getBookSuggestionListBySuggestionType(
+                                bookSuggestionRequest.getSuggestionType()
+
+                        )
                 )
         );
+    }
+
+    private List<BookSuggestion> setBookCategoryName(List<BookSuggestion> bookSuggestionList) {
+        bookSuggestionList.forEach(bs -> bs.setBookCategoryName(bs.getBookCategory().getName()));
+
+        return bookSuggestionList;
     }
 
     private List<BookSuggestion> getBookSuggestionListByUserCategory(
@@ -38,15 +48,15 @@ public class HomeService {
         if (userCategory.isEmpty()) {
             return bookSuggestionList;
         } else {
-            Map<Integer, List<BookSuggestion>> bookListByCategoryId = groupByCategoryId(bookSuggestionList);
+            Map<BookCategory, List<BookSuggestion>> bookListByCategoryId = groupByCategoryId(bookSuggestionList);
             List<BookSuggestion> bookList = new ArrayList<>();
-            userCategory.forEach(uci -> bookList.addAll(bookListByCategoryId.get(uci.getCategoryId())));
+            userCategory.forEach(uci -> bookList.addAll(bookListByCategoryId.get(uci.getBookCategory())));
 
             return bookList;
         }
     }
 
-    private Map<Integer, List<BookSuggestion>> groupByCategoryId(List<BookSuggestion> bookSuggestionList) {
-        return bookSuggestionList.stream().collect(Collectors.groupingBy(BookSuggestion::getCategoryId));
+    private Map<BookCategory, List<BookSuggestion>> groupByCategoryId(List<BookSuggestion> bookSuggestionList) {
+        return bookSuggestionList.stream().collect(Collectors.groupingBy(BookSuggestion::getBookCategory));
     }
 }

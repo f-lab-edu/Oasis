@@ -1,5 +1,6 @@
 package com.flab.oasis.home;
 
+import com.flab.oasis.constant.BookCategory;
 import com.flab.oasis.constant.SuggestionType;
 import com.flab.oasis.mapper.UserCategoryMapper;
 import com.flab.oasis.model.BookSuggestion;
@@ -40,7 +41,7 @@ class HomeServiceTest {
         List<UserCategory> userCategoryList = new ArrayList<>();
         UserCategory userCategory = new UserCategory();
         userCategory.setUid(uid);
-        userCategory.setCategoryId(101);
+        userCategory.setBookCategory(BookCategory.BC101);
 
         userCategoryList.add(userCategory);
 
@@ -50,10 +51,10 @@ class HomeServiceTest {
                 .willReturn(generateBookSuggestionList(suggestionType));
 
         Assertions.assertEquals(
-                userCategoryList.get(0).getCategoryId(),
+                userCategoryList.get(0).getBookCategory(),
                 homeService.getBookSuggestionListByBookSuggestionRequest(
                         new BookSuggestionRequest(uid, suggestionType)
-                ).get(0).getCategoryId()
+                ).get(0).getBookCategory()
         );
     }
 
@@ -70,10 +71,10 @@ class HomeServiceTest {
                 .willReturn(bookSuggestionList);
 
         Assertions.assertEquals(
-                bookSuggestionList.get(0).getCategoryId(),
+                bookSuggestionList.get(0).getBookCategory(),
                 homeService.getBookSuggestionListByBookSuggestionRequest(
                         new BookSuggestionRequest(uid, suggestionType)
-                ).get(0).getCategoryId()
+                ).get(0).getBookCategory()
         );
     }
 
@@ -87,8 +88,8 @@ class HomeServiceTest {
         bookSuggestion.setTranslator("trans");
         bookSuggestion.setPublisher("publish");
         bookSuggestion.setPublishDate(new Date());
-        bookSuggestion.setCategoryId(101);
-        bookSuggestion.setCategoryName("category name");
+        bookSuggestion.setBookCategory(BookCategory.BC101);
+        bookSuggestion.setBookCategoryName(BookCategory.BC101.getName());
         bookSuggestion.setDescription("desc");
         bookSuggestion.setImageUrl("url");
 

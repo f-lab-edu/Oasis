@@ -6,12 +6,8 @@
     <select id="findBookSuggestionBySuggestionType" parameterType="com.flab.oasis.constant.SuggestionType" resultType="com.flab.oasis.model.BookSuggestion">
         SELECT UCASE(A.SUGGESTION_TYPE) AS suggestionType, B.BOOK_ID AS bookId,
             B.TITLE, B.AUTHOR, B.TRANSLATOR, B.PUBLISHER, B.PUBLISH_DATE AS publishDate,
-            B.IMAGE_URL AS imageUrl, B.DESCRIPTION, B.CATEGORY_ID AS categoryId, B.categoryName
-        FROM BOOK_SUGGESTION A, (
-            SELECT X.*, Y.CATEGORY_NAME AS categoryName
-            FROM BOOK_LIST X, BOOK_CATEGORY Y
-            WHERE X.CATEGORY_ID = Y.CATEGORY_ID
-        ) B
+            B.IMAGE_URL AS imageUrl, B.DESCRIPTION, B.BOOK_CATEGORY AS bookCategory
+        FROM BOOK_SUGGESTION A, BOOK_LIST B
         WHERE A.BOOK_ID = B.BOOK_ID AND UCASE(A.SUGGESTION_TYPE) = #{suggestionType}
     </select>
 

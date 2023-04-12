@@ -2,6 +2,7 @@ package com.flab.oasis.home;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.flab.oasis.constant.BookCategory;
 import com.flab.oasis.constant.SuggestionType;
 import com.flab.oasis.controller.HomeController;
 import com.flab.oasis.model.BookSuggestion;
@@ -78,8 +79,8 @@ class HomeControllerTest {
         bookSuggestion.setTranslator("trans");
         bookSuggestion.setPublisher("publish");
         bookSuggestion.setPublishDate(new Date());
-        bookSuggestion.setCategoryId(101);
-        bookSuggestion.setCategoryName("category name");
+        bookSuggestion.setBookCategory(BookCategory.BC101);
+        bookSuggestion.setBookCategoryName(BookCategory.BC101.getName());
         bookSuggestion.setDescription("desc");
         bookSuggestion.setImageUrl("url");
 

@@ -1,5 +1,6 @@
 package com.flab.oasis.model;
 
+import com.flab.oasis.constant.BookCategory;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -7,5 +8,5 @@ import lombok.Setter;
 @Setter
 public class UserCategory {
     private String uid;
-    private int categoryId;
+    private BookCategory bookCategory;
 }
