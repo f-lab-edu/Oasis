@@ -18,7 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 public class UserAuthController {
     private final UserAuthService userAuthService;
 
-    @PostMapping("/login-default")
+    @PostMapping("/login/default")
     public boolean loginAuthFromUserLoginRequest(
             @RequestBody UserLoginRequest userLoginRequest, HttpServletResponse response) {
         JwtToken jwtToken = userAuthService.createJwtTokenByUserLoginRequest(userLoginRequest);
@@ -35,7 +35,7 @@ public class UserAuthController {
         return true;
     }
 
-    @PostMapping("/login-google")
+    @PostMapping("/login/google")
     public String loginGoogleByUserGoogleAuthInfo() {
         return "/oauth2/authorization/google";
     }

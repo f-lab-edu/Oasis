@@ -51,7 +51,7 @@ class JwtServiceTest {
     void testVerifyRefreshTokenThrowError() {
         String uid = "test@test.com";
         String refreshToken = jwtService.createJwtToken(uid).getRefreshToken();
-        UserSession willReturn = new UserSession(uid, refreshToken);
+        UserSession willReturn = new UserSession(uid, null);
 
         BDDMockito.given(userAuthRepository.getUserSessionByUid(uid))
                 .willReturn(willReturn);
