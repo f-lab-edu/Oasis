@@ -1,4 +1,4 @@
-package com.flab.oasis.mapper;
+package com.flab.oasis.mapper.user;
 
 import com.flab.oasis.model.UserCategory;
 import org.apache.ibatis.annotations.Mapper;

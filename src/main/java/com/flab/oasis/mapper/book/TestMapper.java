@@ -1,4 +1,4 @@
-package com.flab.oasis.mapper;
+package com.flab.oasis.mapper.book;
 
 
 import com.flab.oasis.model.Book;

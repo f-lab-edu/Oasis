@@ -3,7 +3,7 @@ package com.flab.oasis.repository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flab.oasis.constant.ErrorCode;
-import com.flab.oasis.mapper.UserAuthMapper;
+import com.flab.oasis.mapper.user.UserAuthMapper;
 import com.flab.oasis.model.UserAuth;
 import com.flab.oasis.model.UserSession;
 import com.flab.oasis.model.exception.AuthorizationException;

@@ -2,7 +2,7 @@ package com.flab.oasis.home;
 
 import com.flab.oasis.constant.BookCategory;
 import com.flab.oasis.constant.SuggestionType;
-import com.flab.oasis.mapper.UserCategoryMapper;
+import com.flab.oasis.mapper.user.UserCategoryMapper;
 import com.flab.oasis.model.BookSuggestion;
 import com.flab.oasis.model.BookSuggestionRequest;
 import com.flab.oasis.model.UserCategory;

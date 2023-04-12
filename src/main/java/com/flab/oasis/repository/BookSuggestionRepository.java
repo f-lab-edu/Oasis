@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flab.oasis.constant.ErrorCode;
 import com.flab.oasis.constant.SuggestionType;
-import com.flab.oasis.mapper.BookSuggestionMapper;
+import com.flab.oasis.mapper.book.BookSuggestionMapper;
 import com.flab.oasis.model.BookSuggestion;
 import com.flab.oasis.utils.LogUtils;
 import lombok.RequiredArgsConstructor;

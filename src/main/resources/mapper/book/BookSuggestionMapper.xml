@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.flab.oasis.mapper.BookSuggestionMapper">
+<mapper namespace="com.flab.oasis.mapper.book.BookSuggestionMapper">
 
     <select id="findBookSuggestionBySuggestionType" parameterType="com.flab.oasis.constant.SuggestionType" resultType="com.flab.oasis.model.BookSuggestion">
         SELECT UCASE(A.SUGGESTION_TYPE) AS suggestionType, B.BOOK_ID AS bookId,

@@ -1,6 +1,6 @@
 package com.flab.oasis.service;
 
-import com.flab.oasis.mapper.TestMapper;
+import com.flab.oasis.mapper.book.TestMapper;
 import com.flab.oasis.model.Book;
 import com.flab.oasis.model.TestModel;
 import lombok.RequiredArgsConstructor;
