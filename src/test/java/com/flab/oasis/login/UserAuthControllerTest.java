@@ -56,7 +56,7 @@ class UserAuthControllerTest {
 
         mockMvc.perform(
                 MockMvcRequestBuilders
-                        .post("/api/auth/login-default")
+                        .post("/api/auth/login/default")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(userLoginRequest))
         ).andExpect(
@@ -77,7 +77,7 @@ class UserAuthControllerTest {
 
         mockMvc.perform(
                 MockMvcRequestBuilders
-                        .post("/api/auth/login-default")
+                        .post("/api/auth/login/default")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(new UserLoginRequest()))
         ).andExpect(
