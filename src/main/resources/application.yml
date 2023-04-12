@@ -14,13 +14,30 @@ spring:
               - email
 
   datasource:
-    url: jdbc:mysql://${DB_HOST}:3306/oasis?characterEncoding=utf8
-    username: ${DB_USER}
-    password: ${DB_PASSWORD}
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    hikari:
-      auto-commit: false
-      maximum-pool-size: 30
+    book:
+      hikari:
+        jdbc-url: jdbc:mysql://${DB_HOST}:3306/book?characterEncoding=utf8
+        username: ${DB_USER}
+        password: ${DB_PASSWORD}
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        auto-commit: false
+        maximum-pool-size: 30
+    user:
+      hikari:
+        jdbc-url: jdbc:mysql://${DB_HOST}:3306/user?characterEncoding=utf8
+        username: ${DB_USER}
+        password: ${DB_PASSWORD}
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        auto-commit: false
+        maximum-pool-size: 30
+    feed:
+      hikari:
+        jdbc-url: jdbc:mysql://${DB_HOST}:3306/feed?characterEncoding=utf8
+        username: ${DB_USER}
+        password: ${DB_PASSWORD}
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        auto-commit: false
+        maximum-pool-size: 30
 
   redis:
     lettuce:
@@ -30,7 +47,3 @@ spring:
         min-idle: 2
     port: 6379
     host: ${REDIS_HOST}
-
-# mybatis
-mybatis:
-  mapper-locations: mapper/**/*.xml
