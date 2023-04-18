@@ -1,4 +1,4 @@
-package com.flab.oasis.config.mybatis;
+package com.flab.oasis.config;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -6,19 +6,15 @@ import lombok.RequiredArgsConstructor;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.annotation.MapperScan;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import javax.sql.DataSource;
-
 @Configuration
 @MapperScan(basePackages = "com.flab.oasis.mapper.user", sqlSessionFactoryRef = "userSqlSessionFactory")
 @RequiredArgsConstructor
-public class UserConfig {
+public class MyBatisConfigUser {
     private final ApplicationContext applicationContext;
 
     @Bean("userHikariConfig")
@@ -27,15 +23,15 @@ public class UserConfig {
         return new HikariConfig();
     }
 
-    @Bean("userDataSource")
-    public HikariDataSource userDataSource(@Qualifier("userHikariConfig") HikariConfig hikariConfig) {
-        return new HikariDataSource(hikariConfig);
+    @Bean("userHikariDataSource")
+    public HikariDataSource userDataSource(HikariConfig userHikariConfig) {
+        return new HikariDataSource(userHikariConfig);
     }
 
-    @Bean("userSqlSessionFactory")
-    public SqlSessionFactory userSqlSessionFactory(@Qualifier("userDataSource") DataSource dataSource) throws Exception {
+    @Bean
+    public SqlSessionFactory userSqlSessionFactory(HikariDataSource userHikariDataSource) throws Exception {
         SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
-        sqlSessionFactoryBean.setDataSource(dataSource);
+        sqlSessionFactoryBean.setDataSource(userHikariDataSource);
         sqlSessionFactoryBean.setMapperLocations(
                 applicationContext.getResources("classpath:/mapper/user/*.xml")
         );
