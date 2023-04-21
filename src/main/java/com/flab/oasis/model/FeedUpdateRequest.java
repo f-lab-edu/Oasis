@@ -8,8 +8,8 @@ import java.io.Serializable;
 @Getter
 @Setter
 public class FeedUpdateRequest implements Serializable {
-    private static final long serialVersionUID = 5985546037987964046L;
-
+    private static final long serialVersionUID = 446411284628666675L;
+    
     private String uid;
     private String feedId;
     private String report;
