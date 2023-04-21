@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flab.oasis.mapper.user.FeedMapper">
+
+    <insert id="writeFeed" parameterType="com.flab.oasis.model.FeedWriteRequest">
+        INSERT INTO FEED
+                (UID, FEED_ID, WRITE_DATE, BOOK_ID, REPORT, FEED_LIKE, CREATE_DATETIME, MODIFY_DATETIME)
+        VALUES (
+                #{uid},
+                (
+                    SELECT IFNULL(MAX(FEED_ID) + 1, 0)
+                    FROM FEED
+                    WHERE UID = #{uid}
+                ),
+                NOW(), #{bookId}, #{report}, 0, NOW(), NOW()
+        )
+    </insert>
+
+</mapper>
