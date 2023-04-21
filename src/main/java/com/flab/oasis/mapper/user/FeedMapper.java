@@ -1,5 +1,6 @@
 package com.flab.oasis.mapper.user;
 
+import com.flab.oasis.model.FeedDeleteRequest;
 import com.flab.oasis.model.FeedUpdateRequest;
 import com.flab.oasis.model.FeedWriteRequest;
 import org.apache.ibatis.annotations.Mapper;
@@ -8,4 +9,5 @@ import org.apache.ibatis.annotations.Mapper;
 public interface FeedMapper {
     public void writeFeedByFeedWriteRequest(FeedWriteRequest feedWriteRequest);
     public void updateFeedByFeedUpdateRequest(FeedUpdateRequest feedUpdateRequest);
+    public void deleteFeedByFeedDeleteRequest(FeedDeleteRequest feedDeleteRequest);
 }

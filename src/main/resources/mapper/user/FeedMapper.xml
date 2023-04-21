@@ -23,4 +23,9 @@
         WHERE UID = #{uid} AND FEED_ID = #{feedId}
     </update>
 
+    <delete id="deleteFeedByFeedDeleteRequest" parameterType="com.flab.oasis.model.FeedDeleteRequest">
+        DELETE FROM FEED
+        WHERE UID = #{uid} AND FEED_ID = #{feedId}
+    </delete>
+
 </mapper>
