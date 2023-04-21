@@ -2,7 +2,6 @@ package com.flab.oasis.service;
 
 import com.flab.oasis.mapper.book.BookMapper;
 import com.flab.oasis.model.Book;
-import com.flab.oasis.model.BookSearchRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -15,11 +14,9 @@ public class BookService {
     BookMapper bookMapper;
 
     @Cacheable(cacheNames = "bookCache", keyGenerator = "oasisKeyGenerator", cacheManager = "ehCacheCacheManager")
-    public List<Book> findBookListByBookSearchRequest(BookSearchRequest bookSearchRequest) {
+    public List<Book> findBookListByKeyword(String keyword) {
         return bookMapper.findBookListByKeyword(
-                parseKeywordToFullTextBooleanModeSearchFormat(
-                        bookSearchRequest.getKeyword().trim()
-                )
+                parseKeywordToFullTextBooleanModeSearchFormat(keyword.trim())
         );
     }
 
