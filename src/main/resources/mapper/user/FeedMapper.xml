@@ -17,4 +17,10 @@
         )
     </insert>
 
+    <update id="updateFeedByFeedUpdateRequest" parameterType="com.flab.oasis.model.FeedUpdateRequest">
+        UPDATE FEED
+        SET REPORT = #{report}
+        WHERE UID = #{uid} AND FEED_ID = #{feedId}
+    </update>
+
 </mapper>
