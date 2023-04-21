@@ -1,14 +1,12 @@
 package com.flab.oasis.controller;
 
+import com.flab.oasis.model.FeedDeleteRequest;
 import com.flab.oasis.model.FeedUpdateRequest;
 import com.flab.oasis.model.FeedWriteRequest;
 import com.flab.oasis.service.FeedService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 @Controller("/api/feeds")
 @RequiredArgsConstructor
@@ -29,5 +27,14 @@ public class FeedController {
         feedUpdateRequest.setFeedId(feedId);
 
         feedService.updateFeedByFeedUpdateRequest(feedUpdateRequest);
+    }
+
+    @DeleteMapping("/{uid}/{feed_id}")
+    public void deleteFeed(@PathVariable String uid, @PathVariable("feed_id") String feedId) {
+        FeedDeleteRequest feedDeleteRequest = new FeedDeleteRequest();
+        feedDeleteRequest.setUid(uid);
+        feedDeleteRequest.setFeedId(feedId);
+
+        feedService.deleteFeedByFeedDeleteRequest(feedDeleteRequest);
     }
 }

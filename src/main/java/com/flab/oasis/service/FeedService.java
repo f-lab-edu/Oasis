@@ -1,6 +1,7 @@
 package com.flab.oasis.service;
 
 import com.flab.oasis.mapper.user.FeedMapper;
+import com.flab.oasis.model.FeedDeleteRequest;
 import com.flab.oasis.model.FeedUpdateRequest;
 import com.flab.oasis.model.FeedWriteRequest;
 import lombok.RequiredArgsConstructor;
@@ -17,5 +18,9 @@ public class FeedService {
 
     public void updateFeedByFeedUpdateRequest(FeedUpdateRequest feedUpdateRequest) {
         feedMapper.updateFeedByFeedUpdateRequest(feedUpdateRequest);
+    }
+
+    public void deleteFeedByFeedDeleteRequest(FeedDeleteRequest feedDeleteRequest) {
+        feedMapper.deleteFeedByFeedDeleteRequest(feedDeleteRequest);
     }
 }
