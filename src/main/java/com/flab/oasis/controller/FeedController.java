@@ -5,10 +5,10 @@ import com.flab.oasis.model.FeedUpdateRequest;
 import com.flab.oasis.model.FeedWriteRequest;
 import com.flab.oasis.service.FeedService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-@Controller("/api/feeds")
+@RestController
+@RequestMapping("/api/feeds")
 @RequiredArgsConstructor
 public class FeedController {
     private final FeedService feedService;
