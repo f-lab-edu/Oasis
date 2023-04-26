@@ -8,33 +8,23 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/feeds")
+@RequestMapping("/api/users")
 @RequiredArgsConstructor
 public class FeedController {
     private final FeedService feedService;
 
-    @PostMapping("/{uid}")
-    public void writeFeedByFeedWriteRequest(@PathVariable String uid, @RequestBody FeedWriteRequest feedWriteRequest) {
-        feedWriteRequest.setUid(uid);
-
+    @PostMapping("/feed")
+    public void writeFeedByFeedWriteRequest(@RequestBody FeedWriteRequest feedWriteRequest) {
         feedService.writeFeedByFeedWriteRequest(feedWriteRequest);
     }
 
-    @PatchMapping("/{uid}/{feed_id}")
-    public void writeFeedByFeedWriteRequest(@PathVariable String uid, @PathVariable("feed_id") String feedId,
-                                            @RequestBody FeedUpdateRequest feedUpdateRequest) {
-        feedUpdateRequest.setUid(uid);
-        feedUpdateRequest.setFeedId(feedId);
-
+    @PatchMapping("/feed")
+    public void writeFeedByFeedWriteRequest(@RequestBody FeedUpdateRequest feedUpdateRequest) {
         feedService.updateFeedByFeedUpdateRequest(feedUpdateRequest);
     }
 
-    @DeleteMapping("/{uid}/{feed_id}")
-    public void deleteFeed(@PathVariable String uid, @PathVariable("feed_id") String feedId) {
-        FeedDeleteRequest feedDeleteRequest = new FeedDeleteRequest();
-        feedDeleteRequest.setUid(uid);
-        feedDeleteRequest.setFeedId(feedId);
-
+    @DeleteMapping("/feed")
+    public void deleteFeed(@RequestBody FeedDeleteRequest feedDeleteRequest) {
         feedService.deleteFeedByFeedDeleteRequest(feedDeleteRequest);
     }
 }
