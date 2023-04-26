@@ -14,17 +14,17 @@ public class FeedController {
     private final FeedService feedService;
 
     @PostMapping("/feed")
-    public void writeFeedByFeedWriteRequest(@RequestBody FeedWriteRequest feedWriteRequest) {
-        feedService.writeFeedByFeedWriteRequest(feedWriteRequest);
+    public void writeFeed(@RequestBody FeedWriteRequest feedWriteRequest) {
+        feedService.writeFeed(feedWriteRequest);
     }
 
     @PatchMapping("/feed")
-    public void writeFeedByFeedWriteRequest(@RequestBody FeedUpdateRequest feedUpdateRequest) {
-        feedService.updateFeedByFeedUpdateRequest(feedUpdateRequest);
+    public void updateFeed(@RequestBody FeedUpdateRequest feedUpdateRequest) {
+        feedService.updateFeed(feedUpdateRequest);
     }
 
     @DeleteMapping("/feed")
     public void deleteFeed(@RequestBody FeedDeleteRequest feedDeleteRequest) {
-        feedService.deleteFeedByFeedDeleteRequest(feedDeleteRequest);
+        feedService.deleteFeed(feedDeleteRequest);
     }
 }

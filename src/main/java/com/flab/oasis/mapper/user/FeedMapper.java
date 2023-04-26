@@ -7,7 +7,7 @@ import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
 public interface FeedMapper {
-    public void writeFeedByFeedWriteRequest(FeedWriteRequest feedWriteRequest);
-    public void updateFeedByFeedUpdateRequest(FeedUpdateRequest feedUpdateRequest);
-    public void deleteFeedByFeedDeleteRequest(FeedDeleteRequest feedDeleteRequest);
+    public void writeFeed(FeedWriteRequest feedWriteRequest);
+    public void updateFeed(FeedUpdateRequest feedUpdateRequest);
+    public void deleteFeed(FeedDeleteRequest feedDeleteRequest);
 }

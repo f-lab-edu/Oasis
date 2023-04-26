@@ -12,15 +12,15 @@ import org.springframework.stereotype.Service;
 public class FeedService {
     private final FeedMapper feedMapper;
 
-    public void writeFeedByFeedWriteRequest(FeedWriteRequest feedWriteRequest) {
-        feedMapper.writeFeedByFeedWriteRequest(feedWriteRequest);
+    public void writeFeed(FeedWriteRequest feedWriteRequest) {
+        feedMapper.writeFeed(feedWriteRequest);
     }
 
-    public void updateFeedByFeedUpdateRequest(FeedUpdateRequest feedUpdateRequest) {
-        feedMapper.updateFeedByFeedUpdateRequest(feedUpdateRequest);
+    public void updateFeed(FeedUpdateRequest feedUpdateRequest) {
+        feedMapper.updateFeed(feedUpdateRequest);
     }
 
-    public void deleteFeedByFeedDeleteRequest(FeedDeleteRequest feedDeleteRequest) {
-        feedMapper.deleteFeedByFeedDeleteRequest(feedDeleteRequest);
+    public void deleteFeed(FeedDeleteRequest feedDeleteRequest) {
+        feedMapper.deleteFeed(feedDeleteRequest);
     }
 }
