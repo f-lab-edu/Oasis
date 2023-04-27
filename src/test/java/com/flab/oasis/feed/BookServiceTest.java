@@ -1,7 +1,9 @@
 package com.flab.oasis.feed;
 
+import com.flab.oasis.constant.BookCategory;
 import com.flab.oasis.mapper.book.BookMapper;
 import com.flab.oasis.model.Book;
+import com.flab.oasis.model.BookSearchRequest;
 import com.flab.oasis.service.BookService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -25,14 +27,17 @@ class BookServiceTest {
 
     @Test
     void bookSearchTest() {
+        Book book = new Book();
         List<Book> bookList = new ArrayList<>();
-        bookList.add(new Book());
 
-        BDDMockito.given(bookMapper.findBookListByKeyword(ArgumentMatchers.any(String.class)))
+        book.setBookCategory(BookCategory.BC105);
+        bookList.add(book);
+
+        BDDMockito.given(bookMapper.findBookListByBookSearchRequest(ArgumentMatchers.any(BookSearchRequest.class)))
                 .willReturn(bookList);
 
-        List<Book> result = bookService.findBookListByKeyword("");
+        List<Book> result = bookService.findBookListByKeyword(new BookSearchRequest(""));
 
-        Assertions.assertEquals(bookList.get(0).getTitle(), result.get(0).getTitle());
+        Assertions.assertEquals(bookList.get(0).getBookCategory(), result.get(0).getBookCategory());
     }
 }
