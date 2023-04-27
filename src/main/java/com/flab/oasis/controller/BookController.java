@@ -1,6 +1,7 @@
 package com.flab.oasis.controller;
 
 import com.flab.oasis.model.Book;
+import com.flab.oasis.model.BookSearchRequest;
 import com.flab.oasis.service.BookService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,6 +19,6 @@ public class BookController {
 
     @GetMapping("/{keyword}")
     public List<Book> findBookListByKeyword(@PathVariable String keyword) {
-        return bookService.findBookListByKeyword(keyword);
+        return bookService.findBookListByKeyword(new BookSearchRequest(keyword));
     }
 }
