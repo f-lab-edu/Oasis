@@ -34,12 +34,6 @@ public class HomeService {
         );
     }
 
-    private List<BookSuggestion> matchBookCategoryName(List<BookSuggestion> bookSuggestionList) {
-        bookSuggestionList.forEach(bs -> bs.setBookCategoryName(bs.getBookCategory().getName()));
-
-        return bookSuggestionList;
-    }
-
     private List<BookSuggestion> filterBookSuggestionListByUserCategory(
             List<BookSuggestion> bookSuggestionList, String uid) {
         List<UserCategory> userCategory = userCategoryMapper.findUserCategoryByUid(uid);
@@ -53,6 +47,12 @@ public class HomeService {
 
             return bookList;
         }
+    }
+
+    private List<BookSuggestion> matchBookCategoryName(List<BookSuggestion> bookSuggestionList) {
+        bookSuggestionList.forEach(bs -> bs.setBookCategoryName(bs.getBookCategory().getName()));
+
+        return bookSuggestionList;
     }
 
     private Map<BookCategory, List<BookSuggestion>> groupByCategoryId(List<BookSuggestion> bookSuggestionList) {
