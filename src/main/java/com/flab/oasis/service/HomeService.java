@@ -24,14 +24,16 @@ public class HomeService {
     @Cacheable(cacheNames = "homeCache", keyGenerator = "oasisKeyGenerator", cacheManager = "ehCacheCacheManager")
     public List<BookSuggestion> getBookSuggestionListByBookSuggestionRequest(
             BookSuggestionRequest bookSuggestionRequest) {
-        return matchBookCategoryName(
-                filterBookSuggestionListByUserCategory(
-                        bookSuggestionRepository.getBookSuggestionListBySuggestionType(
-                                bookSuggestionRequest.getSuggestionType()
-                        ),
-                        bookSuggestionRequest.getUid()
-                )
+        List<BookSuggestion> bookSuggestionList = filterBookSuggestionListByUserCategory(
+                bookSuggestionRepository.getBookSuggestionListBySuggestionType(
+                        bookSuggestionRequest.getSuggestionType()
+                ),
+                bookSuggestionRequest.getUid()
         );
+        
+        bookSuggestionList.forEach(bs -> bs.setBookCategoryName(bs.getBookCategory().getName()));
+
+        return bookSuggestionList;
     }
 
     private List<BookSuggestion> filterBookSuggestionListByUserCategory(
@@ -47,12 +49,6 @@ public class HomeService {
 
             return bookList;
         }
-    }
-
-    private List<BookSuggestion> matchBookCategoryName(List<BookSuggestion> bookSuggestionList) {
-        bookSuggestionList.forEach(bs -> bs.setBookCategoryName(bs.getBookCategory().getName()));
-
-        return bookSuggestionList;
     }
 
     private Map<BookCategory, List<BookSuggestion>> groupByCategoryId(List<BookSuggestion> bookSuggestionList) {
