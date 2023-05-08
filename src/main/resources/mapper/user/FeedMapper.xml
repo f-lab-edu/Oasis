@@ -4,7 +4,7 @@
 <mapper namespace="com.flab.oasis.mapper.user.FeedMapper">
 
     <select id="getMaxFeedIdByUid" parameterType="java.lang.String" resultType="java.lang.Integer">
-        SELECT IFNULL(MAX(FEED_ID), 0)
+        SELECT MAX(FEED_ID)
         FROM FEED
         WHERE UID = #{uid}
     </select>
