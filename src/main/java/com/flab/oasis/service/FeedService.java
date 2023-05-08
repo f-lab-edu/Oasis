@@ -10,17 +10,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class FeedService {
     private final FeedMapper feedMapper;
 
-    // 한 유저가 동시에 여러 개의 요청을 날리게 되면 중복된 feed id가 생성될 수 있기에 transaction으로 중복 무결성을 보장해줘야 한다.
     @Transactional
     public void writeFeed(FeedWriteRequest feedWriteRequest) {
-        // 작성한 피드가 존재하지 않으면 0을 반환한다.
-        int maxFeedId = feedMapper.getMaxFeedIdByUid(feedWriteRequest.getUid());
+        int maxFeedId = Optional.ofNullable(feedMapper.getMaxFeedIdByUid(feedWriteRequest.getUid())).orElse(0);
 
         feedMapper.writeFeed(
                 Feed.builder()
