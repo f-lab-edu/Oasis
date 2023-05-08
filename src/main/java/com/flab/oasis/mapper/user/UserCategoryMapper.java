@@ -7,5 +7,5 @@ import java.util.List;
 
 @Mapper
 public interface UserCategoryMapper {
-    public List<UserCategory> findUserCategoryByUid(String uid);
+    public List<UserCategory> getUserCategoryByUid(String uid);
 }

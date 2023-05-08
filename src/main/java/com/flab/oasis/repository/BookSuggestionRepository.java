@@ -44,6 +44,6 @@ public class BookSuggestionRepository {
     }
 
     private List<BookSuggestion> getBookSuggestionListBySuggestionTypeFromDB(SuggestionType suggestionType) {
-        return bookSuggestionMapper.findBookSuggestionBySuggestionType(suggestionType);
+        return bookSuggestionMapper.getBookSuggestionBySuggestionType(suggestionType);
     }
 }
