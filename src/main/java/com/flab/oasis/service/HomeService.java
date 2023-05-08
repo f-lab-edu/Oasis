@@ -28,7 +28,9 @@ public class HomeService {
                 bookSuggestionRepository.getBookSuggestionListBySuggestionType(
                         bookSuggestionRequest.getSuggestionType()
                 ),
-                bookSuggestionRequest.getUid()
+                userCategoryMapper.findUserCategoryByUid(
+                        bookSuggestionRequest.getUid()
+                )
         );
         
         bookSuggestionList.forEach(bs -> bs.setBookCategoryName(bs.getBookCategory().getName()));
@@ -37,9 +39,7 @@ public class HomeService {
     }
 
     private List<BookSuggestion> filterBookSuggestionListByUserCategory(
-            List<BookSuggestion> bookSuggestionList, String uid) {
-        List<UserCategory> userCategory = userCategoryMapper.findUserCategoryByUid(uid);
-
+            List<BookSuggestion> bookSuggestionList, List<UserCategory> userCategory) {
         if (userCategory.isEmpty()) {
             return bookSuggestionList;
         } else {
