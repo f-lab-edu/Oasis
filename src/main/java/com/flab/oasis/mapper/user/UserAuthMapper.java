@@ -1,4 +1,4 @@
-package com.flab.oasis.mapper;
+package com.flab.oasis.mapper.user;
 
 import com.flab.oasis.model.UserAuth;
 import com.flab.oasis.model.UserSession;

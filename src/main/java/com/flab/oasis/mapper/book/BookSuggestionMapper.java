@@ -1,4 +1,4 @@
-package com.flab.oasis.mapper;
+package com.flab.oasis.mapper.book;
 
 import com.flab.oasis.constant.SuggestionType;
 import com.flab.oasis.model.BookSuggestion;
@@ -8,5 +8,5 @@ import java.util.List;
 
 @Mapper
 public interface BookSuggestionMapper {
-    public List<BookSuggestion> findBookSuggestionBySuggestionType(SuggestionType suggestionType);
+    public List<BookSuggestion> getBookSuggestionBySuggestionType(SuggestionType suggestionType);
 }

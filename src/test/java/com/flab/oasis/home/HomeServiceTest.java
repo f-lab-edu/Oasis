@@ -1,7 +1,8 @@
 package com.flab.oasis.home;
 
+import com.flab.oasis.constant.BookCategory;
 import com.flab.oasis.constant.SuggestionType;
-import com.flab.oasis.mapper.UserCategoryMapper;
+import com.flab.oasis.mapper.user.UserCategoryMapper;
 import com.flab.oasis.model.BookSuggestion;
 import com.flab.oasis.model.BookSuggestionRequest;
 import com.flab.oasis.model.UserCategory;
@@ -40,20 +41,20 @@ class HomeServiceTest {
         List<UserCategory> userCategoryList = new ArrayList<>();
         UserCategory userCategory = new UserCategory();
         userCategory.setUid(uid);
-        userCategory.setCategoryId(101);
+        userCategory.setBookCategory(BookCategory.BC101);
 
         userCategoryList.add(userCategory);
 
-        BDDMockito.given(userCategoryMapper.findUserCategoryByUid(uid))
+        BDDMockito.given(userCategoryMapper.getUserCategoryByUid(uid))
                 .willReturn(userCategoryList);
         BDDMockito.given(bookSuggestionRepository.getBookSuggestionListBySuggestionType(suggestionType))
                 .willReturn(generateBookSuggestionList(suggestionType));
 
         Assertions.assertEquals(
-                userCategoryList.get(0).getCategoryId(),
+                userCategoryList.get(0).getBookCategory(),
                 homeService.getBookSuggestionListByBookSuggestionRequest(
                         new BookSuggestionRequest(uid, suggestionType)
-                ).get(0).getCategoryId()
+                ).get(0).getBookCategory()
         );
     }
 
@@ -64,16 +65,16 @@ class HomeServiceTest {
         SuggestionType suggestionType = SuggestionType.NEWBOOK;
         List<BookSuggestion> bookSuggestionList = generateBookSuggestionList(suggestionType);
 
-        BDDMockito.given(userCategoryMapper.findUserCategoryByUid(uid))
+        BDDMockito.given(userCategoryMapper.getUserCategoryByUid(uid))
                 .willReturn(new ArrayList<>());
         BDDMockito.given(bookSuggestionRepository.getBookSuggestionListBySuggestionType(suggestionType))
                 .willReturn(bookSuggestionList);
 
         Assertions.assertEquals(
-                bookSuggestionList.get(0).getCategoryId(),
+                bookSuggestionList.get(0).getBookCategory(),
                 homeService.getBookSuggestionListByBookSuggestionRequest(
                         new BookSuggestionRequest(uid, suggestionType)
-                ).get(0).getCategoryId()
+                ).get(0).getBookCategory()
         );
     }
 
@@ -87,8 +88,8 @@ class HomeServiceTest {
         bookSuggestion.setTranslator("trans");
         bookSuggestion.setPublisher("publish");
         bookSuggestion.setPublishDate(new Date());
-        bookSuggestion.setCategoryId(101);
-        bookSuggestion.setCategoryName("category name");
+        bookSuggestion.setBookCategory(BookCategory.BC101);
+        bookSuggestion.setBookCategoryName(BookCategory.BC101.getName());
         bookSuggestion.setDescription("desc");
         bookSuggestion.setImageUrl("url");
 
