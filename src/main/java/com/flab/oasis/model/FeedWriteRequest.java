@@ -10,7 +10,6 @@ import java.io.Serializable;
 public class FeedWriteRequest implements Serializable {
     private static final long serialVersionUID = 5985546037987964046L;
 
-    private String uid;
     private String bookId;
     private String report;
 }
