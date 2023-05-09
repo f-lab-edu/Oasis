@@ -14,13 +14,13 @@
         VALUES (#{uid}, #{feedId}, #{writeDate}, #{bookId}, #{report}, #{feedLike}, NOW(), NOW())
     </insert>
 
-    <update id="updateFeed" parameterType="com.flab.oasis.model.FeedUpdateRequest">
+    <update id="updateFeed" parameterType="com.flab.oasis.model.Feed">
         UPDATE FEED
         SET REPORT = #{report}
         WHERE UID = #{uid} AND FEED_ID = #{feedId}
     </update>
 
-    <delete id="deleteFeed" parameterType="com.flab.oasis.model.FeedDeleteRequest">
+    <delete id="deleteFeed" parameterType="com.flab.oasis.model.Feed">
         DELETE FROM FEED
         WHERE UID = #{uid} AND FEED_ID = #{feedId}
     </delete>
