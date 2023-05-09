@@ -10,6 +10,6 @@ import java.io.Serializable;
 public class FeedUpdateRequest implements Serializable {
     private static final long serialVersionUID = 446411284628666675L;
 
-    private String feedId;
+    private int feedId;
     private String report;
 }

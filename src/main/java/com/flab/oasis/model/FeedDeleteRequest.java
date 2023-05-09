@@ -10,5 +10,5 @@ import java.io.Serializable;
 public class FeedDeleteRequest implements Serializable {
     private static final long serialVersionUID = 1600046029481345714L;
 
-    private String feedId;
+    private int feedId;
 }
