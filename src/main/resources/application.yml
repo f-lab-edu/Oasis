@@ -1,6 +1,9 @@
 server:
   port: 8081
 
+client:
+  url: ${CLIENT_URL}
+
 # database
 spring:
   security:
