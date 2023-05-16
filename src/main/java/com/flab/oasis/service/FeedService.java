@@ -1,10 +1,13 @@
 package com.flab.oasis.service;
 
+import com.flab.oasis.constant.ErrorCode;
 import com.flab.oasis.mapper.user.FeedMapper;
 import com.flab.oasis.model.Feed;
 import com.flab.oasis.model.FeedDeleteRequest;
 import com.flab.oasis.model.FeedUpdateRequest;
 import com.flab.oasis.model.FeedWriteRequest;
+import com.flab.oasis.model.exception.AuthorizationException;
+import com.flab.oasis.utils.LogUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -18,38 +21,61 @@ public class FeedService {
     private final FeedMapper feedMapper;
 
     public void writeFeed(FeedWriteRequest feedWriteRequest) {
-        String uid = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
+        String uid = Optional.ofNullable(
+                SecurityContextHolder.getContext()
+        ).orElseThrow(
+                () -> new AuthorizationException(ErrorCode.UNAUTHORIZED, "Unauthorized user.")
+        ).getAuthentication().getPrincipal().toString();
+
         int maxFeedId = Optional.ofNullable(feedMapper.getMaxFeedIdByUid(uid))
                 .orElse(0);
 
-        feedMapper.writeFeed(
-                Feed.builder()
-                        .uid(uid)
-                        .feedId(maxFeedId + 1)
-                        .writeDate(new Date())
-                        .bookId(feedWriteRequest.getBookId())
-                        .report(feedWriteRequest.getReport())
-                        .feedLike(0)
-                        .build()
-        );
+        Feed newFeed = Feed.builder()
+                .uid(uid)
+                .feedId(maxFeedId + 1)
+                .writeDate(new Date())
+                .bookId(feedWriteRequest.getBookId())
+                .report(feedWriteRequest.getReport())
+                .feedLike(0)
+                .build();
+
+        feedMapper.writeFeed(newFeed);
+
+        LogUtils.info(String.format("User \"%s\"'s new feed has been created.", uid), newFeed.toString());
     }
 
     public void updateFeed(FeedUpdateRequest feedUpdateRequest) {
-        feedMapper.updateFeed(
-                Feed.builder()
-                        .uid(SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString())
-                        .feedId(feedUpdateRequest.getFeedId())
-                        .report(feedUpdateRequest.getReport())
-                        .build()
-        );
+        String uid = Optional.ofNullable(
+                SecurityContextHolder.getContext()
+        ).orElseThrow(
+                () -> new AuthorizationException(ErrorCode.UNAUTHORIZED, "Unauthorized user.")
+        ).getAuthentication().getPrincipal().toString();
+
+        Feed updateFeed = Feed.builder()
+                .uid(uid)
+                .feedId(feedUpdateRequest.getFeedId())
+                .report(feedUpdateRequest.getReport())
+                .build();
+
+        feedMapper.updateFeed(updateFeed);
+
+        LogUtils.info(String.format("User \"%s\"'s new feed has been modified.", uid), updateFeed.toString());
     }
 
     public void deleteFeed(FeedDeleteRequest feedDeleteRequest) {
-        feedMapper.deleteFeed(
-                Feed.builder()
-                        .uid(SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString())
-                        .feedId(feedDeleteRequest.getFeedId())
-                        .build()
-        );
+        String uid = Optional.ofNullable(
+                SecurityContextHolder.getContext()
+        ).orElseThrow(
+                () -> new AuthorizationException(ErrorCode.UNAUTHORIZED, "Unauthorized user.")
+        ).getAuthentication().getPrincipal().toString();
+
+        Feed deleteFeed = Feed.builder()
+                .uid(uid)
+                .feedId(feedDeleteRequest.getFeedId())
+                .build();
+
+        feedMapper.deleteFeed(deleteFeed);
+
+        LogUtils.info(String.format("User \"%s\"'s new feed has been deleted.", uid), deleteFeed.toString());
     }
 }
