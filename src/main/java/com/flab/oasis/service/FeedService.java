@@ -1,12 +1,12 @@
 package com.flab.oasis.service;
 
-import com.flab.oasis.interceptor.UidInterceptor;
 import com.flab.oasis.mapper.user.FeedMapper;
 import com.flab.oasis.model.Feed;
 import com.flab.oasis.model.FeedDeleteRequest;
 import com.flab.oasis.model.FeedUpdateRequest;
 import com.flab.oasis.model.FeedWriteRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -18,7 +18,7 @@ public class FeedService {
     private final FeedMapper feedMapper;
 
     public void writeFeed(FeedWriteRequest feedWriteRequest) {
-        String uid = UidInterceptor.STRING_THREAD_LOCAL.get();
+        String uid = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
         int maxFeedId = Optional.ofNullable(feedMapper.getMaxFeedIdByUid(uid))
                 .orElse(0);
 
@@ -37,7 +37,7 @@ public class FeedService {
     public void updateFeed(FeedUpdateRequest feedUpdateRequest) {
         feedMapper.updateFeed(
                 Feed.builder()
-                        .uid(UidInterceptor.STRING_THREAD_LOCAL.get())
+                        .uid(SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString())
                         .feedId(feedUpdateRequest.getFeedId())
                         .report(feedUpdateRequest.getReport())
                         .build()
@@ -47,7 +47,7 @@ public class FeedService {
     public void deleteFeed(FeedDeleteRequest feedDeleteRequest) {
         feedMapper.deleteFeed(
                 Feed.builder()
-                        .uid(UidInterceptor.STRING_THREAD_LOCAL.get())
+                        .uid(SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString())
                         .feedId(feedDeleteRequest.getFeedId())
                         .build()
         );
