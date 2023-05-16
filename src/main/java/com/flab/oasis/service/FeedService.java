@@ -21,11 +21,7 @@ public class FeedService {
     private final FeedMapper feedMapper;
 
     public void writeFeed(FeedWriteRequest feedWriteRequest) {
-        String uid = Optional.ofNullable(
-                SecurityContextHolder.getContext()
-        ).orElseThrow(
-                () -> new AuthorizationException(ErrorCode.UNAUTHORIZED, "Unauthorized user.")
-        ).getAuthentication().getPrincipal().toString();
+        String uid = getUid();
 
         int maxFeedId = Optional.ofNullable(feedMapper.getMaxFeedIdByUid(uid))
                 .orElse(0);
@@ -45,11 +41,7 @@ public class FeedService {
     }
 
     public void updateFeed(FeedUpdateRequest feedUpdateRequest) {
-        String uid = Optional.ofNullable(
-                SecurityContextHolder.getContext()
-        ).orElseThrow(
-                () -> new AuthorizationException(ErrorCode.UNAUTHORIZED, "Unauthorized user.")
-        ).getAuthentication().getPrincipal().toString();
+        String uid = getUid();
 
         Feed updateFeed = Feed.builder()
                 .uid(uid)
@@ -63,11 +55,7 @@ public class FeedService {
     }
 
     public void deleteFeed(FeedDeleteRequest feedDeleteRequest) {
-        String uid = Optional.ofNullable(
-                SecurityContextHolder.getContext()
-        ).orElseThrow(
-                () -> new AuthorizationException(ErrorCode.UNAUTHORIZED, "Unauthorized user.")
-        ).getAuthentication().getPrincipal().toString();
+        String uid = getUid();
 
         Feed deleteFeed = Feed.builder()
                 .uid(uid)
@@ -77,5 +65,13 @@ public class FeedService {
         feedMapper.deleteFeed(deleteFeed);
 
         LogUtils.info(String.format("User \"%s\"'s new feed has been deleted.", uid), deleteFeed.toString());
+    }
+
+    private String getUid() {
+        return Optional.ofNullable(
+                SecurityContextHolder.getContext()
+        ).orElseThrow(
+                () -> new AuthorizationException(ErrorCode.UNAUTHORIZED, "Unauthorized user.")
+        ).getAuthentication().getPrincipal().toString();
     }
 }
