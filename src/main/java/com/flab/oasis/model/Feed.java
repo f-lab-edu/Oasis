@@ -10,6 +10,7 @@ import java.util.Date;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class Feed implements Serializable {
     private static final long serialVersionUID = 7061404739566319032L;
 
