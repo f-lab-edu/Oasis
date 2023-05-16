@@ -51,7 +51,7 @@ public class FeedService {
 
         feedMapper.updateFeed(updateFeed);
 
-        LogUtils.info(String.format("User \"%s\"'s new feed has been modified.", uid), updateFeed.toString());
+        LogUtils.info(String.format("User \"%s\"'s feed has been modified.", uid), updateFeed.toString());
     }
 
     public void deleteFeed(FeedDeleteRequest feedDeleteRequest) {
@@ -64,7 +64,7 @@ public class FeedService {
 
         feedMapper.deleteFeed(deleteFeed);
 
-        LogUtils.info(String.format("User \"%s\"'s new feed has been deleted.", uid), deleteFeed.toString());
+        LogUtils.info(String.format("User \"%s\"'s feed has been deleted.", uid), deleteFeed.toString());
     }
 
     private String getUid() {
