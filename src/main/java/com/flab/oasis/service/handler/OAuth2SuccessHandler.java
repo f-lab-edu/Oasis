@@ -1,7 +1,7 @@
 package com.flab.oasis.service.handler;
 
 import com.flab.oasis.model.JwtToken;
-import com.flab.oasis.model.exception.AuthorizationException;
+import com.flab.oasis.model.exception.AuthenticationException;
 import com.flab.oasis.repository.UserAuthRepository;
 import com.flab.oasis.service.JwtService;
 import com.flab.oasis.utils.CookieUtils;
@@ -39,7 +39,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             userAuthRepository.getUserAuthByUid(oAuth2User.getName());
 
             joinState = true;
-        } catch (AuthorizationException e) {
+        } catch (AuthenticationException e) {
             LogUtils.info("This UID need to join in oasis service.", oAuth2User.getName());
 
             joinState = false;

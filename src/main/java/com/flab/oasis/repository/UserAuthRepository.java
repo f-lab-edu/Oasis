@@ -6,7 +6,7 @@ import com.flab.oasis.constant.ErrorCode;
 import com.flab.oasis.mapper.user.UserAuthMapper;
 import com.flab.oasis.model.UserAuth;
 import com.flab.oasis.model.UserSession;
-import com.flab.oasis.model.exception.AuthorizationException;
+import com.flab.oasis.model.exception.AuthenticationException;
 import com.flab.oasis.utils.LogUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -23,7 +23,7 @@ public class UserAuthRepository {
 
     public UserAuth getUserAuthByUid(String uid) {
         return Optional.ofNullable(userAuthMapper.getUserAuthByUid(uid))
-                .orElseThrow(() -> new AuthorizationException(
+                .orElseThrow(() -> new AuthenticationException(
                         ErrorCode.UNAUTHORIZED, "User does not exist.", uid
                 ));
     }
@@ -62,7 +62,7 @@ public class UserAuthRepository {
 
     private UserSession getUserSessionByUidFromDB(String uid) {
         return Optional.ofNullable(userAuthMapper.getUserSessionByUid(uid))
-                .orElseThrow(() -> new AuthorizationException(
+                .orElseThrow(() -> new AuthenticationException(
                         ErrorCode.UNAUTHORIZED, "User does not exist.", uid
                 ));
     }
