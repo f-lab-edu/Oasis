@@ -14,13 +14,13 @@ public class AuthorizationException extends RuntimeException {
         super(message);
         this.errorCode = errorCode;
 
-        LogUtils.error(errorCode, message);
+        LogUtils.error(this.getClass().getName(), errorCode, message);
     }
 
     public AuthorizationException(ErrorCode errorCode, String message, String value) {
         super(message);
         this.errorCode = errorCode;
 
-        LogUtils.error(errorCode, message, value);
+        LogUtils.error(this.getClass().getName(), errorCode, message, value);
     }
 }

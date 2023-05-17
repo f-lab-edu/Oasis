@@ -23,7 +23,7 @@ public class OAuth2FailureHandler extends SimpleUrlAuthenticationFailureHandler 
             HttpServletRequest request, HttpServletResponse response, AuthenticationException exception)
             throws IOException {
 
-        LogUtils.error(ErrorCode.UNAUTHORIZED, exception.getMessage());
+        LogUtils.error(exception.getClass().getName(), ErrorCode.UNAUTHORIZED, exception.getMessage());
 
         response.sendRedirect(
                 UriComponentsBuilder.fromUriString(String.format("%s%s", clientUrl, "/oauth2/redirect"))
