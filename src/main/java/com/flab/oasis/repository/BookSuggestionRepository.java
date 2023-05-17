@@ -37,7 +37,7 @@ public class BookSuggestionRepository {
 
             return bookSuggestionList;
         } catch (Exception e) {
-            LogUtils.error(ErrorCode.SERVICE_UNAVAILABLE, e.getMessage());
+            LogUtils.error(e.getClass().getName(), ErrorCode.SERVICE_UNAVAILABLE, e.getMessage());
 
             return getBookSuggestionListBySuggestionTypeFromDB(suggestionType);
         }

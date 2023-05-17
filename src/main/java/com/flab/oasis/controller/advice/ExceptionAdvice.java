@@ -1,7 +1,7 @@
 package com.flab.oasis.controller.advice;
 
 import com.flab.oasis.constant.ErrorCode;
-import com.flab.oasis.model.exception.AuthorizationException;
+import com.flab.oasis.model.exception.AuthenticationException;
 import com.flab.oasis.model.exception.ResponseError;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,8 +12,8 @@ import java.sql.SQLException;
 
 @RestControllerAdvice
 public class ExceptionAdvice {
-    @ExceptionHandler(AuthorizationException.class)
-    public ResponseEntity<ResponseError> handleAuthorizationException(AuthorizationException e) {
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ResponseError> handleAuthenticationException(AuthenticationException e) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ResponseError(e.getErrorCode().getCode(), e.getMessage()));
     }

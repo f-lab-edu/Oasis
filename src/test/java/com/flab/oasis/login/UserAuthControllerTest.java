@@ -6,7 +6,7 @@ import com.flab.oasis.controller.UserAuthController;
 import com.flab.oasis.controller.advice.ExceptionAdvice;
 import com.flab.oasis.model.JwtToken;
 import com.flab.oasis.model.UserLoginRequest;
-import com.flab.oasis.model.exception.AuthorizationException;
+import com.flab.oasis.model.exception.AuthenticationException;
 import com.flab.oasis.service.UserAuthService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -69,7 +69,7 @@ class UserAuthControllerTest {
     @DisplayName("기본 로그인 실패 테스트")
     @Test
     void testLoginDefaultFail() throws Exception {
-        BDDMockito.doThrow(new AuthorizationException(ErrorCode.UNAUTHORIZED, null))
+        BDDMockito.doThrow(new AuthenticationException(ErrorCode.UNAUTHORIZED, null))
                 .when(userAuthService)
                 .createJwtTokenByUserLoginRequest(
                         ArgumentMatchers.any(UserLoginRequest.class)

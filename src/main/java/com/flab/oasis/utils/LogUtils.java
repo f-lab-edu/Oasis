@@ -15,11 +15,17 @@ public class LogUtils {
         LOGGER.info("Message: {}\nValue: {}", message, value);
     }
 
-    public static void error(ErrorCode errorCode, String message) {
-        LOGGER.error("ErrorCode: {}({})\nMessage: {}", errorCode, errorCode.getCode(), message);
+    public static void error(String exceptionClassName, ErrorCode errorCode, String message) {
+        LOGGER.error(
+                "ExceptionClass: {}\nErrorCode: {}({})\nMessage: {}",
+                exceptionClassName, errorCode, errorCode.getCode(), message
+        );
     }
 
-    public static void error(ErrorCode errorCode, String message, String value) {
-        LOGGER.error("ErrorCode: {}({})\nMessage: {}\nValue: {}", errorCode, errorCode.getCode(), message, value);
+    public static void error(String exceptionClassName, ErrorCode errorCode, String message, String value) {
+        LOGGER.error(
+                "ExceptionClass: {}\nErrorCode: {}({})\nMessage: {}\nValue: {}",
+                exceptionClassName, errorCode, errorCode.getCode(), message, value
+        );
     }
 }
