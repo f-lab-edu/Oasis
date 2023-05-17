@@ -1,7 +1,6 @@
 package com.flab.oasis.service.handler;
 
 import com.flab.oasis.model.JwtToken;
-import com.flab.oasis.model.UserAuth;
 import com.flab.oasis.model.exception.AuthorizationException;
 import com.flab.oasis.repository.UserAuthRepository;
 import com.flab.oasis.service.JwtService;
