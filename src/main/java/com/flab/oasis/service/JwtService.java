@@ -98,6 +98,10 @@ public class JwtService {
         return new JwtToken(generateToken(userSession.getUid(), ACCESS_TOKEN), userSession.getRefreshToken());
     }
 
+    public String getClaim(String token, String claim) {
+        return JWT.decode(token).getClaim(claim).asString();
+    }
+
     private DecodedJWT getDecodedJwtWithVerifySignature(String token)
             throws TokenExpiredException, SignatureVerificationException, InvalidClaimException {
         Algorithm algorithm = Algorithm.HMAC256(JwtProperty.SECRET_KEY);

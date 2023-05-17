@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flab.oasis.mapper.book.BookMapper">
+
+    <select id="findBookListByBookSearchRequest" parameterType="com.flab.oasis.model.BookSearchRequest" resultType="com.flab.oasis.model.Book">
+        SELECT BOOK_ID AS bookId, TITLE, AUTHOR, TRANSLATOR, PUBLISHER,
+               PUBLISH_DATE AS publishDate, IMAGE_URL AS imageUrl, DESCRIPTION,
+               BOOK_CATEGORY AS bookCategory
+        FROM BOOK_LIST
+        <choose>
+            <when test="naturalMode == true">
+                WHERE MATCH(TITLE, AUTHOR, TRANSLATOR, PUBLISHER) AGAINST(#{keyword} IN NATURAL LANGUAGE MODE)
+            </when>
+            <otherwise>
+                WHERE MATCH(TITLE, AUTHOR, TRANSLATOR, PUBLISHER) AGAINST(#{keyword} IN BOOLEAN MODE)
+            </otherwise>
+        </choose>
+    </select>
+
+</mapper>

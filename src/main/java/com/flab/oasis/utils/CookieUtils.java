@@ -10,11 +10,8 @@ public class CookieUtils {
     public static final String REFRESH_TOKEN = "RefreshToken";
 
     public static String createCookie(String tokenType, String token) {
-        int expireTime = tokenType.equals(ACCESS_TOKEN) ?
-                JwtProperty.ACCESS_TOKEN_EXPIRE_TIME : JwtProperty.REFRESH_TOKEN_EXPIRE_TIME;
-
         return ResponseCookie.from(tokenType, token)
-                .maxAge(expireTime / 1000)
+                .maxAge(JwtProperty.REFRESH_TOKEN_EXPIRE_TIME / 1000)
                 .httpOnly(true)
                 .path("/")
                 .sameSite(Cookie.SameSite.LAX.toString())
