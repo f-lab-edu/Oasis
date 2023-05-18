@@ -15,11 +15,11 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class FeedService {
-    private final SecurityContextService securityContextService;
+    private final UserAuthService userAuthService;
     private final FeedMapper feedMapper;
 
     public void writeFeed(FeedWriteRequest feedWriteRequest) {
-        String uid = securityContextService.getAuthorizedUid();
+        String uid = userAuthService.getAuthorizedUid();
 
         int maxFeedId = Optional.ofNullable(feedMapper.getMaxFeedIdByUid(uid))
                 .orElse(0);
@@ -39,7 +39,7 @@ public class FeedService {
     }
 
     public void updateFeed(FeedUpdateRequest feedUpdateRequest) {
-        String uid = securityContextService.getAuthorizedUid();
+        String uid = userAuthService.getAuthorizedUid();
 
         Feed updateFeed = Feed.builder()
                 .uid(uid)
@@ -53,7 +53,7 @@ public class FeedService {
     }
 
     public void deleteFeed(FeedDeleteRequest feedDeleteRequest) {
-        String uid = securityContextService.getAuthorizedUid();
+        String uid = userAuthService.getAuthorizedUid();
 
         Feed deleteFeed = Feed.builder()
                 .uid(uid)

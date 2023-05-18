@@ -8,16 +8,26 @@ import com.flab.oasis.model.UserLoginRequest;
 import com.flab.oasis.model.exception.AuthorizationException;
 import com.flab.oasis.repository.UserAuthRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class UserAuthService {
     private final UserAuthRepository userAuthRepository;
     private final JwtService jwtService;
+
+    public String getAuthorizedUid() {
+        return Optional.ofNullable(
+                SecurityContextHolder.getContext()
+        ).orElseThrow(
+                () -> new AuthorizationException(ErrorCode.UNAUTHORIZED, "Unauthorized user.")
+        ).getAuthentication().getPrincipal().toString();
+    }
 
     public JwtToken createJwtTokenByUserLoginRequest(UserLoginRequest userLoginRequest) {
         UserAuth userAuth = userAuthRepository.getUserAuthByUid(userLoginRequest.getUid());
