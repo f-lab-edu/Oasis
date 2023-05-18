@@ -14,13 +14,13 @@ public class AuthenticationException extends RuntimeException {
         super(message);
         this.errorCode = errorCode;
 
-        LogUtils.error(this.getClass().getName(), errorCode, message);
+        LogUtils.error(this.getClass(), errorCode, message);
     }
 
     public AuthenticationException(ErrorCode errorCode, String message, String value) {
         super(message);
         this.errorCode = errorCode;
 
-        LogUtils.error(this.getClass().getName(), errorCode, message, value);
+        LogUtils.error(this.getClass(), errorCode, message, value);
     }
 }

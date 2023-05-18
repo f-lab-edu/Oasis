@@ -56,12 +56,7 @@ public class JwtFilter extends BasicAuthenticationFilter {
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             } catch (AuthorizationException e) {
                 if (e.getMessage().equals("Access Token is Expired.")) {
-                    LogUtils.error(
-                            e.getClass().getName(),
-                            ErrorCode.UNAUTHORIZED,
-                            "Access Token is Expired.",
-                            accessToken
-                    );
+                    LogUtils.error(e.getClass(), ErrorCode.UNAUTHORIZED, "Access Token is Expired.", accessToken);
 
                     UserSession userSession = jwtService.verifyRefreshToken(refreshToken);
                     JwtToken jwtToken = jwtService.reissueJwtToken(userSession);
