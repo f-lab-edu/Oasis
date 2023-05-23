@@ -1,9 +1,6 @@
 package com.flab.oasis.controller;
 
-import com.flab.oasis.model.JwtToken;
-import com.flab.oasis.model.GoogleOAuthLoginResult;
-import com.flab.oasis.model.GoogleOAuthToken;
-import com.flab.oasis.model.UserLoginRequest;
+import com.flab.oasis.model.*;
 import com.flab.oasis.service.UserAuthService;
 import com.flab.oasis.utils.CookieUtils;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +16,11 @@ import javax.servlet.http.HttpServletResponse;
 @RequiredArgsConstructor
 public class UserAuthController {
     private final UserAuthService userAuthService;
+
+    @PostMapping("/join")
+    public boolean createUserAuth(@RequestBody UserAuth userAuth) {
+        return userAuthService.createUserAuth(userAuth);
+    }
 
     @PostMapping("/login/default")
     public boolean loginAuthFromUserLoginRequest(
