@@ -20,6 +20,7 @@ import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collections;
+import java.util.Date;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +30,20 @@ public class UserAuthService {
 
     @Value("${spring.security.oauth2.client.registration.google.client-id}")
     private String googleClientId;
+
+    public boolean createUserAuth(UserAuth userAuth) {
+        userAuth.setSalt(String.valueOf(new Date().getTime()));
+        userAuth.setPassword(
+                hashingPassword(
+                        userAuth.getPassword(),
+                        userAuth.getSalt()
+                )
+        );
+
+        userAuthRepository.createUserAuth(userAuth);
+
+        return true;
+    }
 
     public JwtToken createJwtTokenByUserLoginRequest(UserLoginRequest userLoginRequest) {
         UserAuth userAuth = userAuthRepository.getUserAuthByUid(userLoginRequest.getUid());
