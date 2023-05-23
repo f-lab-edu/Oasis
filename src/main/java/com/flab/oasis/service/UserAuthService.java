@@ -4,6 +4,7 @@ package com.flab.oasis.service;
 import com.flab.oasis.constant.ErrorCode;
 import com.flab.oasis.model.*;
 import com.flab.oasis.model.exception.AuthenticationException;
+import com.flab.oasis.model.exception.AuthorizationException;
 import com.flab.oasis.repository.UserAuthRepository;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
@@ -13,6 +14,7 @@ import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.gson.GsonFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -21,6 +23,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -43,6 +46,14 @@ public class UserAuthService {
         userAuthRepository.createUserAuth(userAuth);
 
         return true;
+    }
+
+    public String getAuthorizedUid() {
+        return Optional.ofNullable(
+                SecurityContextHolder.getContext()
+        ).orElseThrow(
+                () -> new AuthorizationException(ErrorCode.UNAUTHORIZED, "Unauthorized user.")
+        ).getAuthentication().getPrincipal().toString();
     }
 
     public JwtToken createJwtTokenByUserLoginRequest(UserLoginRequest userLoginRequest) {
