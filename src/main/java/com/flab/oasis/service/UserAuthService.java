@@ -35,6 +35,7 @@ public class UserAuthService {
     private String googleClientId;
 
     public boolean createUserAuth(UserAuth userAuth) {
+        userAuth.setUid(getAuthorizedUid());
         userAuth.setSalt(String.valueOf(new Date().getTime()));
         userAuth.setPassword(
                 hashingPassword(
