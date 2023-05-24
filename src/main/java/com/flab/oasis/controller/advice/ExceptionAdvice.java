@@ -1,7 +1,7 @@
 package com.flab.oasis.controller.advice;
 
 import com.flab.oasis.model.exception.AuthenticationException;
-import com.flab.oasis.model.exception.ResponseError;
+import com.flab.oasis.model.ResponseError;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
