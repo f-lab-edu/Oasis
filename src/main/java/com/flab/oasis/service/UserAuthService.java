@@ -4,8 +4,8 @@ package com.flab.oasis.service;
 import com.flab.oasis.constant.ErrorCode;
 import com.flab.oasis.model.*;
 import com.flab.oasis.model.exception.AuthenticationException;
+import com.flab.oasis.model.exception.FatalException;
 import com.flab.oasis.repository.UserAuthRepository;
-import com.flab.oasis.utils.LogUtils;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.HttpTransport;
@@ -77,9 +77,7 @@ public class UserAuthService {
 
             return password;
         } catch (NoSuchAlgorithmException e) {
-            LogUtils.fatal(e.getClass(), ErrorCode.INTERNAL_SERVER_ERROR, e.getStackTrace());
-
-            throw new RuntimeException(e);
+            throw new FatalException(e, ErrorCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -101,14 +99,12 @@ public class UserAuthService {
                         payload.getEmail()
                 );
             }
-        } catch (GeneralSecurityException | IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             throw new AuthenticationException(
                     ErrorCode.UNAUTHORIZED, "Invalid Google Auth Token.", token
             );
-        } catch (IOException e) {
-            LogUtils.fatal(e.getClass(), ErrorCode.INTERNAL_SERVER_ERROR, e.getStackTrace());
-
-            throw new RuntimeException(e);
+        } catch (GeneralSecurityException | IOException e) {
+            throw new FatalException(e, ErrorCode.INTERNAL_SERVER_ERROR);
         }
     }
 
