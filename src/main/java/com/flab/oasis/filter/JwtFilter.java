@@ -6,7 +6,6 @@ import com.flab.oasis.model.UserSession;
 import com.flab.oasis.model.exception.AuthorizationException;
 import com.flab.oasis.service.JwtService;
 import com.flab.oasis.utils.CookieUtils;
-import com.flab.oasis.utils.LogUtils;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -56,8 +55,6 @@ public class JwtFilter extends BasicAuthenticationFilter {
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             } catch (AuthorizationException e) {
                 if (e.getMessage().equals("Access Token is Expired.")) {
-                    LogUtils.error(e.getClass(), ErrorCode.UNAUTHORIZED, "Access Token is Expired.", accessToken);
-
                     UserSession userSession = jwtService.verifyRefreshToken(refreshToken);
                     JwtToken jwtToken = jwtService.reissueJwtToken(userSession);
 
