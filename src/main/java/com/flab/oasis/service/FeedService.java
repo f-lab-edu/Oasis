@@ -1,15 +1,12 @@
 package com.flab.oasis.service;
 
-import com.flab.oasis.constant.ErrorCode;
 import com.flab.oasis.mapper.user.FeedMapper;
 import com.flab.oasis.model.Feed;
 import com.flab.oasis.model.FeedDeleteRequest;
 import com.flab.oasis.model.FeedUpdateRequest;
 import com.flab.oasis.model.FeedWriteRequest;
-import com.flab.oasis.model.exception.AuthorizationException;
 import com.flab.oasis.utils.LogUtils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -18,10 +15,11 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class FeedService {
+    private final UserAuthService userAuthService;
     private final FeedMapper feedMapper;
 
     public void writeFeed(FeedWriteRequest feedWriteRequest) {
-        String uid = getUid();
+        String uid = userAuthService.getAuthorizedUid();
 
         int maxFeedId = Optional.ofNullable(feedMapper.getMaxFeedIdByUid(uid))
                 .orElse(0);
@@ -41,7 +39,7 @@ public class FeedService {
     }
 
     public void updateFeed(FeedUpdateRequest feedUpdateRequest) {
-        String uid = getUid();
+        String uid = userAuthService.getAuthorizedUid();
 
         Feed updateFeed = Feed.builder()
                 .uid(uid)
@@ -55,7 +53,7 @@ public class FeedService {
     }
 
     public void deleteFeed(FeedDeleteRequest feedDeleteRequest) {
-        String uid = getUid();
+        String uid = userAuthService.getAuthorizedUid();
 
         Feed deleteFeed = Feed.builder()
                 .uid(uid)
@@ -65,13 +63,5 @@ public class FeedService {
         feedMapper.deleteFeed(deleteFeed);
 
         LogUtils.info(String.format("User \"%s\"'s feed has been deleted.", uid), deleteFeed.toString());
-    }
-
-    private String getUid() {
-        return Optional.ofNullable(
-                SecurityContextHolder.getContext()
-        ).orElseThrow(
-                () -> new AuthorizationException(ErrorCode.UNAUTHORIZED, "Unauthorized user.")
-        ).getAuthentication().getPrincipal().toString();
     }
 }
