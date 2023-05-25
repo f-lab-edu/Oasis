@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flab.oasis.mapper.user.FeedMapper">
+
+    <select id="getMaxFeedIdByUid" parameterType="java.lang.String" resultType="java.lang.Integer">
+        SELECT MAX(FEED_ID)
+        FROM FEED
+        WHERE UID = #{uid}
+    </select>
+
+    <insert id="writeFeed" parameterType="com.flab.oasis.model.Feed">
+        INSERT INTO FEED (UID, FEED_ID, WRITE_DATE, BOOK_ID, REPORT, FEED_LIKE, CREATE_DATETIME, MODIFY_DATETIME)
+        VALUES (#{uid}, #{feedId}, #{writeDate}, #{bookId}, #{report}, #{feedLike}, NOW(), NOW())
+    </insert>
+
+    <update id="updateFeed" parameterType="com.flab.oasis.model.Feed">
+        UPDATE FEED
+        SET REPORT = #{report}
+        WHERE UID = #{uid} AND FEED_ID = #{feedId}
+    </update>
+
+    <delete id="deleteFeed" parameterType="com.flab.oasis.model.Feed">
+        DELETE FROM FEED
+        WHERE UID = #{uid} AND FEED_ID = #{feedId}
+    </delete>
+
+</mapper>
