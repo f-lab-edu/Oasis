@@ -55,19 +55,19 @@ public class UserAuthService {
         return jwtService.createJwtToken(userAuth.getUid());
     }
 
-    public GoogleOAuthLoginResult createJwtTokenByGoogleOAuthToken(GoogleOAuthLoginRequest googleOAuthLoginRequest) {
+    public GoogleOAuthLoginResponse createJwtTokenByGoogleOAuthToken(GoogleOAuthLoginRequest googleOAuthLoginRequest) {
         String uid = getUidByGoogleOAuthToken(googleOAuthLoginRequest.getToken());
 
         try {
             userAuthRepository.getUserAuthByUid(uid);
 
-            return GoogleOAuthLoginResult.builder()
+            return GoogleOAuthLoginResponse.builder()
                     .jwtToken(jwtService.createJwtToken(uid))
                     .joinState(true)
                     .uid(uid)
                     .build();
         } catch (AuthenticationException e) {
-            return GoogleOAuthLoginResult.builder()
+            return GoogleOAuthLoginResponse.builder()
                     .jwtToken(jwtService.createJwtToken(uid))
                     .joinState(false)
                     .uid(uid)

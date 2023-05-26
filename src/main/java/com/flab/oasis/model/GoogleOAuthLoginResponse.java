@@ -10,7 +10,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class GoogleOAuthLoginResult implements Serializable {
+public class GoogleOAuthLoginResponse implements Serializable {
     private static final long serialVersionUID = -8270812217050935838L;
 
     @JsonIgnore
