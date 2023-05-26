@@ -25,14 +25,7 @@ public class UserAuthController {
             @RequestBody UserLoginRequest userLoginRequest, HttpServletResponse response) {
         JwtToken jwtToken = userAuthService.createJwtTokenByUserLoginRequest(userLoginRequest);
 
-        response.addHeader(
-                CookieUtils.SET_COOKIE,
-                CookieUtils.createCookie(CookieUtils.ACCESS_TOKEN, jwtToken.getAccessToken())
-        );
-        response.addHeader(
-                CookieUtils.SET_COOKIE,
-                CookieUtils.createCookie(CookieUtils.REFRESH_TOKEN, jwtToken.getRefreshToken())
-        );
+        CookieUtils.setCookieHeader(response, jwtToken);
 
         return true;
     }
@@ -44,14 +37,7 @@ public class UserAuthController {
                 googleOAuthToken
         );
 
-        response.addHeader(
-                CookieUtils.SET_COOKIE,
-                CookieUtils.createCookie(CookieUtils.ACCESS_TOKEN, googleOAuthLoginResult.getJwtToken().getAccessToken())
-        );
-        response.addHeader(
-                CookieUtils.SET_COOKIE,
-                CookieUtils.createCookie(CookieUtils.REFRESH_TOKEN, googleOAuthLoginResult.getJwtToken().getRefreshToken())
-        );
+        CookieUtils.setCookieHeader(response, googleOAuthLoginResult.getJwtToken());
 
         return googleOAuthLoginResult;
     }

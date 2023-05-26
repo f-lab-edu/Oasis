@@ -58,14 +58,7 @@ public class JwtFilter extends BasicAuthenticationFilter {
                     UserSession userSession = jwtService.verifyRefreshToken(refreshToken);
                     JwtToken jwtToken = jwtService.reissueJwtToken(userSession);
 
-                    response.addHeader(
-                            CookieUtils.SET_COOKIE,
-                            CookieUtils.createCookie(CookieUtils.ACCESS_TOKEN, jwtToken.getAccessToken())
-                    );
-                    response.addHeader(
-                            CookieUtils.SET_COOKIE,
-                            CookieUtils.createCookie(CookieUtils.REFRESH_TOKEN, jwtToken.getRefreshToken())
-                    );
+                    CookieUtils.setCookieHeader(response, jwtToken);
 
                     response.sendError(
                             ErrorCode.RESET_CONTENT.getCode(),
