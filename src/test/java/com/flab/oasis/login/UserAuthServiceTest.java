@@ -1,6 +1,6 @@
 package com.flab.oasis.login;
 
-import com.flab.oasis.model.GoogleOAuthToken;
+import com.flab.oasis.model.GoogleOAuthLoginRequest;
 import com.flab.oasis.model.exception.AuthenticationException;
 import com.flab.oasis.service.UserAuthService;
 import org.junit.jupiter.api.Assertions;
@@ -16,12 +16,12 @@ class UserAuthServiceTest {
 
     @Test
     void testInvalidGoogleIdTokenError() {
-        GoogleOAuthToken googleOAuthToken = new GoogleOAuthToken();
-        googleOAuthToken.setToken("");
+        GoogleOAuthLoginRequest googleOAuthLoginRequest = new GoogleOAuthLoginRequest();
+        googleOAuthLoginRequest.setToken("");
 
         Assertions.assertThrows(
                 AuthenticationException.class,
-                () -> userAuthService.createJwtTokenByGoogleOAuthToken(googleOAuthToken)
+                () -> userAuthService.createJwtTokenByGoogleOAuthToken(googleOAuthLoginRequest)
         );
     }
 }

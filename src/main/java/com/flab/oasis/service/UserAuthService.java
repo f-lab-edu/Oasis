@@ -55,8 +55,8 @@ public class UserAuthService {
         return jwtService.createJwtToken(userAuth.getUid());
     }
 
-    public GoogleOAuthLoginResult createJwtTokenByGoogleOAuthToken(GoogleOAuthToken googleOAuthToken) {
-        String uid = getUidByGoogleOAuthToken(googleOAuthToken.getToken());
+    public GoogleOAuthLoginResult createJwtTokenByGoogleOAuthToken(GoogleOAuthLoginRequest googleOAuthLoginRequest) {
+        String uid = getUidByGoogleOAuthToken(googleOAuthLoginRequest.getToken());
 
         try {
             userAuthRepository.getUserAuthByUid(uid);
