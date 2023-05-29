@@ -1,18 +1,21 @@
 package com.flab.oasis.controller;
 
 import com.flab.oasis.model.JwtToken;
-import com.flab.oasis.model.GoogleOAuthLoginResponse;
+import com.flab.oasis.model.GoogleOAuthLoginResult;
 import com.flab.oasis.model.GoogleOAuthLoginRequest;
 import com.flab.oasis.model.UserLoginRequest;
 import com.flab.oasis.service.UserAuthService;
-import com.flab.oasis.utils.CookieUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -23,22 +26,33 @@ public class UserAuthController {
     @PostMapping("/login/default")
     public boolean loginAuthFromUserLoginRequest(
             @RequestBody UserLoginRequest userLoginRequest, HttpServletResponse response) {
-        JwtToken jwtToken = userAuthService.createJwtTokenByUserLoginRequest(userLoginRequest);
-
-        CookieUtils.setCookieHeader(response, jwtToken);
+        setSecurityContext(
+                userLoginRequest.getUid(),
+                userAuthService.createJwtTokenByUserLoginRequest(userLoginRequest)
+        );
 
         return true;
     }
 
     @PostMapping("/login/google")
-    public GoogleOAuthLoginResponse loginGoogleByGoogleOAuthToken(
+    public boolean loginGoogleByGoogleOAuthToken(
             @RequestBody GoogleOAuthLoginRequest googleOAuthLoginRequest, HttpServletResponse response) {
-        GoogleOAuthLoginResponse googleOAuthLoginResponse = userAuthService.createJwtTokenByGoogleOAuthToken(
+        GoogleOAuthLoginResult googleOAuthLoginResult = userAuthService.createJwtTokenByGoogleOAuthToken(
                 googleOAuthLoginRequest
         );
 
-        CookieUtils.setCookieHeader(response, googleOAuthLoginResponse.getJwtToken());
+        if (googleOAuthLoginResult.isJoinState()) {
+            setSecurityContext(googleOAuthLoginResult.getUid(), googleOAuthLoginResult.getJwtToken());
+        }
 
-        return googleOAuthLoginResponse;
+        return googleOAuthLoginResult.isJoinState();
+    }
+
+    private void setSecurityContext(String uid, JwtToken jwtToken) {
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+                uid, jwtToken, new ArrayList<>()
+        );
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 }
