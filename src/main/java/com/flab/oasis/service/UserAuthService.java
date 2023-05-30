@@ -88,7 +88,9 @@ public class UserAuthService {
 
             return password;
         } catch (NoSuchAlgorithmException e) {
-            throw new FatalException(e, ErrorCode.INTERNAL_SERVER_ERROR);
+            throw new FatalException(
+                    ErrorCode.INTERNAL_SERVER_ERROR, FatalException.makeStackTraceMessage(e)
+            );
         }
     }
 
@@ -115,7 +117,9 @@ public class UserAuthService {
                     ErrorCode.UNAUTHORIZED, "Invalid Google Auth Token.", token
             );
         } catch (GeneralSecurityException | IOException e) {
-            throw new FatalException(e, ErrorCode.INTERNAL_SERVER_ERROR);
+            throw new FatalException(
+                    ErrorCode.INTERNAL_SERVER_ERROR, FatalException.makeStackTraceMessage(e)
+            );
         }
     }
 
