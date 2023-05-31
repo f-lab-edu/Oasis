@@ -26,7 +26,7 @@ class JwtServiceTest {
     @Test
     void testCreateToken() {
         String originUid = "test@test.com";
-        String accessToken = jwtService.createJwtToken(originUid).getAccessToken();
+        String accessToken = jwtService.createJwt(originUid).getAccessToken();
         String actualUid = JWT.decode(accessToken).getClaim("uid").asString();
 
         Assertions.assertEquals(originUid, actualUid);
@@ -36,10 +36,10 @@ class JwtServiceTest {
     @Test
     void testReissueAccessToken() {
         String originUid = "test@test.com";
-        String refreshToken = jwtService.createJwtToken(originUid).getRefreshToken();
+        String refreshToken = jwtService.createJwt(originUid).getRefreshToken();
         UserSession userSession = new UserSession(originUid, refreshToken);
 
-        String accessToken = jwtService.reissueJwtToken(userSession).getAccessToken();
+        String accessToken = jwtService.reissueJwt(userSession).getAccessToken();
         String actualUid = JWT.decode(accessToken).getClaim("uid").asString();
 
         // refresh token으로 재발급된 access token 검증
@@ -50,7 +50,7 @@ class JwtServiceTest {
     @Test
     void testVerifyRefreshTokenThrowError() {
         String uid = "test@test.com";
-        String refreshToken = jwtService.createJwtToken(uid).getRefreshToken();
+        String refreshToken = jwtService.createJwt(uid).getRefreshToken();
         UserSession willReturn = new UserSession(uid, null);
 
         BDDMockito.given(userAuthRepository.getUserSessionByUid(uid))

@@ -1,7 +1,7 @@
 package com.flab.oasis.login;
 
 import com.flab.oasis.model.GoogleOAuthLoginRequest;
-import com.flab.oasis.model.JwtToken;
+import com.flab.oasis.model.JsonWebToken;
 import com.flab.oasis.model.UserAuth;
 import com.flab.oasis.model.UserLoginRequest;
 import com.flab.oasis.model.exception.AuthenticationException;
@@ -32,7 +32,7 @@ class UserAuthServiceTest {
     @Test
     void testDefaultLogin() {
         UserLoginRequest userLoginRequest = new UserLoginRequest();
-        JwtToken jwtToken = new JwtToken("", "");
+        JsonWebToken jsonWebToken = new JsonWebToken("", "");
 
         // UserAuthService의 hashingPassword를 통해 해싱된 비밀번호
         // parameter - password: null, salt: null
@@ -40,12 +40,12 @@ class UserAuthServiceTest {
 
         BDDMockito.given(userAuthRepository.getUserAuthByUid(userLoginRequest.getUid()))
                 .willReturn(UserAuth.builder().password(hashingPassword).build());
-        BDDMockito.given(jwtService.createJwtToken(userLoginRequest.getUid()))
-                .willReturn(jwtToken);
+        BDDMockito.given(jwtService.createJwt(userLoginRequest.getUid()))
+                .willReturn(jsonWebToken);
 
         Assertions.assertEquals(
-                userAuthService.tryLoginDefault(userLoginRequest).getJwtToken().getAccessToken(),
-                jwtToken.getAccessToken()
+                userAuthService.tryLoginDefault(userLoginRequest).getJsonWebToken().getAccessToken(),
+                jsonWebToken.getAccessToken()
         );
     }
 

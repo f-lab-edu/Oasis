@@ -1,7 +1,7 @@
 package com.flab.oasis.utils;
 
 import com.flab.oasis.constant.JwtProperty;
-import com.flab.oasis.model.JwtToken;
+import com.flab.oasis.model.JsonWebToken;
 import org.springframework.boot.web.server.Cookie;
 import org.springframework.http.ResponseCookie;
 
@@ -22,14 +22,14 @@ public class CookieUtils {
                 .toString();
     }
 
-    public static void setCookieHeader(HttpServletResponse response, JwtToken jwtToken) {
+    public static void setCookieHeader(HttpServletResponse response, JsonWebToken jsonWebToken) {
         response.addHeader(
                 SET_COOKIE,
-                CookieUtils.createCookie(ACCESS_TOKEN, jwtToken.getAccessToken())
+                CookieUtils.createCookie(ACCESS_TOKEN, jsonWebToken.getAccessToken())
         );
         response.addHeader(
                 SET_COOKIE,
-                CookieUtils.createCookie(REFRESH_TOKEN, jwtToken.getRefreshToken())
+                CookieUtils.createCookie(REFRESH_TOKEN, jsonWebToken.getRefreshToken())
         );
     }
 }

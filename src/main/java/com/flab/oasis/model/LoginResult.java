@@ -9,6 +9,6 @@ import lombok.Setter;
 @Builder
 public class LoginResult {
     String uid;
-    JwtToken jwtToken;
+    JsonWebToken jsonWebToken;
     boolean joinUser;
 }

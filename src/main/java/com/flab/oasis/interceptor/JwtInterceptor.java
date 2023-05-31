@@ -20,7 +20,7 @@ public class JwtInterceptor implements HandlerInterceptor {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         LoginResult loginResult = (LoginResult) authentication.getCredentials();
-        CookieUtils.setCookieHeader(response, loginResult.getJwtToken());
+        CookieUtils.setCookieHeader(response, loginResult.getJsonWebToken());
         response.getOutputStream().print(loginResult.isJoinUser());
 
         HandlerInterceptor.super.postHandle(request, response, handler, modelAndView);

@@ -9,7 +9,7 @@ import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.flab.oasis.constant.ErrorCode;
 import com.flab.oasis.constant.JwtProperty;
-import com.flab.oasis.model.JwtToken;
+import com.flab.oasis.model.JsonWebToken;
 import com.flab.oasis.model.UserSession;
 import com.flab.oasis.model.exception.AuthorizationException;
 import com.flab.oasis.repository.UserAuthRepository;
@@ -27,7 +27,7 @@ public class JwtService {
     private static final String ACCESS_TOKEN = "AccessToken";
     private static final String REFRESH_TOKEN = "RefreshToken";
 
-    public JwtToken createJwtToken(String uid) {
+    public JsonWebToken createJwt(String uid) {
         String accessToken = generateToken(uid, ACCESS_TOKEN);
         String refreshToken = generateToken(uid, REFRESH_TOKEN);
 
@@ -35,7 +35,7 @@ public class JwtService {
                 new UserSession(uid, refreshToken)
         );
 
-        return new JwtToken(accessToken, refreshToken);
+        return new JsonWebToken(accessToken, refreshToken);
     }
 
     public void verifyAccessToken(String accessToken) {
@@ -82,20 +82,20 @@ public class JwtService {
         }
     }
 
-    public JwtToken reissueJwtToken(UserSession userSession) {
+    public JsonWebToken reissueJwt(UserSession userSession) {
         DecodedJWT decodedJWT = JWT.decode(userSession.getRefreshToken());
 
         // refresh token 만료 3일 전이면 신규 토큰을 발급한다.
         if (willExpire(decodedJWT.getExpiresAt())) {
             LogUtils.info("Access and Refresh Token were Reissued.", userSession.getUid());
 
-            return createJwtToken(userSession.getUid());
+            return createJwt(userSession.getUid());
         }
 
         // 유효한 refresh token이면 access token만 새로 발급한다.
         LogUtils.info("Access Token was Reissued.", userSession.getUid());
 
-        return new JwtToken(generateToken(userSession.getUid(), ACCESS_TOKEN), userSession.getRefreshToken());
+        return new JsonWebToken(generateToken(userSession.getUid(), ACCESS_TOKEN), userSession.getRefreshToken());
     }
 
     public String getClaim(String token, String claim) {

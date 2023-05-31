@@ -1,7 +1,7 @@
 package com.flab.oasis.filter;
 
 import com.flab.oasis.constant.ErrorCode;
-import com.flab.oasis.model.JwtToken;
+import com.flab.oasis.model.JsonWebToken;
 import com.flab.oasis.model.UserSession;
 import com.flab.oasis.model.exception.AuthorizationException;
 import com.flab.oasis.service.JwtService;
@@ -56,9 +56,9 @@ public class JwtFilter extends BasicAuthenticationFilter {
             } catch (AuthorizationException e) {
                 if (e.getMessage().equals("Access Token is Expired.")) {
                     UserSession userSession = jwtService.verifyRefreshToken(refreshToken);
-                    JwtToken jwtToken = jwtService.reissueJwtToken(userSession);
+                    JsonWebToken jsonWebToken = jwtService.reissueJwt(userSession);
 
-                    CookieUtils.setCookieHeader(response, jwtToken);
+                    CookieUtils.setCookieHeader(response, jsonWebToken);
 
                     response.sendError(
                             ErrorCode.RESET_CONTENT.getCode(),

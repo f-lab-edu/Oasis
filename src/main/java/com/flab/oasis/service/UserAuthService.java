@@ -46,7 +46,7 @@ public class UserAuthService {
 
         return LoginResult.builder()
                 .uid(userLoginRequest.getUid())
-                .jwtToken(jwtService.createJwtToken(userAuth.getUid()))
+                .jsonWebToken(jwtService.createJwt(userAuth.getUid()))
                 .joinUser(true)
                 .build();
     }
@@ -59,13 +59,13 @@ public class UserAuthService {
 
             return LoginResult.builder()
                     .uid(uid)
-                    .jwtToken(jwtService.createJwtToken(uid))
+                    .jsonWebToken(jwtService.createJwt(uid))
                     .joinUser(true)
                     .build();
         } catch (AuthenticationException e) {
             return LoginResult.builder()
                     .uid(uid)
-                    .jwtToken(null)
+                    .jsonWebToken(null)
                     .joinUser(false)
                     .build();
         }
