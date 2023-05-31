@@ -1,8 +1,7 @@
 package com.flab.oasis.interceptor;
 
-import com.flab.oasis.model.JwtToken;
+import com.flab.oasis.model.LoginResult;
 import com.flab.oasis.utils.CookieUtils;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -20,10 +19,9 @@ public class JwtInterceptor implements HandlerInterceptor {
     ) throws Exception {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        if (authentication instanceof UsernamePasswordAuthenticationToken) {
-            JwtToken jwtToken = (JwtToken) authentication.getCredentials();
-            CookieUtils.setCookieHeader(response, jwtToken);
-        }
+        LoginResult loginResult = (LoginResult) authentication.getCredentials();
+        CookieUtils.setCookieHeader(response, loginResult.getJwtToken());
+        response.getOutputStream().print(loginResult.isJoinUser());
 
         HandlerInterceptor.super.postHandle(request, response, handler, modelAndView);
     }
