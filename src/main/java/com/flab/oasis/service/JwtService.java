@@ -46,13 +46,13 @@ public class JwtService {
 
             if (!uid.equals(userSession.getUid())) {
                 throw new AuthorizationException(
-                        ErrorCode.UNAUTHORIZED, "Invalid user.", uid
+                        ErrorCode.FORBIDDEN, "Invalid user.", uid
                 );
             }
         } catch (TokenExpiredException e) {
-            throw new AuthorizationException(ErrorCode.UNAUTHORIZED, "Access Token is Expired.", accessToken);
+            throw new AuthorizationException(ErrorCode.FORBIDDEN, "Access Token is Expired.", accessToken);
         } catch (SignatureVerificationException | InvalidClaimException e) {
-            throw new AuthorizationException(ErrorCode.UNAUTHORIZED, "Invalid Access Token.", accessToken);
+            throw new AuthorizationException(ErrorCode.FORBIDDEN, "Invalid Access Token.", accessToken);
         }
     }
 
@@ -64,21 +64,21 @@ public class JwtService {
 
             if (!uid.equals(userSession.getUid())) {
                 throw new AuthorizationException(
-                        ErrorCode.UNAUTHORIZED, "Invalid user.", uid
+                        ErrorCode.FORBIDDEN, "Invalid user.", uid
                 );
             }
 
             if (!refreshToken.equals(userSession.getRefreshToken())) {
                 throw new AuthorizationException(
-                        ErrorCode.UNAUTHORIZED, "Refresh Token doesn't match.", refreshToken
+                        ErrorCode.FORBIDDEN, "Refresh Token doesn't match.", refreshToken
                 );
             }
 
             return userSession;
         } catch (TokenExpiredException e) {
-            throw new AuthorizationException(ErrorCode.UNAUTHORIZED, "Refresh Token is Expired.", refreshToken);
+            throw new AuthorizationException(ErrorCode.FORBIDDEN, "Refresh Token is Expired.", refreshToken);
         } catch (SignatureVerificationException | InvalidClaimException e) {
-            throw new AuthorizationException(ErrorCode.UNAUTHORIZED, "Invalid Refresh Token.", refreshToken);
+            throw new AuthorizationException(ErrorCode.FORBIDDEN, "Invalid Refresh Token.", refreshToken);
         }
     }
 
@@ -87,13 +87,13 @@ public class JwtService {
 
         // refresh token 만료 3일 전이면 신규 토큰을 발급한다.
         if (willExpire(decodedJWT.getExpiresAt())) {
-            LogUtils.info("Access/Refresh Token wes Reissued.", userSession.getUid());
+            LogUtils.info("Access and Refresh Token were Reissued.", userSession.getUid());
 
             return createJwtToken(userSession.getUid());
         }
 
         // 유효한 refresh token이면 access token만 새로 발급한다.
-        LogUtils.info("Access Token wes Reissued.", userSession.getUid());
+        LogUtils.info("Access Token was Reissued.", userSession.getUid());
 
         return new JwtToken(generateToken(userSession.getUid(), ACCESS_TOKEN), userSession.getRefreshToken());
     }

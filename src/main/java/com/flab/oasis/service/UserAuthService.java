@@ -34,14 +34,6 @@ public class UserAuthService {
     @Value("${spring.security.oauth2.client.registration.google.client-id}")
     private String googleClientId;
 
-    public String getAuthorizedUid() {
-        return Optional.ofNullable(
-                SecurityContextHolder.getContext()
-        ).orElseThrow(
-                () -> new AuthorizationException(ErrorCode.UNAUTHORIZED, "Unauthorized user.")
-        ).getAuthentication().getPrincipal().toString();
-    }
-
     public JwtToken createJwtTokenByUserLoginRequest(UserLoginRequest userLoginRequest) {
         UserAuth userAuth = userAuthRepository.getUserAuthByUid(userLoginRequest.getUid());
         String hashingPassword = hashingPassword(userLoginRequest.getPassword(), userAuth.getSalt());
@@ -73,6 +65,15 @@ public class UserAuthService {
                     .uid(uid)
                     .build();
         }
+    }
+
+    // 토큰을 통해 등록된 uid를 가져오므로 인가된 유저에 해당
+    public String getAuthorizedUid() {
+        return Optional.ofNullable(
+                SecurityContextHolder.getContext()
+        ).orElseThrow(
+                () -> new AuthorizationException(ErrorCode.FORBIDDEN, "Unauthorized user.")
+        ).getAuthentication().getPrincipal().toString();
     }
 
     private String hashingPassword(String password, String salt) {
@@ -114,7 +115,7 @@ public class UserAuthService {
             return payload.getEmail();
         } catch (IllegalArgumentException e) {
             throw new AuthenticationException(
-                    ErrorCode.UNAUTHORIZED, "Invalid Google Auth Token.", token
+                    ErrorCode.UNAUTHORIZED, "Invalid Google OAuth Token.", token
             );
         } catch (GeneralSecurityException | IOException e) {
             throw new FatalException(

@@ -36,11 +36,11 @@ public class JwtFilter extends BasicAuthenticationFilter {
         if (!request.getRequestURI().contains("auth")) {
             String accessToken = Optional.ofNullable(WebUtils.getCookie(request, CookieUtils.ACCESS_TOKEN))
                     .orElseThrow(() -> new AuthorizationException(
-                            ErrorCode.UNAUTHORIZED, "Access Token does not exist in cookie.")
+                            ErrorCode.FORBIDDEN, "Access Token does not exist in cookie.")
                     ).getValue();
             String refreshToken = Optional.ofNullable(WebUtils.getCookie(request, CookieUtils.REFRESH_TOKEN))
                     .orElseThrow(() -> new AuthorizationException(
-                            ErrorCode.UNAUTHORIZED, "Refresh Token does not exist in cookie.")
+                            ErrorCode.FORBIDDEN, "Refresh Token does not exist in cookie.")
                     ).getValue();
 
             try {
