@@ -44,7 +44,7 @@ class UserAuthServiceTest {
                 .willReturn(jwtToken);
 
         Assertions.assertEquals(
-                userAuthService.createJwtTokenByUserLoginRequest(userLoginRequest).getAccessToken(),
+                userAuthService.tryLoginDefault(userLoginRequest).getJwtToken().getAccessToken(),
                 jwtToken.getAccessToken()
         );
     }
@@ -59,7 +59,7 @@ class UserAuthServiceTest {
 
         Assertions.assertThrows(
                 AuthenticationException.class,
-                () -> userAuthService.createJwtTokenByUserLoginRequest(userLoginRequest)
+                () -> userAuthService.tryLoginDefault(userLoginRequest)
         );
     }
 
@@ -71,7 +71,7 @@ class UserAuthServiceTest {
 
         Assertions.assertThrows(
                 AuthenticationException.class,
-                () -> userAuthService.createJwtTokenByGoogleOAuthToken(googleOAuthLoginRequest)
+                () -> userAuthService.tryLoginGoogle(googleOAuthLoginRequest)
         );
     }
 }
