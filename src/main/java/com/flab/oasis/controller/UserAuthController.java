@@ -1,8 +1,7 @@
 package com.flab.oasis.controller;
 
-import com.flab.oasis.model.JwtToken;
-import com.flab.oasis.model.GoogleOAuthLoginResult;
 import com.flab.oasis.model.GoogleOAuthLoginRequest;
+import com.flab.oasis.model.LoginResult;
 import com.flab.oasis.model.UserLoginRequest;
 import com.flab.oasis.service.UserAuthService;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 
 @RestController
@@ -24,35 +22,31 @@ public class UserAuthController {
     private final UserAuthService userAuthService;
 
     @PostMapping("/login/default")
-    public boolean loginAuthFromUserLoginRequest(
-            @RequestBody UserLoginRequest userLoginRequest, HttpServletResponse response) {
+    public boolean loginAuthFromUserLoginRequest(@RequestBody UserLoginRequest userLoginRequest) {
         setSecurityContext(
                 userLoginRequest.getUid(),
-                userAuthService.createJwtTokenByUserLoginRequest(userLoginRequest)
+                userAuthService.tryLoginDefault(userLoginRequest)
         );
 
         return true;
     }
 
     @PostMapping("/login/google")
-    public boolean loginGoogleByGoogleOAuthToken(
-            @RequestBody GoogleOAuthLoginRequest googleOAuthLoginRequest, HttpServletResponse response) {
-        GoogleOAuthLoginResult googleOAuthLoginResult = userAuthService.createJwtTokenByGoogleOAuthToken(
+    public void loginGoogleByGoogleOAuthToken(@RequestBody GoogleOAuthLoginRequest googleOAuthLoginRequest) {
+        LoginResult loginResult = userAuthService.tryLoginGoogle(
                 googleOAuthLoginRequest
         );
 
-        if (googleOAuthLoginResult.isJoinState()) {
-            setSecurityContext(googleOAuthLoginResult.getUid(), googleOAuthLoginResult.getJwtToken());
-        }
-
-        return googleOAuthLoginResult.isJoinState();
+        setSecurityContext(loginResult.getUid(), loginResult);
     }
 
-    private void setSecurityContext(String uid, JwtToken jwtToken) {
+    private boolean setSecurityContext(String uid, LoginResult loginResult) {
         Authentication authentication = new UsernamePasswordAuthenticationToken(
-                uid, jwtToken, new ArrayList<>()
+                uid, loginResult, new ArrayList<>()
         );
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        return loginResult.isJoinUser();
     }
 }
