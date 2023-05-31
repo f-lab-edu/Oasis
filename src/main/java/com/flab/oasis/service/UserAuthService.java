@@ -34,7 +34,7 @@ public class UserAuthService {
     @Value("${spring.security.oauth2.client.registration.google.client-id}")
     private String googleClientId;
 
-    public JwtToken createJwtTokenByUserLoginRequest(UserLoginRequest userLoginRequest) {
+    public LoginResult tryLoginDefault(UserLoginRequest userLoginRequest) {
         UserAuth userAuth = userAuthRepository.getUserAuthByUid(userLoginRequest.getUid());
         String hashingPassword = hashingPassword(userLoginRequest.getPassword(), userAuth.getSalt());
 
@@ -44,25 +44,29 @@ public class UserAuthService {
             );
         }
 
-        return jwtService.createJwtToken(userAuth.getUid());
+        return LoginResult.builder()
+                .uid(userLoginRequest.getUid())
+                .jwtToken(jwtService.createJwtToken(userAuth.getUid()))
+                .joinUser(true)
+                .build();
     }
 
-    public GoogleOAuthLoginResult createJwtTokenByGoogleOAuthToken(GoogleOAuthLoginRequest googleOAuthLoginRequest) {
+    public LoginResult tryLoginGoogle(GoogleOAuthLoginRequest googleOAuthLoginRequest) {
         String uid = getUidByGoogleOAuthToken(googleOAuthLoginRequest.getToken());
 
         try {
             userAuthRepository.getUserAuthByUid(uid);
 
-            return GoogleOAuthLoginResult.builder()
-                    .jwtToken(jwtService.createJwtToken(uid))
-                    .joinState(true)
+            return LoginResult.builder()
                     .uid(uid)
+                    .jwtToken(jwtService.createJwtToken(uid))
+                    .joinUser(true)
                     .build();
         } catch (AuthenticationException e) {
-            return GoogleOAuthLoginResult.builder()
-                    .jwtToken(null)
-                    .joinState(false)
+            return LoginResult.builder()
                     .uid(uid)
+                    .jwtToken(null)
+                    .joinUser(false)
                     .build();
         }
     }
