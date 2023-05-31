@@ -7,8 +7,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class GoogleOAuthLoginResult {
-    JwtToken jwtToken;
+public class LoginResult {
     String uid;
-    boolean joinState;
+    JwtToken jwtToken;
+    boolean joinUser;
 }
