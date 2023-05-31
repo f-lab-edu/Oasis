@@ -103,15 +103,15 @@ public class UserAuthService {
         try {
             GoogleIdToken.Payload payload = verifier.verify(token).getPayload();
 
-            if (Boolean.TRUE.equals(payload.getEmailVerified())) {
-                return payload.getEmail();
-            } else {
+            if (!Boolean.TRUE.equals(payload.getEmailVerified())) {
                 throw new AuthenticationException(
                         ErrorCode.UNAUTHORIZED,
                         "This users e-mail address is not verified by Google.",
                         payload.getEmail()
                 );
             }
+
+            return payload.getEmail();
         } catch (IllegalArgumentException e) {
             throw new AuthenticationException(
                     ErrorCode.UNAUTHORIZED, "Invalid Google Auth Token.", token
