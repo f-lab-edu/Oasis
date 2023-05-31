@@ -22,13 +22,11 @@ public class UserAuthController {
     private final UserAuthService userAuthService;
 
     @PostMapping("/login/default")
-    public boolean loginAuthFromUserLoginRequest(@RequestBody UserLoginRequest userLoginRequest) {
+    public void loginAuthFromUserLoginRequest(@RequestBody UserLoginRequest userLoginRequest) {
         setSecurityContext(
                 userLoginRequest.getUid(),
                 userAuthService.tryLoginDefault(userLoginRequest)
         );
-
-        return true;
     }
 
     @PostMapping("/login/google")
@@ -40,13 +38,11 @@ public class UserAuthController {
         setSecurityContext(loginResult.getUid(), loginResult);
     }
 
-    private boolean setSecurityContext(String uid, LoginResult loginResult) {
+    private void setSecurityContext(String uid, LoginResult loginResult) {
         Authentication authentication = new UsernamePasswordAuthenticationToken(
                 uid, loginResult, new ArrayList<>()
         );
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        return loginResult.isJoinUser();
     }
 }
