@@ -7,7 +7,7 @@ import java.io.Serializable;
 
 @Getter
 @Setter
-public class GoogleOAuthToken implements Serializable {
+public class GoogleOAuthLoginRequest implements Serializable {
     private static final long serialVersionUID = -3778175011718972617L;
 
     private String token;
