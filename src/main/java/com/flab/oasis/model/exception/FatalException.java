@@ -12,17 +12,18 @@ public class FatalException extends RuntimeException {
 
     private final ErrorCode errorCode;
 
-    public FatalException(Throwable throwable, ErrorCode errorCode) {
-        super(throwable.getMessage());
+    public FatalException(ErrorCode errorCode, String message) {
+        super(message);
         this.errorCode = errorCode;
 
-        LogUtils.error(throwable.getClass(), errorCode, parseStackTraceToString(throwable.getStackTrace()));
+        LogUtils.error(this.getClass(), errorCode, message);
     }
 
-    private String parseStackTraceToString(StackTraceElement[] stackTraceElements) {
+    public static String makeStackTraceMessage(Throwable throwable) {
         StringBuilder stringBuilder = new StringBuilder();
 
-        Arrays.stream(stackTraceElements)
+        stringBuilder.append(throwable.getClass().getName()).append("\n");
+        Arrays.stream(throwable.getStackTrace())
                 .forEach(e -> stringBuilder.append(e.toString()).append("\n"));
 
         return stringBuilder.toString();

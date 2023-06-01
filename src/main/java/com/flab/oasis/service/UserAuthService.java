@@ -2,9 +2,11 @@ package com.flab.oasis.service;
 
 
 import com.flab.oasis.constant.ErrorCode;
-import com.flab.oasis.model.*;
+import com.flab.oasis.model.GoogleOAuthLoginRequest;
+import com.flab.oasis.model.LoginResult;
+import com.flab.oasis.model.UserAuth;
+import com.flab.oasis.model.UserLoginRequest;
 import com.flab.oasis.model.exception.AuthenticationException;
-import com.flab.oasis.model.exception.AuthorizationException;
 import com.flab.oasis.model.exception.FatalException;
 import com.flab.oasis.repository.UserAuthRepository;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
@@ -50,15 +52,7 @@ public class UserAuthService {
         return true;
     }
 
-    public String getAuthorizedUid() {
-        return Optional.ofNullable(
-                SecurityContextHolder.getContext()
-        ).orElseThrow(
-                () -> new AuthorizationException(ErrorCode.UNAUTHORIZED, "Unauthorized user.")
-        ).getAuthentication().getPrincipal().toString();
-    }
-
-    public JwtToken createJwtTokenByUserLoginRequest(UserLoginRequest userLoginRequest) {
+    public LoginResult tryLoginDefault(UserLoginRequest userLoginRequest) {
         UserAuth userAuth = userAuthRepository.getUserAuthByUid(userLoginRequest.getUid());
         String hashingPassword = hashingPassword(userLoginRequest.getPassword(), userAuth.getSalt());
 
@@ -68,27 +62,44 @@ public class UserAuthService {
             );
         }
 
-        return jwtService.createJwtToken(userAuth.getUid());
+        return LoginResult.builder()
+                .uid(userLoginRequest.getUid())
+                .jsonWebToken(
+                        jwtService.createJwt(userAuth.getUid(), userAuth.getUserRole())
+                )
+                .joinUser(true)
+                .build();
     }
 
-    public GoogleOAuthLoginResult createJwtTokenByGoogleOAuthToken(GoogleOAuthToken googleOAuthToken) {
-        String uid = getUidByGoogleOAuthToken(googleOAuthToken.getToken());
+    public LoginResult tryLoginGoogle(GoogleOAuthLoginRequest googleOAuthLoginRequest) {
+        String uid = getUidByGoogleOAuthToken(googleOAuthLoginRequest.getToken());
 
         try {
-            userAuthRepository.getUserAuthByUid(uid);
+            UserAuth userAuth = userAuthRepository.getUserAuthByUid(uid);
 
-            return GoogleOAuthLoginResult.builder()
-                    .jwtToken(jwtService.createJwtToken(uid))
-                    .joinState(true)
+            return LoginResult.builder()
                     .uid(uid)
+                    .jsonWebToken(
+                            jwtService.createJwt(uid, userAuth.getUserRole())
+                    )
+                    .joinUser(true)
                     .build();
         } catch (AuthenticationException e) {
-            return GoogleOAuthLoginResult.builder()
-                    .jwtToken(jwtService.createJwtToken(uid))
-                    .joinState(false)
+            return LoginResult.builder()
                     .uid(uid)
+                    .jsonWebToken(null)
+                    .joinUser(false)
                     .build();
         }
+    }
+
+    // 토큰을 통해 등록된 uid를 가져오므로 인가된 유저에 해당
+    public String getAuthorizedUid() {
+        return Optional.ofNullable(
+                SecurityContextHolder.getContext()
+        ).orElseThrow(
+                () -> new AuthenticationException(ErrorCode.UNAUTHORIZED, "Unauthorized user.")
+        ).getAuthentication().getPrincipal().toString();
     }
 
     private String hashingPassword(String password, String salt) {
@@ -104,7 +115,9 @@ public class UserAuthService {
 
             return password;
         } catch (NoSuchAlgorithmException e) {
-            throw new FatalException(e, ErrorCode.INTERNAL_SERVER_ERROR);
+            throw new FatalException(
+                    ErrorCode.INTERNAL_SERVER_ERROR, FatalException.makeStackTraceMessage(e)
+            );
         }
     }
 
@@ -117,21 +130,23 @@ public class UserAuthService {
         try {
             GoogleIdToken.Payload payload = verifier.verify(token).getPayload();
 
-            if (Boolean.TRUE.equals(payload.getEmailVerified())) {
-                return payload.getEmail();
-            } else {
+            if (!Boolean.TRUE.equals(payload.getEmailVerified())) {
                 throw new AuthenticationException(
                         ErrorCode.UNAUTHORIZED,
                         "This users e-mail address is not verified by Google.",
                         payload.getEmail()
                 );
             }
+
+            return payload.getEmail();
         } catch (IllegalArgumentException e) {
             throw new AuthenticationException(
-                    ErrorCode.UNAUTHORIZED, "Invalid Google Auth Token.", token
+                    ErrorCode.UNAUTHORIZED, "Invalid Google OAuth Token.", token
             );
         } catch (GeneralSecurityException | IOException e) {
-            throw new FatalException(e, ErrorCode.INTERNAL_SERVER_ERROR);
+            throw new FatalException(
+                    ErrorCode.INTERNAL_SERVER_ERROR, FatalException.makeStackTraceMessage(e)
+            );
         }
     }
 

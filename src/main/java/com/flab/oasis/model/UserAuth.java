@@ -1,8 +1,8 @@
 package com.flab.oasis.model;
 
-import lombok.*;
-
 import java.io.Serializable;
+import com.flab.oasis.constant.UserRole;
+import lombok.*;
 
 @Getter
 @Setter
@@ -17,4 +17,5 @@ public class UserAuth implements Serializable {
     private String salt;
     private char socialYN;
     private String refreshToken;
+    private UserRole userRole;
 }

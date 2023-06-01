@@ -1,5 +1,6 @@
 package com.flab.oasis.config;
 
+import com.flab.oasis.constant.UserRole;
 import com.flab.oasis.filter.JwtFilter;
 import com.flab.oasis.service.JwtService;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,7 @@ public class SecurityConfig {
                 .and()
                 .authorizeRequests(auth -> auth
                         .antMatchers("/api/auth/**").permitAll() // '/api/auth' 경로는 인증 안함
+                        .antMatchers("/api/**").hasRole(UserRole.USER.name())
                         .anyRequest().authenticated() // 그 외 경로는 모두 인증 필요
                 );
 
