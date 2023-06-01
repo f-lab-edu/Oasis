@@ -19,7 +19,7 @@ public class FeedService {
     private final FeedMapper feedMapper;
 
     public void writeFeed(FeedWriteRequest feedWriteRequest) {
-        String uid = userAuthService.getAuthorizedUid();
+        String uid = userAuthService.getAuthenticatedUid();
 
         int maxFeedId = Optional.ofNullable(feedMapper.getMaxFeedIdByUid(uid))
                 .orElse(0);
@@ -39,7 +39,7 @@ public class FeedService {
     }
 
     public void updateFeed(FeedUpdateRequest feedUpdateRequest) {
-        String uid = userAuthService.getAuthorizedUid();
+        String uid = userAuthService.getAuthenticatedUid();
 
         Feed updateFeed = Feed.builder()
                 .uid(uid)
@@ -53,7 +53,7 @@ public class FeedService {
     }
 
     public void deleteFeed(FeedDeleteRequest feedDeleteRequest) {
-        String uid = userAuthService.getAuthorizedUid();
+        String uid = userAuthService.getAuthenticatedUid();
 
         Feed deleteFeed = Feed.builder()
                 .uid(uid)
