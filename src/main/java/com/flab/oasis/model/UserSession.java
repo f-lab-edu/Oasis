@@ -1,5 +1,6 @@
 package com.flab.oasis.model;
 
+import com.flab.oasis.constant.UserRole;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,4 +17,5 @@ public class UserSession implements Serializable {
 
     private String uid;
     private String refreshToken;
+    private UserRole userRole;
 }

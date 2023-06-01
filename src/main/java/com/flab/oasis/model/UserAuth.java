@@ -1,5 +1,6 @@
 package com.flab.oasis.model;
 
+import com.flab.oasis.constant.UserRole;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,4 +14,5 @@ public class UserAuth {
     private String salt;
     private char socialYN;
     private String refreshToken;
+    private UserRole userRole;
 }
