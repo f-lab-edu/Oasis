@@ -93,8 +93,7 @@ public class UserAuthService {
         }
     }
 
-    // 토큰을 통해 등록된 uid를 가져오므로 인가된 유저에 해당
-    public String getAuthorizedUid() {
+    public String getAuthenticatedUid() {
         return Optional.ofNullable(
                 SecurityContextHolder.getContext()
         ).orElseThrow(
