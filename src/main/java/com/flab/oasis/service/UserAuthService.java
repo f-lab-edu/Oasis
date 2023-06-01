@@ -80,7 +80,7 @@ public class UserAuthService {
         return Optional.ofNullable(
                 SecurityContextHolder.getContext()
         ).orElseThrow(
-                () -> new AuthorizationException(ErrorCode.FORBIDDEN, "Unauthorized user.")
+                () -> new AuthenticationException(ErrorCode.UNAUTHORIZED, "Unauthorized user.")
         ).getAuthentication().getPrincipal().toString();
     }
 

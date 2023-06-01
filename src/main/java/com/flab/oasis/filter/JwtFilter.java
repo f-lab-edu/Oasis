@@ -3,6 +3,7 @@ package com.flab.oasis.filter;
 import com.flab.oasis.constant.ErrorCode;
 import com.flab.oasis.model.JsonWebToken;
 import com.flab.oasis.model.UserSession;
+import com.flab.oasis.model.exception.AuthenticationException;
 import com.flab.oasis.model.exception.AuthorizationException;
 import com.flab.oasis.service.JwtService;
 import com.flab.oasis.utils.CookieUtils;
@@ -36,12 +37,12 @@ public class JwtFilter extends BasicAuthenticationFilter {
         // 인증 요청은 JwtFilter 과정을 생략한다.
         if (!request.getRequestURI().contains("auth")) {
             String accessToken = Optional.ofNullable(WebUtils.getCookie(request, CookieUtils.ACCESS_TOKEN))
-                    .orElseThrow(() -> new AuthorizationException(
-                            ErrorCode.FORBIDDEN, "Access Token does not exist in cookie.")
+                    .orElseThrow(() -> new AuthenticationException(
+                            ErrorCode.UNAUTHORIZED, "Access Token does not exist in cookie.")
                     ).getValue();
             String refreshToken = Optional.ofNullable(WebUtils.getCookie(request, CookieUtils.REFRESH_TOKEN))
-                    .orElseThrow(() -> new AuthorizationException(
-                            ErrorCode.FORBIDDEN, "Refresh Token does not exist in cookie.")
+                    .orElseThrow(() -> new AuthenticationException(
+                            ErrorCode.UNAUTHORIZED, "Refresh Token does not exist in cookie.")
                     ).getValue();
 
             try {
