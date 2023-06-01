@@ -1,5 +1,6 @@
 package com.flab.oasis.login;
 
+import com.flab.oasis.constant.UserRole;
 import com.flab.oasis.model.GoogleOAuthLoginRequest;
 import com.flab.oasis.model.JsonWebToken;
 import com.flab.oasis.model.UserAuth;
@@ -40,7 +41,7 @@ class UserAuthServiceTest {
 
         BDDMockito.given(userAuthRepository.getUserAuthByUid(userLoginRequest.getUid()))
                 .willReturn(UserAuth.builder().password(hashingPassword).build());
-        BDDMockito.given(jwtService.createJwt(userLoginRequest.getUid()))
+        BDDMockito.given(jwtService.createJwt(userLoginRequest.getUid(), UserRole.USER))
                 .willReturn(jsonWebToken);
 
         Assertions.assertEquals(

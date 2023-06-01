@@ -46,7 +46,9 @@ public class UserAuthService {
 
         return LoginResult.builder()
                 .uid(userLoginRequest.getUid())
-                .jsonWebToken(jwtService.createJwt(userAuth.getUid()))
+                .jsonWebToken(
+                        jwtService.createJwt(userAuth.getUid(), userAuth.getUserRole())
+                )
                 .joinUser(true)
                 .build();
     }
@@ -55,11 +57,13 @@ public class UserAuthService {
         String uid = getUidByGoogleOAuthToken(googleOAuthLoginRequest.getToken());
 
         try {
-            userAuthRepository.getUserAuthByUid(uid);
+            UserAuth userAuth = userAuthRepository.getUserAuthByUid(uid);
 
             return LoginResult.builder()
                     .uid(uid)
-                    .jsonWebToken(jwtService.createJwt(uid))
+                    .jsonWebToken(
+                            jwtService.createJwt(uid, userAuth.getUserRole())
+                    )
                     .joinUser(true)
                     .build();
         } catch (AuthenticationException e) {

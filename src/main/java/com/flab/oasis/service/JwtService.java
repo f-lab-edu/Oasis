@@ -9,6 +9,7 @@ import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.flab.oasis.constant.ErrorCode;
 import com.flab.oasis.constant.JwtProperty;
+import com.flab.oasis.constant.UserRole;
 import com.flab.oasis.model.JsonWebToken;
 import com.flab.oasis.model.UserSession;
 import com.flab.oasis.model.exception.AuthorizationException;
@@ -27,13 +28,11 @@ public class JwtService {
     private static final String ACCESS_TOKEN = "AccessToken";
     private static final String REFRESH_TOKEN = "RefreshToken";
 
-    public JsonWebToken createJwt(String uid) {
+    public JsonWebToken createJwt(String uid, UserRole userRole) {
         String accessToken = generateToken(uid, ACCESS_TOKEN);
         String refreshToken = generateToken(uid, REFRESH_TOKEN);
 
-        userAuthRepository.updateRefreshToken(
-                new UserSession(uid, refreshToken)
-        );
+        userAuthRepository.updateRefreshToken(new UserSession(uid, refreshToken, userRole));
 
         return new JsonWebToken(accessToken, refreshToken);
     }
@@ -89,7 +88,7 @@ public class JwtService {
         if (willExpire(decodedJWT.getExpiresAt())) {
             LogUtils.info("Access and Refresh Token were Reissued.", userSession.getUid());
 
-            return createJwt(userSession.getUid());
+            return createJwt(userSession.getUid(), userSession.getUserRole());
         }
 
         // 유효한 refresh token이면 access token만 새로 발급한다.
