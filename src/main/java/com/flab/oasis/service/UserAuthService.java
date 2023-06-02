@@ -113,7 +113,7 @@ public class UserAuthService {
         try {
             GoogleIdToken.Payload payload = verifier.verify(token).getPayload();
 
-            if (!Boolean.TRUE.equals(payload.getEmailVerified())) {
+            if (Boolean.FALSE.equals(payload.getEmailVerified())) {
                 throw new AuthenticationException(
                         ErrorCode.UNAUTHORIZED,
                         "This users e-mail address is not verified by Google.",
