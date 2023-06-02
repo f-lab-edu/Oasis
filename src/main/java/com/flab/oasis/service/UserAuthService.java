@@ -2,9 +2,11 @@ package com.flab.oasis.service;
 
 
 import com.flab.oasis.constant.ErrorCode;
-import com.flab.oasis.model.*;
+import com.flab.oasis.model.GoogleOAuthLoginRequest;
+import com.flab.oasis.model.LoginResult;
+import com.flab.oasis.model.UserAuth;
+import com.flab.oasis.model.UserLoginRequest;
 import com.flab.oasis.model.exception.AuthenticationException;
-import com.flab.oasis.model.exception.AuthorizationException;
 import com.flab.oasis.model.exception.FatalException;
 import com.flab.oasis.repository.UserAuthRepository;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;

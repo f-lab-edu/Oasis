@@ -4,7 +4,6 @@ import com.flab.oasis.constant.ErrorCode;
 import com.flab.oasis.model.JsonWebToken;
 import com.flab.oasis.model.UserSession;
 import com.flab.oasis.model.exception.AuthenticationException;
-import com.flab.oasis.model.exception.AuthorizationException;
 import com.flab.oasis.service.JwtService;
 import com.flab.oasis.utils.CookieUtils;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -56,7 +55,7 @@ public class JwtFilter extends BasicAuthenticationFilter {
 
                 // Spring Security Context에 유저의 인증 정보를 등록한다.
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-            } catch (AuthorizationException e) {
+            } catch (AuthenticationException e) {
                 if (e.getMessage().equals("Access Token is Expired.")) {
                     UserSession userSession = jwtService.verifyRefreshToken(refreshToken);
                     JsonWebToken jsonWebToken = jwtService.reissueJwt(userSession);
