@@ -5,22 +5,22 @@ import com.flab.oasis.utils.LogUtils;
 import lombok.Getter;
 
 @Getter
-public class AuthorizationException extends RuntimeException {
+public class AuthenticationException extends RuntimeException {
     private static final long serialVersionUID = -7138577059223481163L;
 
     private final ErrorCode errorCode;
 
-    public AuthorizationException(ErrorCode errorCode, String message) {
+    public AuthenticationException(ErrorCode errorCode, String message) {
         super(message);
         this.errorCode = errorCode;
 
-        LogUtils.error(errorCode, message);
+        LogUtils.error(this.getClass(), errorCode, message);
     }
 
-    public AuthorizationException(ErrorCode errorCode, String message, String value) {
+    public AuthenticationException(ErrorCode errorCode, String message, String value) {
         super(message);
         this.errorCode = errorCode;
 
-        LogUtils.error(errorCode, message, value);
+        LogUtils.error(this.getClass(), errorCode, message, value);
     }
 }

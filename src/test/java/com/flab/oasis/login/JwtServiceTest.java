@@ -1,6 +1,7 @@
 package com.flab.oasis.login;
 
 import com.auth0.jwt.JWT;
+import com.flab.oasis.constant.UserRole;
 import com.flab.oasis.model.UserSession;
 import com.flab.oasis.model.exception.AuthorizationException;
 import com.flab.oasis.repository.UserAuthRepository;
@@ -26,7 +27,7 @@ class JwtServiceTest {
     @Test
     void testCreateToken() {
         String originUid = "test@test.com";
-        String accessToken = jwtService.createJwtToken(originUid).getAccessToken();
+        String accessToken = jwtService.createJwt(originUid, UserRole.USER).getAccessToken();
         String actualUid = JWT.decode(accessToken).getClaim("uid").asString();
 
         Assertions.assertEquals(originUid, actualUid);
@@ -36,10 +37,11 @@ class JwtServiceTest {
     @Test
     void testReissueAccessToken() {
         String originUid = "test@test.com";
-        String refreshToken = jwtService.createJwtToken(originUid).getRefreshToken();
-        UserSession userSession = new UserSession(originUid, refreshToken);
+        UserRole userRole = UserRole.USER;
+        String refreshToken = jwtService.createJwt(originUid, userRole).getRefreshToken();
+        UserSession userSession = new UserSession(originUid, refreshToken, userRole);
 
-        String accessToken = jwtService.reissueJwtToken(userSession).getAccessToken();
+        String accessToken = jwtService.reissueJwt(userSession).getAccessToken();
         String actualUid = JWT.decode(accessToken).getClaim("uid").asString();
 
         // refresh token으로 재발급된 access token 검증
@@ -50,8 +52,9 @@ class JwtServiceTest {
     @Test
     void testVerifyRefreshTokenThrowError() {
         String uid = "test@test.com";
-        String refreshToken = jwtService.createJwtToken(uid).getRefreshToken();
-        UserSession willReturn = new UserSession(uid, null);
+        UserRole userRole = UserRole.USER;
+        String refreshToken = jwtService.createJwt(uid, userRole).getRefreshToken();
+        UserSession willReturn = new UserSession(uid, null, userRole);
 
         BDDMockito.given(userAuthRepository.getUserSessionByUid(uid))
                 .willReturn(willReturn);

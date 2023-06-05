@@ -6,7 +6,7 @@ import com.flab.oasis.constant.ErrorCode;
 import com.flab.oasis.mapper.user.UserAuthMapper;
 import com.flab.oasis.model.UserAuth;
 import com.flab.oasis.model.UserSession;
-import com.flab.oasis.model.exception.AuthorizationException;
+import com.flab.oasis.model.exception.AuthenticationException;
 import com.flab.oasis.utils.LogUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -23,7 +23,7 @@ public class UserAuthRepository {
 
     public UserAuth getUserAuthByUid(String uid) {
         return Optional.ofNullable(userAuthMapper.getUserAuthByUid(uid))
-                .orElseThrow(() -> new AuthorizationException(
+                .orElseThrow(() -> new AuthenticationException(
                         ErrorCode.UNAUTHORIZED, "User does not exist.", uid
                 ));
     }
@@ -43,7 +43,7 @@ public class UserAuthRepository {
 
             return userSession;
         } catch (Exception e) {
-            LogUtils.error(ErrorCode.SERVICE_UNAVAILABLE, e.getMessage());
+            LogUtils.error(e.getClass(), ErrorCode.SERVICE_UNAVAILABLE, e.getMessage());
 
             // redis에 문제가 생겨 연결할 수 없을 경우 DB에서 직접 가져온다.
             return getUserSessionByUidFromDB(uid);
@@ -54,7 +54,7 @@ public class UserAuthRepository {
         try {
             redisTemplate.opsForValue().getAndDelete(makeKey(userSession.getUid()));
         } catch (Exception e) {
-            LogUtils.error(ErrorCode.SERVICE_UNAVAILABLE, e.getMessage());
+            LogUtils.error(e.getClass(), ErrorCode.SERVICE_UNAVAILABLE, e.getMessage());
         }
 
         userAuthMapper.updateRefreshToken(userSession);
@@ -62,7 +62,7 @@ public class UserAuthRepository {
 
     private UserSession getUserSessionByUidFromDB(String uid) {
         return Optional.ofNullable(userAuthMapper.getUserSessionByUid(uid))
-                .orElseThrow(() -> new AuthorizationException(
+                .orElseThrow(() -> new AuthenticationException(
                         ErrorCode.UNAUTHORIZED, "User does not exist.", uid
                 ));
     }

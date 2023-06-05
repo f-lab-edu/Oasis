@@ -1,4 +1,4 @@
-package com.flab.oasis.model.exception;
+package com.flab.oasis.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
