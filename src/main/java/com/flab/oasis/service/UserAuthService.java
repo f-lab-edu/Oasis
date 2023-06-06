@@ -2,6 +2,7 @@ package com.flab.oasis.service;
 
 
 import com.flab.oasis.constant.ErrorCode;
+import com.flab.oasis.constant.UserRole;
 import com.flab.oasis.model.GoogleOAuthLoginRequest;
 import com.flab.oasis.model.LoginResult;
 import com.flab.oasis.model.UserAuth;
@@ -37,19 +38,26 @@ public class UserAuthService {
     @Value("${spring.security.oauth2.client.registration.google.client-id}")
     private String googleClientId;
 
-    public boolean createUserAuth(UserAuth userAuth) {
-        userAuth.setUid(getAuthenticatedUid());
-        userAuth.setSalt(String.valueOf(new Date().getTime()));
-        userAuth.setPassword(
-                hashingPassword(
-                        userAuth.getPassword(),
-                        userAuth.getSalt()
-                )
-        );
+    public LoginResult createUserAuth(UserAuth userAuth) {
+        userAuth.setUserRole(UserRole.USER);
+        if (userAuth.getSocialYN() == 'N') {
+            userAuth.setSalt(String.valueOf(new Date().getTime()));
+            userAuth.setPassword(
+                    hashingPassword(
+                            userAuth.getPassword(),
+                            userAuth.getSalt()
+                    )
+            );
+        }
 
         userAuthRepository.createUserAuth(userAuth);
 
-        return true;
+        return LoginResult.builder()
+                .jsonWebToken(
+                        jwtService.createJwt(userAuth.getUid(), userAuth.getUserRole())
+                )
+                .joinUser(true)
+                .build();
     }
 
     public LoginResult tryLoginDefault(UserLoginRequest userLoginRequest) {
