@@ -18,7 +18,7 @@ public class UserAuthController {
     private final UserAuthService userAuthService;
 
     @PostMapping("/join")
-    public boolean createUserAuth(@RequestBody UserAuth userAuth) {
+    public LoginResult createUserAuth(@RequestBody UserAuth userAuth) {
         return userAuthService.createUserAuth(userAuth);
     }
 
