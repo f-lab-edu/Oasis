@@ -47,7 +47,6 @@ public class UserAuthService {
         }
 
         return LoginResult.builder()
-                .uid(userLoginRequest.getUid())
                 .jsonWebToken(
                         jwtService.createJwt(userAuth.getUid(), userAuth.getUserRole())
                 )
@@ -62,7 +61,6 @@ public class UserAuthService {
             UserAuth userAuth = userAuthRepository.getUserAuthByUid(uid);
 
             return LoginResult.builder()
-                    .uid(uid)
                     .jsonWebToken(
                             jwtService.createJwt(uid, userAuth.getUserRole())
                     )
@@ -70,7 +68,6 @@ public class UserAuthService {
                     .build();
         } catch (AuthenticationException e) {
             return LoginResult.builder()
-                    .uid(uid)
                     .jsonWebToken(null)
                     .joinUser(false)
                     .build();
@@ -113,7 +110,7 @@ public class UserAuthService {
         try {
             GoogleIdToken.Payload payload = verifier.verify(token).getPayload();
 
-            if (!Boolean.TRUE.equals(payload.getEmailVerified())) {
+            if (Boolean.FALSE.equals(payload.getEmailVerified())) {
                 throw new AuthenticationException(
                         ErrorCode.UNAUTHORIZED,
                         "This users e-mail address is not verified by Google.",
