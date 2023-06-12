@@ -2,11 +2,11 @@ package com.flab.oasis.home;
 
 import com.flab.oasis.constant.BookCategory;
 import com.flab.oasis.constant.SuggestionType;
-import com.flab.oasis.mapper.user.UserCategoryMapper;
 import com.flab.oasis.model.BookSuggestion;
 import com.flab.oasis.model.BookSuggestionRequest;
 import com.flab.oasis.model.UserCategory;
 import com.flab.oasis.repository.BookSuggestionRepository;
+import com.flab.oasis.repository.UserCategoryRepository;
 import com.flab.oasis.service.HomeService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -30,7 +30,7 @@ class HomeServiceTest {
     BookSuggestionRepository bookSuggestionRepository;
 
     @Mock
-    UserCategoryMapper userCategoryMapper;
+    UserCategoryRepository userCategoryRepository;
 
     @DisplayName("User Category가 존재할 때")
     @Test
@@ -45,7 +45,7 @@ class HomeServiceTest {
 
         userCategoryList.add(userCategory);
 
-        BDDMockito.given(userCategoryMapper.getUserCategoryByUid(uid))
+        BDDMockito.given(userCategoryRepository.getUserCategoryByUid(uid))
                 .willReturn(userCategoryList);
         BDDMockito.given(bookSuggestionRepository.getBookSuggestionListBySuggestionType(suggestionType))
                 .willReturn(generateBookSuggestionList(suggestionType));
@@ -65,7 +65,7 @@ class HomeServiceTest {
         SuggestionType suggestionType = SuggestionType.NEWBOOK;
         List<BookSuggestion> bookSuggestionList = generateBookSuggestionList(suggestionType);
 
-        BDDMockito.given(userCategoryMapper.getUserCategoryByUid(uid))
+        BDDMockito.given(userCategoryRepository.getUserCategoryByUid(uid))
                 .willReturn(new ArrayList<>());
         BDDMockito.given(bookSuggestionRepository.getBookSuggestionListBySuggestionType(suggestionType))
                 .willReturn(bookSuggestionList);
