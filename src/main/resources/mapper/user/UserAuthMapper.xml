@@ -4,8 +4,8 @@
 <mapper namespace="com.flab.oasis.mapper.user.UserAuthMapper">
 
     <insert id="createUserAuth" parameterType="com.flab.oasis.model.UserAuth">
-        INSERT INTO USER_AUTH (UID, PASSWORD, SALT, SOCIAL_YN, CREATE_DATETIME, MODIFY_DATETIME)
-        VALUES (#{uid}, #{password}, #{salt}, #{socialYN}, NOW(), NOW())
+        INSERT INTO USER_AUTH (UID, PASSWORD, SALT, SOCIAL_YN, USER_ROLE, CREATE_DATETIME, MODIFY_DATETIME)
+        VALUES (#{uid}, #{password}, #{salt}, #{socialYN}, #{userRole}, NOW(), NOW())
     </insert>
 
     <select id="getUserAuthByUid" parameterType="java.lang.String" resultType="com.flab.oasis.model.UserAuth">
