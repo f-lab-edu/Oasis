@@ -3,10 +3,13 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.flab.oasis.mapper.user.UserCategoryMapper">
 
-    <select id="createUserCategory" parameterType="com.flab.oasis.model.UserCategory">
+    <insert id="createUserCategory" parameterType="java.util.List">
         INSERT INTO USER_CATEGORY (UID, BOOK_CATEGORY, CREATE_DATETIME, MODIFY_DATETIME)
-        VALUES (#{uid}, #{bookCategory}, NOW(), NOW())
-    </select>
+        VALUES
+            <foreach collection="list" item="item" separator=",">
+                (#{item.uid}, #{item.bookCategory}, NOW(), NOW())
+            </foreach>
+    </insert>
 
     <select id="getUserCategoryByUid" parameterType="java.lang.String" resultType="com.flab.oasis.model.UserCategory">
         SELECT UID, BOOK_CATEGORY AS bookCategory
