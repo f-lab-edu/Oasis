@@ -1,11 +1,9 @@
 package com.flab.oasis.controller;
 
+import com.flab.oasis.model.UserProfile;
 import com.flab.oasis.service.UserProfileService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/users")
@@ -16,5 +14,17 @@ public class UserProfileController {
     @GetMapping("/profiles/duplicate/{nickname}")
     public boolean isExistsNickname(@PathVariable String nickname) {
         return userProfileService.isExistsNickname(nickname);
+    }
+
+    @PostMapping("/profile")
+    public boolean createUserProfile(@RequestBody UserProfile userProfile) {
+        userProfileService.createUserProfile(userProfile);
+
+        return true;
+    }
+
+    @GetMapping("/profile")
+    public UserProfile getUserProfileByUid() {
+        return userProfileService.getUserProfileByUid();
     }
 }
