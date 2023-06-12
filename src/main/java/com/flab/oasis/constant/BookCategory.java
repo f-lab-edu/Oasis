@@ -1,5 +1,8 @@
 package com.flab.oasis.constant;
 
+import lombok.Getter;
+
+@Getter
 public enum BookCategory {
     BC101("소설"),
     BC102("시/에세이"),
@@ -17,9 +20,5 @@ public enum BookCategory {
 
     BookCategory(String name) {
         this.name = name;
-    }
-
-    public String getName() {
-        return name;
     }
 }
