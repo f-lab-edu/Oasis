@@ -11,4 +11,15 @@
         )
     </select>
 
+    <insert id="createUserInfo" parameterType="com.flab.oasis.model.UserInfo">
+        INSERT INTO USER_INFO (UID, NICKNAME, INTRODUCE, CREATE_DATETIME, MODIFY_DATETIME)
+        VALUES (#{uid}, #{nickname}, #{introduce}, NOW(), NOW())
+    </insert>
+
+    <select id="getUserInfoByUid" parameterType="java.lang.String" resultType="com.flab.oasis.model.UserInfo">
+        SELECT UID, NICKNAME, INTRODUCE
+        FROM USER_INFO
+        WHERE UID = #{uid}
+    </select>
+
 </mapper>
