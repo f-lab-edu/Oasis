@@ -25,24 +25,28 @@ public class UserProfileService {
 
     @Transactional
     public void createUserProfile(UserProfile userProfile) {
+        String uid = userAuthService.getAuthenticatedUid();
+
         userInfoRepository.createUserInfo(
                 UserInfo.builder()
-                        .uid(userAuthService.getAuthenticatedUid())
+                        .uid(uid)
                         .nickname(userProfile.getNickname())
                         .introduce(userProfile.getIntroduce())
                         .build()
         );
 
-        userCategoryRepository.createUserCategory(
-                userProfile.getBookCategoryList().stream()
-                        .map(
-                                bookCategory -> UserCategory.builder()
-                                        .uid(userProfile.getUid())
-                                        .bookCategory(bookCategory)
-                                        .build()
-                        )
-                        .collect(Collectors.toList())
-        );
+        if (!userProfile.getBookCategoryList().isEmpty()) {
+            userCategoryRepository.createUserCategory(
+                    userProfile.getBookCategoryList().stream()
+                            .map(
+                                    bookCategory -> UserCategory.builder()
+                                            .uid(uid)
+                                            .bookCategory(bookCategory)
+                                            .build()
+                            )
+                            .collect(Collectors.toList())
+            );
+        }
     }
 
     public UserProfile getUserProfileByUid() {
