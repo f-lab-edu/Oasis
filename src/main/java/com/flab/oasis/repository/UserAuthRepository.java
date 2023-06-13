@@ -21,6 +21,10 @@ public class UserAuthRepository {
     private final UserAuthMapper userAuthMapper;
     private final ObjectMapper objectMapper;
 
+    public void createUserAuth(UserAuth userAuth) {
+        userAuthMapper.createUserAuth(userAuth);
+    }
+
     public UserAuth getUserAuthByUid(String uid) {
         return Optional.ofNullable(userAuthMapper.getUserAuthByUid(uid))
                 .orElseThrow(() -> new AuthenticationException(

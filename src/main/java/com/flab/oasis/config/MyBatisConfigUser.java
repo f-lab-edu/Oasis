@@ -6,13 +6,18 @@ import lombok.RequiredArgsConstructor;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
 @MapperScan(basePackages = "com.flab.oasis.mapper.user", sqlSessionFactoryRef = "userSqlSessionFactory")
+@EnableTransactionManagement
 @RequiredArgsConstructor
 public class MyBatisConfigUser {
     private final ApplicationContext applicationContext;
@@ -37,5 +42,15 @@ public class MyBatisConfigUser {
         );
 
         return sqlSessionFactoryBean.getObject();
+    }
+
+    @Bean
+    public PlatformTransactionManager platformTransactionManager(
+            @Qualifier("userHikariDataSource") HikariDataSource hikariDataSource
+    ) {
+        DataSourceTransactionManager transactionManager = new DataSourceTransactionManager();
+        transactionManager.setDataSource(hikariDataSource);
+
+        return transactionManager;
     }
 }
