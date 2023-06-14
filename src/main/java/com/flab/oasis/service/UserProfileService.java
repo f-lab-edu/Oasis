@@ -52,7 +52,7 @@ public class UserProfileService {
     public UserProfile getUserProfileByUid() {
         String uid = userAuthService.getAuthenticatedUid();
         UserInfo userInfo = userInfoRepository.getUserInfoByUid(uid);
-        List<UserCategory> userCategoryList = userCategoryRepository.getUserCategoryByUid(uid);
+        List<UserCategory> userCategoryList = userCategoryRepository.getUserCategoryListByUid(uid);
 
         return UserProfile.builder()
                 .uid(uid)

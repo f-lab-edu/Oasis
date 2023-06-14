@@ -22,13 +22,13 @@ public class UserCategoryRepository {
         userCategoryMapper.createUserCategory(userCategoryList);
     }
 
-    public List<UserCategory> getUserCategoryByUid(String uid) {
+    public List<UserCategory> getUserCategoryListByUid(String uid) {
         try {
             List<UserCategory> userCategoryList = objectMapper.convertValue(
                     Optional.ofNullable(
                             redisTemplate.opsForHash().get("UserCategory", uid)
                     ).orElse(
-                            userCategoryMapper.getUserCategoryByUid(uid)
+                            userCategoryMapper.getUserCategoryListByUid(uid)
                     ),
                     new TypeReference<List<UserCategory>>() {}
             );
@@ -37,7 +37,7 @@ public class UserCategoryRepository {
 
             return userCategoryList;
         } catch (Exception e) {
-            return userCategoryMapper.getUserCategoryByUid(uid);
+            return userCategoryMapper.getUserCategoryListByUid(uid);
         }
     }
 }
