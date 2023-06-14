@@ -1,5 +1,6 @@
 package com.flab.oasis.controller;
 
+import com.flab.oasis.model.SQLResultResponse;
 import com.flab.oasis.model.UserProfile;
 import com.flab.oasis.service.UserProfileService;
 import lombok.RequiredArgsConstructor;
@@ -17,10 +18,8 @@ public class UserProfileController {
     }
 
     @PostMapping("/profile")
-    public boolean createUserProfile(@RequestBody UserProfile userProfile) {
-        userProfileService.createUserProfile(userProfile);
-
-        return true;
+    public SQLResultResponse createUserProfile(@RequestBody UserProfile userProfile) {
+        return userProfileService.createUserProfile(userProfile);
     }
 
     @GetMapping("/profile")
