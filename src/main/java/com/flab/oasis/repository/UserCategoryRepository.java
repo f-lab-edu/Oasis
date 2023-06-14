@@ -4,12 +4,10 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flab.oasis.mapper.user.UserCategoryMapper;
 import com.flab.oasis.model.UserCategory;
-import com.flab.oasis.model.UserInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,7 +28,7 @@ public class UserCategoryRepository {
                     Optional.ofNullable(
                             redisTemplate.opsForHash().get("UserCategory", uid)
                     ).orElse(
-                            getUserCategoryByUidFromDB(uid)
+                            userCategoryMapper.getUserCategoryByUid(uid)
                     ),
                     new TypeReference<List<UserCategory>>() {}
             );
@@ -39,12 +37,7 @@ public class UserCategoryRepository {
 
             return userCategoryList;
         } catch (Exception e) {
-            return getUserCategoryByUidFromDB(uid);
+            return userCategoryMapper.getUserCategoryByUid(uid);
         }
-    }
-
-    private List<UserCategory> getUserCategoryByUidFromDB(String uid) {
-        return Optional.ofNullable(userCategoryMapper.getUserCategoryByUid(uid))
-                .orElse(new ArrayList<>());
     }
 }
