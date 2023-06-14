@@ -5,9 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flab.oasis.mapper.user.UserCategoryMapper;
 import com.flab.oasis.model.UserCategory;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,8 +20,12 @@ public class UserCategoryRepository {
     private final UserCategoryMapper userCategoryMapper;
     private final ObjectMapper objectMapper;
 
-    public void createUserCategory(List<UserCategory> userCategoryList) {
-        userCategoryMapper.createUserCategory(userCategoryList);
+    public void createUserCategory(List<UserCategory> userCategoryList) throws SQLException {
+        try {
+            userCategoryMapper.createUserCategory(userCategoryList);
+        } catch (DataAccessException e) {
+            throw new SQLException(e);
+        }
     }
 
     public List<UserCategory> getUserCategoryListByUid(String uid) {
