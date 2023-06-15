@@ -22,12 +22,15 @@ public class UserProfileService {
     private final UserCategoryRepository userCategoryRepository;
     private final UserAuthService userAuthService;
 
-    public boolean isExistsNickname(String nickname) {
-        return userInfoRepository.isExistsNickname(nickname);
+    public ResultResponse<Boolean> isExistsNickname(String nickname) {
+        return ResultResponse.<Boolean>builder()
+                .code(HttpStatus.OK.value())
+                .data(userInfoRepository.isExistsNickname(nickname))
+                .build();
     }
 
     @Transactional
-    public void createUserProfile(UserProfile userProfile) {
+    public ResultResponse<Boolean> createUserProfile(UserProfile userProfile) {
         String uid = userAuthService.getAuthenticatedUid();
 
         userInfoRepository.createUserInfo(
@@ -50,14 +53,19 @@ public class UserProfileService {
                             .collect(Collectors.toList())
             );
         }
+
+        return ResultResponse.<Boolean>builder()
+                .code(HttpStatus.OK.value())
+                .data(true)
+                .build();
     }
 
-    public UserProfile getUserProfileByUid() {
+    public ResultResponse<UserProfile> getUserProfileByUid() {
         String uid = userAuthService.getAuthenticatedUid();
         UserInfo userInfo = userInfoRepository.getUserInfoByUid(uid);
         List<UserCategory> userCategoryList = userCategoryRepository.getUserCategoryListByUid(uid);
 
-        return UserProfile.builder()
+        UserProfile userProfile = UserProfile.builder()
                 .uid(uid)
                 .nickname(userInfo.getNickname())
                 .introduce(userInfo.getIntroduce())
@@ -66,6 +74,11 @@ public class UserProfileService {
                                 .map(UserCategory::getBookCategory)
                                 .collect(Collectors.toList())
                 )
+                .build();
+
+        return ResultResponse.<UserProfile>builder()
+                .code(HttpStatus.OK.value())
+                .data(userProfile)
                 .build();
     }
 }
