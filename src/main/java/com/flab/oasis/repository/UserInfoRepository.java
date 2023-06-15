@@ -6,6 +6,7 @@ import com.flab.oasis.mapper.user.UserInfoMapper;
 import com.flab.oasis.model.UserInfo;
 import com.flab.oasis.model.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -34,7 +35,7 @@ public class UserInfoRepository {
                     userInfo != null ? userInfo : handleNotExistUserInfoInRedis(uid),
                     UserInfo.class
             );
-        } catch (Exception e) {
+        } catch (RedisConnectionFailureException e) {
             return getUserInfoByUidFromDB(uid);
         }
     }
