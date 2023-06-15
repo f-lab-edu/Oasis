@@ -21,15 +21,12 @@ public class UserProfileService {
     private final UserCategoryRepository userCategoryRepository;
     private final UserAuthService userAuthService;
 
-    public GeneralResponse<Boolean> isExistsNickname(String nickname) {
-        return GeneralResponse.<Boolean>builder()
-                .code(0)
-                .data(userInfoRepository.isExistsNickname(nickname))
-                .build();
+    public boolean isExistsNickname(String nickname) {
+        return userInfoRepository.isExistsNickname(nickname);
     }
 
     @Transactional
-    public GeneralResponse<Boolean> createUserProfile(UserProfile userProfile) {
+    public void createUserProfile(UserProfile userProfile) {
         String uid = userAuthService.getAuthenticatedUid();
 
         userInfoRepository.createUserInfo(
@@ -52,39 +49,22 @@ public class UserProfileService {
                             .collect(Collectors.toList())
             );
         }
-
-        return GeneralResponse.<Boolean>builder()
-                .code(0)
-                .data(true)
-                .build();
     }
 
-    public GeneralResponse<UserProfile> getUserProfileByUid() {
-        try {
-            String uid = userAuthService.getAuthenticatedUid();
-            UserInfo userInfo = userInfoRepository.getUserInfoByUid(uid);
-            List<UserCategory> userCategoryList = userCategoryRepository.getUserCategoryListByUid(uid);
+    public UserProfile getUserProfileByUid() throws NotFoundException {
+        String uid = userAuthService.getAuthenticatedUid();
+        UserInfo userInfo = userInfoRepository.getUserInfoByUid(uid);
+        List<UserCategory> userCategoryList = userCategoryRepository.getUserCategoryListByUid(uid);
 
-            UserProfile userProfile = UserProfile.builder()
-                    .uid(uid)
-                    .nickname(userInfo.getNickname())
-                    .introduce(userInfo.getIntroduce())
-                    .bookCategoryList(
-                            userCategoryList.stream()
-                                    .map(UserCategory::getBookCategory)
-                                    .collect(Collectors.toList())
-                    )
-                    .build();
-
-            return GeneralResponse.<UserProfile>builder()
-                    .code(0)
-                    .data(userProfile)
-                    .build();
-        } catch (NotFoundException e) {
-            return GeneralResponse.<UserProfile>builder()
-                    .code(e.getErrorCode().getCode())
-                    .message(e.getMessage())
-                    .build();
-        }
+        return UserProfile.builder()
+                .uid(uid)
+                .nickname(userInfo.getNickname())
+                .introduce(userInfo.getIntroduce())
+                .bookCategoryList(
+                        userCategoryList.stream()
+                                .map(UserCategory::getBookCategory)
+                                .collect(Collectors.toList())
+                )
+                .build();
     }
 }
