@@ -1,9 +1,9 @@
 package com.flab.oasis.controller.advice;
 
 import com.flab.oasis.constant.ErrorCode;
+import com.flab.oasis.model.ResultResponse;
 import com.flab.oasis.model.exception.AuthenticationException;
-import com.flab.oasis.model.ResponseError;
-import com.flab.oasis.model.exception.NotFoundException;
+import com.flab.oasis.utils.LogUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -14,20 +14,28 @@ import java.sql.SQLException;
 @RestControllerAdvice
 public class ExceptionAdvice {
     @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity<ResponseError> handleAuthenticationException(AuthenticationException e) {
+    public ResponseEntity<ResultResponse<String>> handleAuthenticationException(AuthenticationException e) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ResponseError(e.getErrorCode().getCode(), e.getMessage()));
+                .body(
+                        ResultResponse.<String>builder()
+                                .code(e.getErrorCode().getCode())
+                                .message(e.getMessage())
+                                .data(e.getValue())
+                                .build()
+                );
     }
 
     @ExceptionHandler(SQLException.class)
-    public ResponseEntity<ResponseError> handleSQLException(SQLException e) {
+    public ResponseEntity<ResultResponse<String>> handleSQLException(SQLException e) {
+        ErrorCode errorCode = ErrorCode.INTERNAL_SERVER_ERROR;
+        LogUtils.error(e.getClass(), errorCode, e.getMessage());
+
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ResponseError(ErrorCode.INTERNAL_SERVER_ERROR.getCode(), e.getMessage()));
-    }
-    
-    @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<ResponseError> handleNotFoundException(NotFoundException e) {
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new ResponseError(ErrorCode.NOT_FOUND.getCode(), e.getMessage()));
+                .body(
+                        ResultResponse.<String>builder()
+                                .code(errorCode.getCode())
+                                .message(e.getMessage())
+                                .build()
+                );
     }
 }
