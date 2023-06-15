@@ -5,6 +5,7 @@ import com.flab.oasis.constant.ErrorCode;
 import com.flab.oasis.mapper.user.UserInfoMapper;
 import com.flab.oasis.model.UserInfo;
 import com.flab.oasis.model.exception.NotFoundException;
+import com.flab.oasis.utils.LogUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -36,6 +37,8 @@ public class UserInfoRepository {
                     UserInfo.class
             );
         } catch (RedisConnectionFailureException e) {
+            LogUtils.error(e.getClass(), ErrorCode.INTERNAL_SERVER_ERROR, e.getMessage());
+
             return getUserInfoByUidFromDB(uid);
         }
     }
