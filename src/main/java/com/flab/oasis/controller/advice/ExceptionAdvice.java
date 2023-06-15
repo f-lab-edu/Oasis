@@ -4,6 +4,7 @@ import com.flab.oasis.constant.ErrorCode;
 import com.flab.oasis.model.GeneralResponse;
 import com.flab.oasis.model.exception.AuthenticationException;
 import com.flab.oasis.utils.LogUtils;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -25,8 +26,8 @@ public class ExceptionAdvice {
                 );
     }
 
-    @ExceptionHandler(SQLException.class)
-    public ResponseEntity<GeneralResponse<String>> handleSQLException(SQLException e) {
+    @ExceptionHandler(DataAccessException.class)
+    public ResponseEntity<GeneralResponse<String>> handleDataAccessException(DataAccessException e) {
         ErrorCode errorCode = ErrorCode.INTERNAL_SERVER_ERROR;
         LogUtils.error(e.getClass(), errorCode, e.getMessage());
 
