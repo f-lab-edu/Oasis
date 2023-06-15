@@ -1,9 +1,10 @@
 package com.flab.oasis.controller;
 
-import com.flab.oasis.model.SQLResultResponse;
+import com.flab.oasis.model.ResultResponse;
 import com.flab.oasis.model.UserProfile;
 import com.flab.oasis.service.UserProfileService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -13,17 +14,17 @@ public class UserProfileController {
     private final UserProfileService userProfileService;
 
     @GetMapping("/profiles/duplicate/{nickname}")
-    public boolean isExistsNickname(@PathVariable String nickname) {
+    public ResultResponse<Boolean> isExistsNickname(@PathVariable String nickname) {
         return userProfileService.isExistsNickname(nickname);
     }
 
     @PostMapping("/profile")
-    public SQLResultResponse createUserProfile(@RequestBody UserProfile userProfile) {
+    public ResultResponse<Boolean> createUserProfile(@RequestBody UserProfile userProfile) {
         return userProfileService.createUserProfile(userProfile);
     }
 
     @GetMapping("/profile")
-    public UserProfile getUserProfileByUid() {
+    public ResultResponse<UserProfile> getUserProfileByUid() {
         return userProfileService.getUserProfileByUid();
     }
 }
