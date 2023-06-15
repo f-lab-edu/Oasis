@@ -61,24 +61,31 @@ public class UserProfileService {
     }
 
     public ResultResponse<UserProfile> getUserProfileByUid() {
-        String uid = userAuthService.getAuthenticatedUid();
-        UserInfo userInfo = userInfoRepository.getUserInfoByUid(uid);
-        List<UserCategory> userCategoryList = userCategoryRepository.getUserCategoryListByUid(uid);
+        try {
+            String uid = userAuthService.getAuthenticatedUid();
+            UserInfo userInfo = userInfoRepository.getUserInfoByUid(uid);
+            List<UserCategory> userCategoryList = userCategoryRepository.getUserCategoryListByUid(uid);
 
-        UserProfile userProfile = UserProfile.builder()
-                .uid(uid)
-                .nickname(userInfo.getNickname())
-                .introduce(userInfo.getIntroduce())
-                .bookCategoryList(
-                        userCategoryList.stream()
-                                .map(UserCategory::getBookCategory)
-                                .collect(Collectors.toList())
-                )
-                .build();
+            UserProfile userProfile = UserProfile.builder()
+                    .uid(uid)
+                    .nickname(userInfo.getNickname())
+                    .introduce(userInfo.getIntroduce())
+                    .bookCategoryList(
+                            userCategoryList.stream()
+                                    .map(UserCategory::getBookCategory)
+                                    .collect(Collectors.toList())
+                    )
+                    .build();
 
-        return ResultResponse.<UserProfile>builder()
-                .code(HttpStatus.OK.value())
-                .data(userProfile)
-                .build();
+            return ResultResponse.<UserProfile>builder()
+                    .code(HttpStatus.OK.value())
+                    .data(userProfile)
+                    .build();
+        } catch (NotFoundException e) {
+            return ResultResponse.<UserProfile>builder()
+                    .code(e.getErrorCode().getCode())
+                    .message(e.getMessage())
+                    .build();
+        }
     }
 }
