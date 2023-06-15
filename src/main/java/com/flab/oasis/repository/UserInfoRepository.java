@@ -1,6 +1,5 @@
 package com.flab.oasis.repository;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flab.oasis.constant.ErrorCode;
 import com.flab.oasis.mapper.user.UserInfoMapper;
@@ -29,21 +28,22 @@ public class UserInfoRepository {
 
     public UserInfo getUserInfoByUid(String uid) throws NotFoundException {
         try {
-            UserInfo userInfo = objectMapper.convertValue(
-                    Optional.ofNullable(
-                            redisTemplate.opsForHash().get("UserInfo", uid)
-                    ).orElse(
-                            getUserInfoByUidFromDB(uid)
-                    ),
-                    new TypeReference<UserInfo>() {}
+            Object userInfo = redisTemplate.opsForHash().get("UserInfo", uid);
+
+            return objectMapper.convertValue(
+                    userInfo != null ? userInfo : handleNotExistUserInfoInRedis(uid),
+                    UserInfo.class
             );
-
-            redisTemplate.opsForHash().put("UserInfo", userInfo.getUid(), userInfo);
-
-            return userInfo;
         } catch (Exception e) {
             return getUserInfoByUidFromDB(uid);
         }
+    }
+
+    private UserInfo handleNotExistUserInfoInRedis(String uid) throws NotFoundException {
+        UserInfo userInfo = getUserInfoByUidFromDB(uid);
+        redisTemplate.opsForHash().put("UserInfo", userInfo.getUid(), userInfo);
+
+        return userInfo;
     }
 
     private UserInfo getUserInfoByUidFromDB(String uid) {
