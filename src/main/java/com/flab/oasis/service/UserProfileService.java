@@ -1,16 +1,17 @@
 package com.flab.oasis.service;
 
-import com.flab.oasis.model.SQLResultResponse;
+import com.flab.oasis.model.ResultResponse;
 import com.flab.oasis.model.UserCategory;
 import com.flab.oasis.model.UserInfo;
 import com.flab.oasis.model.UserProfile;
+import com.flab.oasis.model.exception.NotFoundException;
 import com.flab.oasis.repository.UserCategoryRepository;
 import com.flab.oasis.repository.UserInfoRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.SQLException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,40 +27,28 @@ public class UserProfileService {
     }
 
     @Transactional
-    public SQLResultResponse createUserProfile(UserProfile userProfile) {
+    public void createUserProfile(UserProfile userProfile) {
         String uid = userAuthService.getAuthenticatedUid();
 
-        try {
-            userInfoRepository.createUserInfo(
-                    UserInfo.builder()
-                            .uid(uid)
-                            .nickname(null)
-                            .introduce(userProfile.getIntroduce())
-                            .build()
+        userInfoRepository.createUserInfo(
+                UserInfo.builder()
+                        .uid(uid)
+                        .nickname(userProfile.getNickname())
+                        .introduce(userProfile.getIntroduce())
+                        .build()
+        );
+
+        if (!userProfile.getBookCategoryList().isEmpty()) {
+            userCategoryRepository.createUserCategory(
+                    userProfile.getBookCategoryList().stream()
+                            .map(
+                                    bookCategory -> UserCategory.builder()
+                                            .uid(uid)
+                                            .bookCategory(bookCategory)
+                                            .build()
+                            )
+                            .collect(Collectors.toList())
             );
-
-            if (!userProfile.getBookCategoryList().isEmpty()) {
-                userCategoryRepository.createUserCategory(
-                        userProfile.getBookCategoryList().stream()
-                                .map(
-                                        bookCategory -> UserCategory.builder()
-                                                .uid(uid)
-                                                .bookCategory(bookCategory)
-                                                .build()
-                                )
-                                .collect(Collectors.toList())
-                );
-            }
-
-            return SQLResultResponse.builder()
-                    .result(true)
-                    .message("success")
-                    .build();
-        } catch (SQLException e) {
-            return SQLResultResponse.builder()
-                    .result(false)
-                    .message(e.getMessage())
-                    .build();
         }
     }
 
