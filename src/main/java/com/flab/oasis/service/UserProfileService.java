@@ -1,6 +1,6 @@
 package com.flab.oasis.service;
 
-import com.flab.oasis.model.ResultResponse;
+import com.flab.oasis.model.GeneralResponse;
 import com.flab.oasis.model.UserCategory;
 import com.flab.oasis.model.UserInfo;
 import com.flab.oasis.model.UserProfile;
@@ -8,7 +8,6 @@ import com.flab.oasis.model.exception.NotFoundException;
 import com.flab.oasis.repository.UserCategoryRepository;
 import com.flab.oasis.repository.UserInfoRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,15 +21,15 @@ public class UserProfileService {
     private final UserCategoryRepository userCategoryRepository;
     private final UserAuthService userAuthService;
 
-    public ResultResponse<Boolean> isExistsNickname(String nickname) {
-        return ResultResponse.<Boolean>builder()
+    public GeneralResponse<Boolean> isExistsNickname(String nickname) {
+        return GeneralResponse.<Boolean>builder()
                 .code(0)
                 .data(userInfoRepository.isExistsNickname(nickname))
                 .build();
     }
 
     @Transactional
-    public ResultResponse<Boolean> createUserProfile(UserProfile userProfile) {
+    public GeneralResponse<Boolean> createUserProfile(UserProfile userProfile) {
         String uid = userAuthService.getAuthenticatedUid();
 
         userInfoRepository.createUserInfo(
@@ -54,13 +53,13 @@ public class UserProfileService {
             );
         }
 
-        return ResultResponse.<Boolean>builder()
+        return GeneralResponse.<Boolean>builder()
                 .code(0)
                 .data(true)
                 .build();
     }
 
-    public ResultResponse<UserProfile> getUserProfileByUid() {
+    public GeneralResponse<UserProfile> getUserProfileByUid() {
         try {
             String uid = userAuthService.getAuthenticatedUid();
             UserInfo userInfo = userInfoRepository.getUserInfoByUid(uid);
@@ -77,12 +76,12 @@ public class UserProfileService {
                     )
                     .build();
 
-            return ResultResponse.<UserProfile>builder()
+            return GeneralResponse.<UserProfile>builder()
                     .code(0)
                     .data(userProfile)
                     .build();
         } catch (NotFoundException e) {
-            return ResultResponse.<UserProfile>builder()
+            return GeneralResponse.<UserProfile>builder()
                     .code(e.getErrorCode().getCode())
                     .message(e.getMessage())
                     .build();

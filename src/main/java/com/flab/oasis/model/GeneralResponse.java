@@ -9,7 +9,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ResultResponse<E extends Serializable> implements Serializable {
+public class GeneralResponse<E extends Serializable> implements Serializable {
     private static final long serialVersionUID = 7652773062428593135L;
 
     private int code;
