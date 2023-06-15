@@ -7,12 +7,9 @@ import com.flab.oasis.mapper.user.UserInfoMapper;
 import com.flab.oasis.model.UserInfo;
 import com.flab.oasis.model.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.apache.ibatis.jdbc.RuntimeSqlException;
-import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
-import java.sql.SQLException;
 import java.util.Optional;
 
 @Repository
@@ -26,15 +23,11 @@ public class UserInfoRepository {
         return userInfoMapper.isExistsNickname(nickname);
     }
 
-    public void createUserInfo(UserInfo userInfo) throws SQLException {
-        try{
-            userInfoMapper.createUserInfo(userInfo);
-        } catch (DataAccessException e) {
-            throw new SQLException(e);
-        }
+    public void createUserInfo(UserInfo userInfo) {
+        userInfoMapper.createUserInfo(userInfo);
     }
 
-    public UserInfo getUserInfoByUid(String uid) {
+    public UserInfo getUserInfoByUid(String uid) throws NotFoundException {
         try {
             UserInfo userInfo = objectMapper.convertValue(
                     Optional.ofNullable(
