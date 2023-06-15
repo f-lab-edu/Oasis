@@ -24,7 +24,7 @@ public class UserProfileService {
 
     public ResultResponse<Boolean> isExistsNickname(String nickname) {
         return ResultResponse.<Boolean>builder()
-                .code(HttpStatus.OK.value())
+                .code(0)
                 .data(userInfoRepository.isExistsNickname(nickname))
                 .build();
     }
@@ -55,7 +55,7 @@ public class UserProfileService {
         }
 
         return ResultResponse.<Boolean>builder()
-                .code(HttpStatus.OK.value())
+                .code(0)
                 .data(true)
                 .build();
     }
@@ -78,7 +78,7 @@ public class UserProfileService {
                     .build();
 
             return ResultResponse.<UserProfile>builder()
-                    .code(HttpStatus.OK.value())
+                    .code(0)
                     .data(userProfile)
                     .build();
         } catch (NotFoundException e) {
