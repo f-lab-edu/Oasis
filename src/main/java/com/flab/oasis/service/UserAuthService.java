@@ -10,6 +10,7 @@ import com.flab.oasis.model.UserLoginRequest;
 import com.flab.oasis.model.exception.AuthenticationException;
 import com.flab.oasis.model.exception.FatalException;
 import com.flab.oasis.repository.UserAuthRepository;
+import com.flab.oasis.utils.LogUtils;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.HttpTransport;
@@ -51,6 +52,8 @@ public class UserAuthService {
         }
 
         userAuthRepository.createUserAuth(userAuth);
+
+        LogUtils.info("A new user has been created.", userAuth.getUid());
 
         return LoginResult.builder()
                 .jsonWebToken(
