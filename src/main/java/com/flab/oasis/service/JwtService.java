@@ -13,6 +13,7 @@ import com.flab.oasis.constant.UserRole;
 import com.flab.oasis.model.JsonWebToken;
 import com.flab.oasis.model.UserSession;
 import com.flab.oasis.model.exception.AuthenticationException;
+import com.flab.oasis.model.exception.JwtExpiredException;
 import com.flab.oasis.repository.UserAuthRepository;
 import com.flab.oasis.utils.LogUtils;
 import lombok.RequiredArgsConstructor;
@@ -49,7 +50,7 @@ public class JwtService {
                 );
             }
         } catch (TokenExpiredException e) {
-            throw new AuthenticationException(ErrorCode.UNAUTHORIZED, "Access Token is Expired.", accessToken);
+            throw new JwtExpiredException(ErrorCode.UNAUTHORIZED, "Access Token is Expired.", accessToken);
         } catch (SignatureVerificationException | InvalidClaimException e) {
             throw new AuthenticationException(ErrorCode.UNAUTHORIZED, "Invalid Access Token.", accessToken);
         }
@@ -75,7 +76,7 @@ public class JwtService {
 
             return userSession;
         } catch (TokenExpiredException e) {
-            throw new AuthenticationException(ErrorCode.UNAUTHORIZED, "Refresh Token is Expired.", refreshToken);
+            throw new JwtExpiredException(ErrorCode.UNAUTHORIZED, "Refresh Token is Expired.", refreshToken);
         } catch (SignatureVerificationException | InvalidClaimException e) {
             throw new AuthenticationException(ErrorCode.UNAUTHORIZED, "Invalid Refresh Token.", refreshToken);
         }
