@@ -6,6 +6,7 @@ import com.flab.oasis.model.JsonWebToken;
 import com.flab.oasis.model.GeneralResponse;
 import com.flab.oasis.model.UserSession;
 import com.flab.oasis.model.exception.AuthenticationException;
+import com.flab.oasis.model.exception.JwtExpiredException;
 import com.flab.oasis.service.JwtService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -59,22 +60,20 @@ public class JwtFilter extends BasicAuthenticationFilter {
                 SecurityContextHolder.getContext().setAuthentication(authentication);
 
                 chain.doFilter(request, response);
-            } catch (AuthenticationException e) {
-                if (e.getErrorCode() == ErrorCode.RESET_CONTENT) {
-                    UserSession userSession = jwtService.verifyRefreshToken(refreshToken);
-                    JsonWebToken reissuedJWT = jwtService.reissueJwt(userSession);
-                    GeneralResponse<JsonWebToken> generalResponse = GeneralResponse.<JsonWebToken>builder()
+            } catch (JwtExpiredException e) {
+                UserSession userSession = jwtService.verifyRefreshToken(refreshToken);
+                JsonWebToken reissuedJWT = jwtService.reissueJwt(userSession);
+                GeneralResponse<JsonWebToken> generalResponse = GeneralResponse.<JsonWebToken>builder()
                             .code(ErrorCode.RESET_CONTENT.getCode())
                             .message("The token was reissued because the access token expired.")
                             .data(reissuedJWT)
                             .build();
 
-                    String responseBody = new ObjectMapper().writeValueAsString(generalResponse);
+                String responseBody = new ObjectMapper().writeValueAsString(generalResponse);
 
-                    exceptionHandle(response, HttpStatus.OK.value(), responseBody);
-                } else {
-                    exceptionHandle(response, e.getErrorCode().getCode(), e.getMessage());
-                }
+                exceptionHandle(response, HttpStatus.OK.value(), responseBody);
+            } catch (AuthenticationException e) {
+                exceptionHandle(response, e.getErrorCode().getCode(), e.getMessage());
             }
         } else {
             chain.doFilter(request, response);
