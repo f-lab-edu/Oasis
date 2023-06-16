@@ -10,8 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.sql.SQLException;
-
 @RestControllerAdvice
 public class ExceptionAdvice {
     @ExceptionHandler(AuthenticationException.class)
