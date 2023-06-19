@@ -4,10 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flab.oasis.constant.ErrorCode;
 import com.flab.oasis.constant.ResponseCode;
 import com.flab.oasis.model.JsonWebToken;
-import com.flab.oasis.model.GeneralResponse;
 import com.flab.oasis.model.UserSession;
 import com.flab.oasis.model.exception.AuthenticationException;
 import com.flab.oasis.model.exception.JwtExpiredException;
+import com.flab.oasis.model.response.JsonWebTokenResponse;
 import com.flab.oasis.service.JwtService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -64,10 +64,10 @@ public class JwtFilter extends BasicAuthenticationFilter {
             } catch (JwtExpiredException e) {
                 UserSession userSession = jwtService.verifyRefreshToken(refreshToken);
                 JsonWebToken reissuedJWT = jwtService.reissueJwt(userSession);
-                GeneralResponse<JsonWebToken> generalResponse = GeneralResponse.<JsonWebToken>builder()
+                JsonWebTokenResponse generalResponse = JsonWebTokenResponse.builder()
                             .code(ResponseCode.RESET_CONTENT.getCode())
                             .message("The token was reissued because the access token expired.")
-                            .data(reissuedJWT)
+                            .jsonWebToken(reissuedJWT)
                             .build();
 
                 String responseBody = new ObjectMapper().writeValueAsString(generalResponse);
