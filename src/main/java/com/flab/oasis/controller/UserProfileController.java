@@ -1,5 +1,6 @@
 package com.flab.oasis.controller;
 
+import com.flab.oasis.constant.ResponseCode;
 import com.flab.oasis.model.GeneralResponse;
 import com.flab.oasis.model.UserProfile;
 import com.flab.oasis.model.exception.NotFoundException;
@@ -16,7 +17,7 @@ public class UserProfileController {
     @GetMapping("/profiles/duplicate/{nickname}")
     public GeneralResponse<Boolean> isExistsNickname(@PathVariable String nickname) {
         return GeneralResponse.<Boolean>builder()
-                .code(0)
+                .code(ResponseCode.OK.getCode())
                 .data(userProfileService.isExistsNickname(nickname))
                 .build();
     }
@@ -26,7 +27,7 @@ public class UserProfileController {
         userProfileService.createUserProfile(userProfile);
 
         return GeneralResponse.<Boolean>builder()
-                .code(0)
+                .code(ResponseCode.OK.getCode())
                 .data(true)
                 .build();
     }
@@ -35,7 +36,7 @@ public class UserProfileController {
     public GeneralResponse<UserProfile> getUserProfileByUid() {
         try{
             return GeneralResponse.<UserProfile>builder()
-                    .code(0)
+                    .code(ResponseCode.OK.getCode())
                     .data(userProfileService.getUserProfileByUid())
                     .build();
         } catch (NotFoundException e) {
