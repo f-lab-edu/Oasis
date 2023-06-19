@@ -15,11 +15,8 @@ public class UserProfileController {
     private final UserProfileService userProfileService;
 
     @GetMapping("/profiles/duplicate/{nickname}")
-    public GeneralResponse<Boolean> isExistsNickname(@PathVariable String nickname) {
-        return GeneralResponse.<Boolean>builder()
-                .code(ResponseCode.OK.getCode())
-                .data(userProfileService.isExistsNickname(nickname))
-                .build();
+    public boolean isExistsNickname(@PathVariable String nickname) {
+        return userProfileService.isExistsNickname(nickname);
     }
 
     @PostMapping("/profile")
