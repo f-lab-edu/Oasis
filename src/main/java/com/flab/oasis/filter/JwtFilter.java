@@ -2,6 +2,7 @@ package com.flab.oasis.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flab.oasis.constant.ErrorCode;
+import com.flab.oasis.constant.ResponseCode;
 import com.flab.oasis.model.JsonWebToken;
 import com.flab.oasis.model.GeneralResponse;
 import com.flab.oasis.model.UserSession;
@@ -64,7 +65,7 @@ public class JwtFilter extends BasicAuthenticationFilter {
                 UserSession userSession = jwtService.verifyRefreshToken(refreshToken);
                 JsonWebToken reissuedJWT = jwtService.reissueJwt(userSession);
                 GeneralResponse<JsonWebToken> generalResponse = GeneralResponse.<JsonWebToken>builder()
-                            .code(ErrorCode.RESET_CONTENT.getCode())
+                            .code(ResponseCode.RESET_CONTENT.getCode())
                             .message("The token was reissued because the access token expired.")
                             .data(reissuedJWT)
                             .build();
