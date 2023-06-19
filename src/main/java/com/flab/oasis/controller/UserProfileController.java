@@ -1,10 +1,10 @@
 package com.flab.oasis.controller;
 
 import com.flab.oasis.constant.ResponseCode;
-import com.flab.oasis.model.GeneralResponse;
 import com.flab.oasis.model.UserProfile;
 import com.flab.oasis.model.exception.NotFoundException;
 import com.flab.oasis.model.response.SuccessResponse;
+import com.flab.oasis.model.response.UserProfileResponse;
 import com.flab.oasis.service.UserProfileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -28,14 +28,14 @@ public class UserProfileController {
     }
 
     @GetMapping("/profile")
-    public GeneralResponse<UserProfile> getUserProfileByUid() {
+    public UserProfileResponse getUserProfileByUid() {
         try{
-            return GeneralResponse.<UserProfile>builder()
+            return UserProfileResponse.builder()
                     .code(ResponseCode.OK.getCode())
-                    .data(userProfileService.getUserProfileByUid())
+                    .userProfile(userProfileService.getUserProfileByUid())
                     .build();
         } catch (NotFoundException e) {
-            return GeneralResponse.<UserProfile>builder()
+            return UserProfileResponse.builder()
                     .code(e.getErrorCode().getCode())
                     .message(e.getMessage())
                     .build();
