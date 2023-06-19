@@ -1,6 +1,5 @@
 package com.flab.oasis.service;
 
-import com.flab.oasis.model.GeneralResponse;
 import com.flab.oasis.model.UserCategory;
 import com.flab.oasis.model.UserInfo;
 import com.flab.oasis.model.UserProfile;
