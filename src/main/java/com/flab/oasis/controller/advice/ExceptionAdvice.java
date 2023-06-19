@@ -16,7 +16,6 @@ public class ExceptionAdvice {
                         FailureResponse.builder()
                                 .code(e.getErrorCode().getCode())
                                 .message(e.getMessage())
-                                .value(e.getValue())
                                 .build()
                 );
     }
