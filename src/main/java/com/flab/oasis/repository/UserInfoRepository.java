@@ -1,14 +1,11 @@
 package com.flab.oasis.repository;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flab.oasis.constant.ErrorCode;
 import com.flab.oasis.mapper.user.UserInfoMapper;
 import com.flab.oasis.model.UserInfo;
 import com.flab.oasis.model.exception.NotFoundException;
-import com.flab.oasis.utils.LogUtils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.RedisConnectionFailureException;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -16,9 +13,7 @@ import java.util.Optional;
 @Repository
 @RequiredArgsConstructor
 public class UserInfoRepository {
-    private final RedisTemplate<String, Object> redisTemplate;
     private final UserInfoMapper userInfoMapper;
-    private final ObjectMapper objectMapper;
 
     public boolean isExistsNickname(String nickname) {
         return userInfoMapper.isExistsNickname(nickname);
@@ -28,29 +23,8 @@ public class UserInfoRepository {
         userInfoMapper.createUserInfo(userInfo);
     }
 
+    @Cacheable(cacheNames = "UserInfo", key = "#uid", cacheManager = "redisCacheManager")
     public UserInfo getUserInfoByUid(String uid) throws NotFoundException {
-        try {
-            Object userInfo = redisTemplate.opsForHash().get("UserInfo", uid);
-
-            return objectMapper.convertValue(
-                    userInfo != null ? userInfo : handleNotExistUserInfoInRedis(uid),
-                    UserInfo.class
-            );
-        } catch (RedisConnectionFailureException e) {
-            LogUtils.error(e.getClass(), ErrorCode.INTERNAL_SERVER_ERROR, e.getMessage());
-
-            return getUserInfoByUidFromDB(uid);
-        }
-    }
-
-    private UserInfo handleNotExistUserInfoInRedis(String uid) throws NotFoundException {
-        UserInfo userInfo = getUserInfoByUidFromDB(uid);
-        redisTemplate.opsForHash().put("UserInfo", userInfo.getUid(), userInfo);
-
-        return userInfo;
-    }
-
-    private UserInfo getUserInfoByUidFromDB(String uid) {
         return Optional.ofNullable(userInfoMapper.getUserInfoByUid(uid))
                 .orElseThrow(() -> new NotFoundException(
                         ErrorCode.NOT_FOUND, "UserInfo does not created.", uid
