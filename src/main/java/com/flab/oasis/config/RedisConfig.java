@@ -6,6 +6,8 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.flab.oasis.constant.SuggestionType;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CachingConfigurer;
+import org.springframework.cache.interceptor.CacheErrorHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
@@ -21,7 +23,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
 @EnableRedisRepositories
-public class RedisConfig {
+public class RedisConfig implements CachingConfigurer {
     @Value("${spring.redis.port}")
     private int port;
 
@@ -75,8 +77,10 @@ public class RedisConfig {
     @Bean
     public RedisCacheManager redisCacheManager(
             RedisConnectionFactory redisConnectionFactory, ObjectMapper objectMapper) {
-        return RedisCacheManager.RedisCacheManagerBuilder.fromConnectionFactory(redisConnectionFactory)
-                .cacheDefaults(createDefaultConfiguration(objectMapper)).build();
+        return RedisCacheManager.RedisCacheManagerBuilder
+                .fromConnectionFactory(redisConnectionFactory)
+                .cacheDefaults(createDefaultConfiguration(objectMapper))
+                .build();
     }
 
     private static RedisCacheConfiguration createDefaultConfiguration(ObjectMapper objectMapper) {
@@ -89,5 +93,10 @@ public class RedisConfig {
                         RedisSerializationContext.SerializationPair
                                 .fromSerializer(new GenericJackson2JsonRedisSerializer(objectMapper))
                 );
+    }
+
+    @Override
+    public CacheErrorHandler errorHandler() {
+        return new RedisErrorHandler();
     }
 }
