@@ -9,14 +9,9 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class UserLoginRequest implements BaseRequest, Serializable {
+public class UserLoginRequest implements Serializable {
     private static final long serialVersionUID = 4305118098455201936L;
 
     private String uid;
     private String password;
-
-    @Override
-    public String generateEhCacheKey() {
-        return uid;
-    }
 }
