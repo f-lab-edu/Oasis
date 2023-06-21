@@ -75,15 +75,14 @@ public class RedisConfig implements CachingConfigurer {
     }
 
     @Bean
-    public RedisCacheManager redisCacheManager(
-            RedisConnectionFactory redisConnectionFactory, ObjectMapper objectMapper) {
+    public RedisCacheManager redisCacheManager(RedisConnectionFactory redisConnectionFactory) {
         return RedisCacheManager.RedisCacheManagerBuilder
                 .fromConnectionFactory(redisConnectionFactory)
-                .cacheDefaults(createDefaultConfiguration(objectMapper))
+                .cacheDefaults(createDefaultConfiguration())
                 .build();
     }
 
-    private RedisCacheConfiguration createDefaultConfiguration(ObjectMapper objectMapper) {
+    private RedisCacheConfiguration createDefaultConfiguration() {
         return RedisCacheConfiguration.defaultCacheConfig()
                 .disableCachingNullValues()
                 .serializeKeysWith(
@@ -91,7 +90,7 @@ public class RedisConfig implements CachingConfigurer {
                                 .fromSerializer(new StringRedisSerializer())
                 ).serializeValuesWith(
                         RedisSerializationContext.SerializationPair
-                                .fromSerializer(new GenericJackson2JsonRedisSerializer(objectMapper))
+                                .fromSerializer(new GenericJackson2JsonRedisSerializer())
                 );
     }
 
