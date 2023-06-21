@@ -83,7 +83,7 @@ public class RedisConfig implements CachingConfigurer {
                 .build();
     }
 
-    private static RedisCacheConfiguration createDefaultConfiguration(ObjectMapper objectMapper) {
+    private RedisCacheConfiguration createDefaultConfiguration(ObjectMapper objectMapper) {
         return RedisCacheConfiguration.defaultCacheConfig()
                 .disableCachingNullValues()
                 .serializeKeysWith(
