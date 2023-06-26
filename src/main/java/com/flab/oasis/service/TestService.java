@@ -1,9 +1,8 @@
 package com.flab.oasis.service;
 
 import com.flab.oasis.mapper.book.TestMapper;
-import com.flab.oasis.model.Book;
-import com.flab.oasis.model.TestModel;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -12,17 +11,21 @@ import org.springframework.stereotype.Service;
 public class TestService {
     private final TestMapper testMapper;
 
-    public TestModel dbConnectionTest() {
-        return testMapper.dbConnectionTest();
+    @Cacheable(cacheNames = "testCache", cacheManager = "ehCacheCacheManager")
+    public int dataCachingByEhCache() {
+        return testMapper.getTestData();
     }
 
-    @Cacheable(cacheNames = "testCache", cacheManager = "ehCacheCacheManager")
-    public Book ehCacheTest() {
-        return testMapper.cacheTest();
+    @CacheEvict(cacheNames = "testCache", cacheManager = "ehCacheCacheManager")
+    public void cacheEvictInEhCache() {
     }
 
     @Cacheable(cacheNames = "testCache", cacheManager = "redisCacheManager")
-    public Book redisCacheTest() {
-        return testMapper.cacheTest();
+    public int dataCachingByRedis() {
+        return testMapper.getTestData();
+    }
+
+    @CacheEvict(cacheNames = "testCache", cacheManager = "redisCacheManager")
+    public void cacheEvictInRedis() {
     }
 }
