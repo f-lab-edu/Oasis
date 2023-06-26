@@ -1,69 +1,89 @@
 package com.flab.oasis;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.flab.oasis.model.Book;
-import com.flab.oasis.model.TestModel;
+import com.flab.oasis.config.MyBatisConfigBook;
+import com.flab.oasis.mapper.book.TestMapper;
 import com.flab.oasis.service.TestService;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.BDDMockito;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.cache.Cache;
-import org.springframework.cache.ehcache.EhCacheCacheManager;
-import org.springframework.cache.interceptor.SimpleKey;
-import org.springframework.cache.support.SimpleValueWrapper;
-import org.springframework.data.redis.cache.RedisCacheManager;
 
-import java.util.Objects;
+import java.util.stream.IntStream;
 
 @SpringBootTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@ImportAutoConfiguration(MyBatisConfigBook.class)
 class CommonTest {
-
     @Autowired
-    RedisCacheManager redisCacheManager;
+    TestMapper testMapper;
 
-    @Autowired
-    EhCacheCacheManager ehCacheCacheManager;
-
-    @Autowired
+    @InjectMocks
     TestService testService;
 
+    @Mock
+    TestMapper mockTestMapper;
+
+    @DisplayName("MyBatis Connection 테스트")
     @Test
-    void redisTest() {
-        Book book = testService.redisCacheTest();
-
-        Cache cache = redisCacheManager.getCache("testCache");
-
-        Assertions.assertNotNull(cache);
-
-        SimpleValueWrapper bookCache = (SimpleValueWrapper) cache.get(SimpleKey.EMPTY);
-
-        Assertions.assertEquals(
-                book, new ObjectMapper().convertValue(Objects.requireNonNull(bookCache).get(), Book.class)
-        );
-
-        cache.clear();
+    void myBatisConnectionTest() {
+        Assertions.assertEquals(10, testMapper.getTestData());
     }
 
+    @DisplayName("Redis Caching 테스트")
     @Test
-    void dbTest() {
-        TestModel testModel = testService.dbConnectionTest();
+    void redisCachingTest() {
+        BDDMockito.given(mockTestMapper.getTestData()).willReturn(0);
 
-        Assertions.assertEquals(10, testModel.getData());
+        IntStream.range(0, 1).forEach(i -> testService.dataCachingByRedis());
+
+        // getTestData()가 실제로 1회만 동작했는지 확인
+        BDDMockito.then(mockTestMapper).should(BDDMockito.times(1)).getTestData();
     }
 
+    @DisplayName("Redis Cache Evict 테스트")
     @Test
-    void ehCacheTest() {
-        Book book = testService.ehCacheTest();
+    void redisCacheEvictTest() {
+        BDDMockito.given(mockTestMapper.getTestData()).willReturn(0);
 
-        Cache cache = ehCacheCacheManager.getCache("testCache");
+        testService.dataCachingByRedis();
 
-        Assertions.assertNotNull(cache);
+        testService.cacheEvictInRedis();
 
-        Book bookCache = cache.get(SimpleKey.EMPTY, Book.class);
+        testService.dataCachingByRedis();
 
-        Assertions.assertEquals(book, bookCache);
+        // getTestData()가 실제로 2회 동작했는지 확인
+        BDDMockito.then(mockTestMapper).should(BDDMockito.times(2)).getTestData();
+    }
 
-        cache.clear();
+    @DisplayName("EhCache Caching 테스트")
+    @Test
+    void ehCacheCachingTest() {
+        BDDMockito.given(mockTestMapper.getTestData()).willReturn(0);
+
+        IntStream.range(0, 1).forEach(i -> testService.dataCachingByEhCache());
+
+        // getTestData()가 실제로 1회만 동작했는지 확인
+        BDDMockito.then(mockTestMapper).should(BDDMockito.times(1)).getTestData();
+    }
+
+    @DisplayName("EhCache Cache Evict 테스트")
+    @Test
+    void ehCacheCacheEvictTest() {
+        BDDMockito.given(mockTestMapper.getTestData()).willReturn(0);
+
+        testService.dataCachingByEhCache();
+
+        testService.cacheEvictInEhCache();
+
+        testService.dataCachingByEhCache();
+
+        // getTestData()가 실제로 2회 동작했는지 확인
+        BDDMockito.then(mockTestMapper).should(BDDMockito.times(2)).getTestData();
     }
 }
