@@ -13,8 +13,7 @@ public class ExceptionAdvice {
     public ResponseEntity<FailureResponse> handleAuthenticationException(AuthenticationException e) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(
-                        FailureResponse.builder()
-                                .code(e.getErrorCode().getCode())
+                        FailureResponse.builder(e.getErrorCode().getCode())
                                 .message(e.getMessage())
                                 .build()
                 );
