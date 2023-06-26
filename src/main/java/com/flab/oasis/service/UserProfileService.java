@@ -1,9 +1,12 @@
 package com.flab.oasis.service;
 
+import com.flab.oasis.constant.BookCategory;
+import com.flab.oasis.constant.ResponseCode;
 import com.flab.oasis.model.UserCategory;
 import com.flab.oasis.model.UserInfo;
 import com.flab.oasis.model.UserProfile;
 import com.flab.oasis.model.exception.NotFoundException;
+import com.flab.oasis.model.response.UserProfileResponse;
 import com.flab.oasis.repository.UserCategoryRepository;
 import com.flab.oasis.repository.UserInfoRepository;
 import lombok.RequiredArgsConstructor;
@@ -50,20 +53,34 @@ public class UserProfileService {
         }
     }
 
-    public UserProfile getUserProfileByUid() throws NotFoundException {
+    public UserProfileResponse getUserProfileByUid() throws NotFoundException {
         String uid = userAuthService.getAuthenticatedUid();
-        UserInfo userInfo = userInfoRepository.getUserInfoByUid(uid);
-        List<UserCategory> userCategoryList = userCategoryRepository.getUserCategoryListByUid(uid);
 
-        return UserProfile.builder()
-                .uid(uid)
-                .nickname(userInfo.getNickname())
-                .introduce(userInfo.getIntroduce())
-                .bookCategoryList(
-                        userCategoryList.stream()
-                                .map(UserCategory::getBookCategory)
-                                .collect(Collectors.toList())
-                )
-                .build();
+        try{
+            UserInfo userInfo = userInfoRepository.getUserInfoByUid(uid);
+            List<UserCategory> userCategoryList = userCategoryRepository.getUserCategoryListByUid(uid);
+            List<BookCategory> bookCategoryList = userCategoryList.stream()
+                    .map(UserCategory::getBookCategory)
+                    .collect(Collectors.toList());
+
+            UserProfile userProfile = UserProfile.builder()
+                    .uid(uid)
+                    .nickname(userInfo.getNickname())
+                    .introduce(userInfo.getIntroduce())
+                    .bookCategoryList(bookCategoryList)
+                    .build();
+
+            return UserProfileResponse.builder()
+                    .code(ResponseCode.OK.getCode())
+                    .userProfile(userProfile)
+                    .build();
+        } catch (NotFoundException e) {
+            return UserProfileResponse.builder()
+                    .code(e.getErrorCode().getCode())
+                    .message(e.getMessage())
+                    .build();
+        }
+
+
     }
 }

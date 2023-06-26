@@ -29,16 +29,6 @@ public class UserProfileController {
 
     @GetMapping("/profile")
     public UserProfileResponse getUserProfileByUid() {
-        try{
-            return UserProfileResponse.builder()
-                    .code(ResponseCode.OK.getCode())
-                    .userProfile(userProfileService.getUserProfileByUid())
-                    .build();
-        } catch (NotFoundException e) {
-            return UserProfileResponse.builder()
-                    .code(e.getErrorCode().getCode())
-                    .message(e.getMessage())
-                    .build();
-        }
+        return userProfileService.getUserProfileByUid();
     }
 }
