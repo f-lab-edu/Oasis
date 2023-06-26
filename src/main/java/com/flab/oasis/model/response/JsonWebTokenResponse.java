@@ -10,7 +10,7 @@ import java.io.Serializable;
 @Getter
 @Setter
 @SuperBuilder
-public class JsonWebTokenResponse extends BaseResponse implements Serializable {
+public class JsonWebTokenResponse extends BaseResponse {
     private static final long serialVersionUID = -4159196522419234339L;
 
     private JsonWebToken jsonWebToken;

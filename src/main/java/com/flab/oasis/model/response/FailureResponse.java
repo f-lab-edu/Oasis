@@ -5,6 +5,6 @@ import lombok.experimental.SuperBuilder;
 import java.io.Serializable;
 
 @SuperBuilder
-public class FailureResponse extends BaseResponse implements Serializable {
+public class FailureResponse extends BaseResponse {
     private static final long serialVersionUID = 7291705160666614470L;
 }

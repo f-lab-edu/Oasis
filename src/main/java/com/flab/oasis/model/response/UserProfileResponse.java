@@ -10,7 +10,7 @@ import java.io.Serializable;
 @Getter
 @Setter
 @SuperBuilder
-public class UserProfileResponse extends BaseResponse implements Serializable {
+public class UserProfileResponse extends BaseResponse {
     private static final long serialVersionUID = -8608627323686074086L;
 
     private UserProfile userProfile;
