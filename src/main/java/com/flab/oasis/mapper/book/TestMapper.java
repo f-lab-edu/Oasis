@@ -1,14 +1,11 @@
 package com.flab.oasis.mapper.book;
 
 
-import com.flab.oasis.model.Book;
-import com.flab.oasis.model.TestModel;
 import org.apache.ibatis.annotations.Mapper;
-import org.springframework.stereotype.Repository;
+import org.apache.ibatis.annotations.Select;
 
-@Repository
 @Mapper
 public interface TestMapper {
-    public TestModel dbConnectionTest();
-    public Book cacheTest();
+    @Select("SELECT 10 FROM DUAL")
+    public int getTestData();
 }
