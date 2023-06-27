@@ -3,13 +3,11 @@ package com.flab.oasis.service;
 
 import com.flab.oasis.constant.ErrorCode;
 import com.flab.oasis.constant.UserRole;
-import com.flab.oasis.model.GoogleOAuthLoginRequest;
-import com.flab.oasis.model.LoginResult;
-import com.flab.oasis.model.UserAuth;
-import com.flab.oasis.model.UserLoginRequest;
+import com.flab.oasis.model.*;
 import com.flab.oasis.model.exception.AuthenticationException;
 import com.flab.oasis.model.exception.FatalException;
 import com.flab.oasis.repository.UserAuthRepository;
+import com.flab.oasis.utils.LogUtils;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.HttpTransport;
@@ -38,7 +36,7 @@ public class UserAuthService {
     @Value("${spring.security.oauth2.client.registration.google.client-id}")
     private String googleClientId;
 
-    public LoginResult createUserAuth(UserAuth userAuth) {
+    public JsonWebToken createUserAuth(UserAuth userAuth) {
         userAuth.setUserRole(UserRole.USER);
         if (userAuth.getSocialYN() == 'N') {
             userAuth.setSalt(String.valueOf(new Date().getTime()));
@@ -52,12 +50,9 @@ public class UserAuthService {
 
         userAuthRepository.createUserAuth(userAuth);
 
-        return LoginResult.builder()
-                .jsonWebToken(
-                        jwtService.createJwt(userAuth.getUid(), userAuth.getUserRole())
-                )
-                .joinUser(true)
-                .build();
+        LogUtils.info("A new user has been created.", userAuth.getUid());
+
+        return jwtService.createJwt(userAuth.getUid(), userAuth.getUserRole());
     }
 
     public LoginResult tryLoginDefault(UserLoginRequest userLoginRequest) {

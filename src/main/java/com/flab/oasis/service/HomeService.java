@@ -28,7 +28,7 @@ public class HomeService {
                 bookSuggestionRepository.getBookSuggestionListBySuggestionType(
                         bookSuggestionRequest.getSuggestionType()
                 ),
-                userCategoryRepository.getUserCategoryByUid(
+                userCategoryRepository.getUserCategoryListByUid(
                         bookSuggestionRequest.getUid()
                 )
         );

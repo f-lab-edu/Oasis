@@ -45,7 +45,7 @@ class HomeServiceTest {
 
         userCategoryList.add(userCategory);
 
-        BDDMockito.given(userCategoryRepository.getUserCategoryByUid(uid))
+        BDDMockito.given(userCategoryRepository.getUserCategoryListByUid(uid))
                 .willReturn(userCategoryList);
         BDDMockito.given(bookSuggestionRepository.getBookSuggestionListBySuggestionType(suggestionType))
                 .willReturn(generateBookSuggestionList(suggestionType));
@@ -65,7 +65,7 @@ class HomeServiceTest {
         SuggestionType suggestionType = SuggestionType.NEWBOOK;
         List<BookSuggestion> bookSuggestionList = generateBookSuggestionList(suggestionType);
 
-        BDDMockito.given(userCategoryRepository.getUserCategoryByUid(uid))
+        BDDMockito.given(userCategoryRepository.getUserCategoryListByUid(uid))
                 .willReturn(new ArrayList<>());
         BDDMockito.given(bookSuggestionRepository.getBookSuggestionListBySuggestionType(suggestionType))
                 .willReturn(bookSuggestionList);

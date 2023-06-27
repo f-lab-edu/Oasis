@@ -3,6 +3,7 @@ package com.flab.oasis.controller;
 import com.flab.oasis.model.FeedDeleteRequest;
 import com.flab.oasis.model.FeedUpdateRequest;
 import com.flab.oasis.model.FeedWriteRequest;
+import com.flab.oasis.model.response.SuccessResponse;
 import com.flab.oasis.service.FeedService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -14,23 +15,23 @@ public class FeedController {
     private final FeedService feedService;
 
     @PostMapping("/feed")
-    public boolean writeFeed(@RequestBody FeedWriteRequest feedWriteRequest) {
+    public SuccessResponse writeFeed(@RequestBody FeedWriteRequest feedWriteRequest) {
         feedService.writeFeed(feedWriteRequest);
 
-        return true;
+        return new SuccessResponse();
     }
 
     @PatchMapping("/feed")
-    public boolean updateFeed(@RequestBody FeedUpdateRequest feedUpdateRequest) {
+    public SuccessResponse updateFeed(@RequestBody FeedUpdateRequest feedUpdateRequest) {
         feedService.updateFeed(feedUpdateRequest);
 
-        return true;
+        return new SuccessResponse();
     }
 
     @DeleteMapping("/feed")
-    public boolean deleteFeed(@RequestBody FeedDeleteRequest feedDeleteRequest) {
+    public SuccessResponse deleteFeed(@RequestBody FeedDeleteRequest feedDeleteRequest) {
         feedService.deleteFeed(feedDeleteRequest);
 
-        return true;
+        return new SuccessResponse();
     }
 }

@@ -11,7 +11,7 @@
             </foreach>
     </insert>
 
-    <select id="getUserCategoryByUid" parameterType="java.lang.String" resultType="com.flab.oasis.model.UserCategory">
+    <select id="getUserCategoryListByUid" parameterType="java.lang.String" resultType="com.flab.oasis.model.UserCategory">
         SELECT UID, BOOK_CATEGORY AS bookCategory
         FROM USER_CATEGORY
         WHERE UID=#{uid}
