@@ -1,6 +1,7 @@
 package com.flab.oasis.repository;
 
 import com.flab.oasis.mapper.user.UserCategoryMapper;
+import com.flab.oasis.model.OverlappingCategoryUserSelect;
 import com.flab.oasis.model.UserCategory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
@@ -20,5 +21,10 @@ public class UserCategoryRepository {
     @Cacheable(cacheNames = "UserCategory", key = "#uid", cacheManager = "redisCacheManager")
     public List<UserCategory> getUserCategoryListByUid(String uid) {
         return userCategoryMapper.getUserCategoryListByUid(uid);
+    }
+
+    public List<String> getUidListWithOverlappingBookCategory(
+            OverlappingCategoryUserSelect overlappingCategoryUserSelect) {
+        return userCategoryMapper.getUidListWithOverlappingBookCategory(overlappingCategoryUserSelect);
     }
 }
