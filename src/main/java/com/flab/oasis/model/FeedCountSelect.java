@@ -13,7 +13,6 @@ import java.util.List;
 public class FeedCountSelect implements Serializable {
     private static final long serialVersionUID = 7061404739566319032L;
 
-    private String uid;
     private List<String> uidList;
     private int needSize;
 }
