@@ -2,6 +2,7 @@ package com.flab.oasis.controller;
 
 import com.flab.oasis.model.UserRelation;
 import com.flab.oasis.model.response.SuccessResponse;
+import com.flab.oasis.service.UserAuthService;
 import com.flab.oasis.service.UserRelationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -12,11 +13,12 @@ import java.util.List;
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
 public class UserRelationController {
+    private final UserAuthService userAuthService;
     private final UserRelationService userRelationService;
 
     @GetMapping("/relation/recommend")
     public List<String> getRecommendUserList() {
-        return userRelationService.getRecommendUserList();
+        return userRelationService.getRecommendUserList(userAuthService.getAuthenticatedUid());
     }
 
     @PostMapping("/relation")
