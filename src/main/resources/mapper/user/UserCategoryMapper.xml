@@ -33,4 +33,20 @@
             )
     </select>
 
+    <select id="getUserCategoryCountList" parameterType="com.flab.oasis.model.UserCategoryCountSelect" resultType="com.flab.oasis.model.UserCategoryCount">
+        SELECT UID, COUNT(BOOK_CATEGORY) AS bookCategoryCount
+        FROM USER_CATEGORY
+        WHERE UID IN (
+            <foreach collection="uidList" item="item" separator=",">
+                #{item}
+            </foreach>
+        ) AND
+        BOOK_CATEGORY NOT IN (
+            <foreach collection="userCategoryList" item="item" separator=",">
+                #{item.bookCategory}
+            </foreach>
+        )
+        GROUP BY UID
+    </select>
+
 </mapper>
