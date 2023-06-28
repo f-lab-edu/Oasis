@@ -14,7 +14,23 @@
     <select id="getUserCategoryListByUid" parameterType="java.lang.String" resultType="com.flab.oasis.model.UserCategory">
         SELECT UID, BOOK_CATEGORY AS bookCategory
         FROM USER_CATEGORY
-        WHERE UID=#{uid}
+        WHERE UID = #{uid}
+    </select>
+
+    <select id="getUidListWithOverlappingBookCategory" parameterType="com.flab.oasis.model.OverlappingCategoryUserSelect" resultType="java.util.List">
+        SELECT DISTINCT UID
+        FROM USER_CATEGORY
+        WHERE UID != #{UID} AND
+            UID NOT IN (
+                <foreach collection="userRelationList" item="item" separator=",">
+                    #{item.relationUser}
+                </foreach>
+            ) AND
+            BOOK_CATEGORY IN (
+                <foreach collection="userCategoryList" item="item" separator=",">
+                    #{item.bookCategory}
+                </foreach>
+            )
     </select>
 
 </mapper>
