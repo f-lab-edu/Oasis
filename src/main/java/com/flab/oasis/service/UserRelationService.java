@@ -86,6 +86,12 @@ public class UserRelationService {
                 .collect(Collectors.toList());
     }
 
+    public void createUserRelation(UserRelation userRelation) {
+        userRelation.setUid(userAuthService.getAuthenticatedUid());
+
+        userRelationRepository.createUserRelation(userRelation);
+    }
+
     private List<RecommendUser> getRecommendUserAsManyAsNeed(String uid, int needSize) {
         List<FeedCount> feedCountList = feedMapper.getFeedCountList(
                 FeedCountSelect.builder()
