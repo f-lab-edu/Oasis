@@ -12,5 +12,6 @@ public class UserRelation implements Serializable {
     private static final long serialVersionUID = 9092423039001303261L;
 
     private String uid;
+    private String relationUser;
     private RelationType relationType;
 }
