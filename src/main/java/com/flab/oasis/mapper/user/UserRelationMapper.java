@@ -8,4 +8,5 @@ import java.util.List;
 @Mapper
 public interface UserRelationMapper {
     public List<UserRelation> getUserRelationListByUid(String uid);
+    public void createUserRelation(UserRelation userRelation);
 }

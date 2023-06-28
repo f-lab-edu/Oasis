@@ -9,4 +9,9 @@
         WHERE UID = #{uid}
     </select>
 
+    <insert id="createUserRelation" parameterType="com.flab.oasis.model.UserRelation">
+        INSERT INTO USER_RELATION (UID, RELATION_USER, RELATION_TYPE, CREATE_DATETIME, MODIFY_DATETIME)
+        VALUES (#{uid}, #{relationUser}, #{relationType}, NOW(), NOW())
+    </insert>
+
 </mapper>
