@@ -25,30 +25,15 @@
         WHERE UID = #{uid} AND FEED_ID = #{feedId}
     </delete>
 
-    <select id="getFeedCountList" parameterType="com.flab.oasis.model.FeedCountSelect" resultType="com.flab.oasis.model.FeedCount">
+    <select id="getFeedCountList" parameterType="java.util.List" resultType="com.flab.oasis.model.FeedCount">
         SELECT UID, COUNT(UID) AS feedCount
         FROM FEED
-        WHERE
-        <choose>
-            <when test="needSize == -1">
-                UID IN (
-                    <foreach collection="uidList" item="item" separator=",">
-                        #{item}
-                    </foreach>
-                )
-            </when>
-            <otherwise>
-                UID NOT IN (
-                <foreach collection="uidList" item="item" separator=",">
-                    #{item.relationUser}
-                </foreach>
-                )
-            </otherwise>
-        </choose>
+        WHERE UID NOT IN (
+            <foreach collection="list" item="item" separator=",">
+                #{item}
+            </foreach>
+            )
         GROUP BY UID
-        <if test="needSize != -1">
-            LIMIT #{needSize, jdbcType=INTEGER}
-        </if>
     </select>
 
 </mapper>
