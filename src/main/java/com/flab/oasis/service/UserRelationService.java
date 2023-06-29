@@ -1,6 +1,5 @@
 package com.flab.oasis.service;
 
-import com.flab.oasis.mapper.user.FeedMapper;
 import com.flab.oasis.model.*;
 import com.flab.oasis.repository.UserCategoryRepository;
 import com.flab.oasis.repository.UserInfoRepository;
@@ -17,7 +16,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserRelationService {
     private final UserAuthService userAuthService;
-    private final FeedMapper feedMapper;
     private final UserCategoryRepository userCategoryRepository;
     private final UserRelationRepository userRelationRepository;
     private final UserInfoRepository userInfoRepository;
@@ -72,12 +70,15 @@ public class UserRelationService {
     private List<String> getRecommendUserAsManyAsNeed(List<String> uidList, int needSize) {
         uidList.add(userAuthService.getAuthenticatedUid());
 
-        return userInfoRepository.getRecommendUserList(
-                RecommendUserSelect.builder()
+        return userInfoRepository.getUsersFeedCountList(
+                UsersFeedCountSelect.builder()
                         .uidList(uidList)
                         .needSize(needSize)
                         .build()
-        );
+        )
+                .stream()
+                .map(UsersFeedCount::getUid)
+                .collect(Collectors.toList());
     }
 
     private List<String> getUidListFromUserRelationList(List<UserRelation> userRelationList) {
@@ -97,13 +98,18 @@ public class UserRelationService {
                 .stream()
                 .collect(Collectors.toMap(UserCategoryCount::getUid, UserCategoryCount::getBookCategoryCount));
 
-        List<FeedCount> feedCountList = feedMapper.getFeedCountList(overlappingCategoryUserList);
+        List<UsersFeedCount> usersFeedCountList = userInfoRepository.getUsersFeedCountList(
+                UsersFeedCountSelect.builder()
+                        .uidList(overlappingCategoryUserList)
+                        .needSize(-1)
+                        .build()
+        );
 
-        List<RecommendUser> recommendUserList = feedCountList.stream()
-                .map(feedCount -> RecommendUser.builder()
-                        .uid(feedCount.getUid())
-                        .feedCount(feedCount.getFeedCount())
-                        .categoryCount(userCategoryCountMap.get(feedCount.getUid()))
+        List<RecommendUser> recommendUserList = usersFeedCountList.stream()
+                .map(usersFeedCount -> RecommendUser.builder()
+                        .uid(usersFeedCount.getUid())
+                        .feedCount(usersFeedCount.getFeedCount())
+                        .categoryCount(userCategoryCountMap.get(usersFeedCount.getUid()))
                         .build()
                 ).
                 collect(Collectors.toList());
