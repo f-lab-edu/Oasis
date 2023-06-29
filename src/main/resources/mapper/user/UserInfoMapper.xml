@@ -22,4 +22,17 @@
         WHERE UID = #{uid}
     </select>
 
+    <select id="getRecommendUserList" parameterType="com.flab.oasis.model.RecommendUserSelect" resultType="java.lang.String">
+        SELECT UID,
+            (SELECT COUNT(B.UID) FROM FEED B WHERE B.UID = A.UID) AS FEED_COUNT
+        FROM USER_INFO A
+        WHERE UID NOT IN (
+                  <foreach collection="uidList" item="item" separator=",">
+                    #{item}
+                  </foreach>
+              )
+        ORDER BY FEED_COUNT DESC
+        LIMIT #{needSize, jdbcType=INTEGER}
+    </select>
+
 </mapper>
