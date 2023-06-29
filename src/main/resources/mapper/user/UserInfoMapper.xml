@@ -22,7 +22,7 @@
         WHERE UID = #{uid}
     </select>
 
-    <select id="getUsersFeedCountList" parameterType="com.flab.oasis.model.UsersFeedCountSelect" resultType="com.flab.oasis.model.UsersFeedCount">
+    <select id="getUserFeedCountList" parameterType="com.flab.oasis.model.UserFeedCountSelect" resultType="com.flab.oasis.model.UserFeedCount">
         SELECT UID,
             (SELECT COUNT(B.UID) FROM FEED B WHERE B.UID = A.UID) AS FEED_COUNT
         FROM USER_INFO A

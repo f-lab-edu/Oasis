@@ -10,7 +10,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UsersFeedCountSelect implements Serializable {
+public class UserFeedCountSelect implements Serializable {
     private static final long serialVersionUID = 7061404739566319032L;
 
     private List<String> uidList;

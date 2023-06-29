@@ -70,14 +70,14 @@ public class UserRelationService {
     private List<String> getRecommendUserAsManyAsNeed(List<String> uidList, int needSize) {
         uidList.add(userAuthService.getAuthenticatedUid());
 
-        return userInfoRepository.getUsersFeedCountList(
-                UsersFeedCountSelect.builder()
+        return userInfoRepository.getUserFeedCountList(
+                UserFeedCountSelect.builder()
                         .uidList(uidList)
                         .needSize(needSize)
                         .build()
         )
                 .stream()
-                .map(UsersFeedCount::getUid)
+                .map(UserFeedCount::getUid)
                 .collect(Collectors.toList());
     }
 
@@ -98,18 +98,18 @@ public class UserRelationService {
                 .stream()
                 .collect(Collectors.toMap(UserCategoryCount::getUid, UserCategoryCount::getBookCategoryCount));
 
-        List<UsersFeedCount> usersFeedCountList = userInfoRepository.getUsersFeedCountList(
-                UsersFeedCountSelect.builder()
+        List<UserFeedCount> userFeedCountList = userInfoRepository.getUserFeedCountList(
+                UserFeedCountSelect.builder()
                         .uidList(overlappingCategoryUserList)
                         .needSize(-1)
                         .build()
         );
 
-        List<RecommendUser> recommendUserList = usersFeedCountList.stream()
-                .map(usersFeedCount -> RecommendUser.builder()
-                        .uid(usersFeedCount.getUid())
-                        .feedCount(usersFeedCount.getFeedCount())
-                        .categoryCount(userCategoryCountMap.get(usersFeedCount.getUid()))
+        List<RecommendUser> recommendUserList = userFeedCountList.stream()
+                .map(userFeedCount -> RecommendUser.builder()
+                        .uid(userFeedCount.getUid())
+                        .feedCount(userFeedCount.getFeedCount())
+                        .categoryCount(userCategoryCountMap.get(userFeedCount.getUid()))
                         .build()
                 ).
                 collect(Collectors.toList());

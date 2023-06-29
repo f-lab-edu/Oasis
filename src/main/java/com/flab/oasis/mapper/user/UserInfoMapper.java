@@ -1,7 +1,7 @@
 package com.flab.oasis.mapper.user;
 
-import com.flab.oasis.model.UsersFeedCount;
-import com.flab.oasis.model.UsersFeedCountSelect;
+import com.flab.oasis.model.UserFeedCount;
+import com.flab.oasis.model.UserFeedCountSelect;
 import com.flab.oasis.model.UserInfo;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -12,5 +12,5 @@ public interface UserInfoMapper {
     public boolean isExistsNickname(String nickname);
     public void createUserInfo(UserInfo userInfo);
     public UserInfo getUserInfoByUid(String uid);
-    public List<UsersFeedCount> getUsersFeedCountList(UsersFeedCountSelect usersFeedCountSelect);
+    public List<UserFeedCount> getUserFeedCountList(UserFeedCountSelect userFeedCountSelect);
 }
