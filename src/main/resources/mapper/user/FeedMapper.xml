@@ -28,11 +28,11 @@
     <select id="getFeedCountList" parameterType="java.util.List" resultType="com.flab.oasis.model.FeedCount">
         SELECT UID, COUNT(UID) AS feedCount
         FROM FEED
-        WHERE UID NOT IN (
+        WHERE UID IN (
             <foreach collection="list" item="item" separator=",">
                 #{item}
             </foreach>
-            )
+        )
         GROUP BY UID
     </select>
 
