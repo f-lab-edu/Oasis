@@ -2,7 +2,6 @@ package com.flab.oasis.mapper.user;
 
 import com.flab.oasis.model.Feed;
 import com.flab.oasis.model.FeedCount;
-import com.flab.oasis.model.RecommendUserSelect;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
