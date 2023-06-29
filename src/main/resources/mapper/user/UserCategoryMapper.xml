@@ -17,7 +17,7 @@
         WHERE UID = #{uid}
     </select>
 
-    <select id="getUidListWithOverlappingBookCategory" parameterType="com.flab.oasis.model.OverlappingCategoryUserSelect" resultType="java.util.List">
+    <select id="getUidListWithOverlappingBookCategory" parameterType="com.flab.oasis.model.OverlappingCategoryUserSelect" resultType="java.lang.String">
         SELECT DISTINCT UID
         FROM USER_CATEGORY
         WHERE UID != #{uid} AND
