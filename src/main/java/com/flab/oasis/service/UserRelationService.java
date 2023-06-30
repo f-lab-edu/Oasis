@@ -49,11 +49,12 @@ public class UserRelationService {
 
         // 추천 유저가 30명이 안될 경우, 부족한 추천 user를 채운다.
         if (recommendUserList.size() < 30) {
-            List<String> uidList = getUidListFromUserRelationList(userRelationList);
-            uidList.addAll(recommendUserList);
+            // exclude 대상으로 relation이 있는 user와 생성된 recommend user를 추가한다.
+            List<String> excludeUidList = getUidListFromUserRelationList(userRelationList);
+            excludeUidList.addAll(recommendUserList);
 
             recommendUserList.addAll(
-                    getRecommendUserAsManyAsNeed(uidList, 30 - recommendUserList.size())
+                    getRecommendUserAsManyAsNeed(excludeUidList, 30 - recommendUserList.size())
             );
         }
 
@@ -67,12 +68,12 @@ public class UserRelationService {
     }
 
     // '본인 | relation이 있는 user | 생성된 recommend user'를 제외하고 needSize만큼 recommend user를 가져온다.
-    private List<String> getRecommendUserAsManyAsNeed(List<String> uidList, int needSize) {
-        uidList.add(userAuthService.getAuthenticatedUid());
+    private List<String> getRecommendUserAsManyAsNeed(List<String> excludeUidList, int needSize) {
+        excludeUidList.add(userAuthService.getAuthenticatedUid());
 
         return userInfoRepository.getUserFeedCountList(
                 UserFeedCountSelect.builder()
-                        .uidList(uidList)
+                        .uidList(excludeUidList)
                         .needSize(needSize)
                         .build()
         )
