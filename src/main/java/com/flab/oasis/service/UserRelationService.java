@@ -91,7 +91,7 @@ public class UserRelationService {
             List<UserCategory> userCategoryList, List<String> overlappingCategoryUserList) {
         Map<String, Integer> userCategoryCountMap = userCategoryRepository.getUserCategoryCountList(
                 UserCategoryCountSelect.builder()
-                        .uidList(overlappingCategoryUserList)
+                        .overlappingCategoryUserList(overlappingCategoryUserList)
                         .userCategoryList(userCategoryList)
                         .build()
         )

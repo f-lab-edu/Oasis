@@ -13,6 +13,6 @@ import java.util.List;
 public class UserCategoryCountSelect implements Serializable {
     private static final long serialVersionUID = 1389467238782839862L;
 
-    private List<String> uidList;
+    private List<String> overlappingCategoryUserList;
     private List<UserCategory> userCategoryList;
 }

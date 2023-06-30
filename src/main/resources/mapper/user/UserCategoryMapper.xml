@@ -39,7 +39,7 @@
         SELECT UID, COUNT(BOOK_CATEGORY) AS bookCategoryCount
         FROM USER_CATEGORY
         WHERE UID IN (
-            <foreach collection="uidList" item="item" separator=",">
+            <foreach collection="overlappingCategoryUserList" item="item" separator=",">
                 #{item}
             </foreach>
         ) AND
