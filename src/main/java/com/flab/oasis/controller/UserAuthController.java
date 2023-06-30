@@ -1,8 +1,6 @@
 package com.flab.oasis.controller;
 
-import com.flab.oasis.model.GoogleOAuthLoginRequest;
-import com.flab.oasis.model.LoginResult;
-import com.flab.oasis.model.UserLoginRequest;
+import com.flab.oasis.model.*;
 import com.flab.oasis.service.UserAuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,6 +13,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class UserAuthController {
     private final UserAuthService userAuthService;
+
+    @PostMapping("/join")
+    public JsonWebToken createUserAuth(@RequestBody UserAuth userAuth) {
+        return userAuthService.createUserAuth(userAuth);
+    }
 
     @PostMapping("/login/default")
     public LoginResult loginAuthFromUserLoginRequest(@RequestBody UserLoginRequest userLoginRequest) {

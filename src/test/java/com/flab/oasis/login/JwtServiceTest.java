@@ -3,7 +3,7 @@ package com.flab.oasis.login;
 import com.auth0.jwt.JWT;
 import com.flab.oasis.constant.UserRole;
 import com.flab.oasis.model.UserSession;
-import com.flab.oasis.model.exception.AuthorizationException;
+import com.flab.oasis.model.exception.AuthenticationException;
 import com.flab.oasis.repository.UserAuthRepository;
 import com.flab.oasis.service.JwtService;
 import org.junit.jupiter.api.Assertions;
@@ -59,7 +59,7 @@ class JwtServiceTest {
         BDDMockito.given(userAuthRepository.getUserSessionByUid(uid))
                 .willReturn(willReturn);
 
-        Assertions.assertThrows(AuthorizationException.class, () -> jwtService.verifyRefreshToken(refreshToken));
+        Assertions.assertThrows(AuthenticationException.class, () -> jwtService.verifyRefreshToken(refreshToken));
     }
 
 }

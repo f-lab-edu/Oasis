@@ -1,14 +1,17 @@
 package com.flab.oasis.model;
 
+import java.io.Serializable;
 import com.flab.oasis.constant.UserRole;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Builder
-public class UserAuth {
+public class UserAuth implements Serializable {
+    private static final long serialVersionUID = 4199401124507626L;
+
     private String uid;
     private String password;
     private String salt;

@@ -1,11 +1,11 @@
 package com.flab.oasis.service;
 
 import com.flab.oasis.constant.BookCategory;
-import com.flab.oasis.mapper.user.UserCategoryMapper;
 import com.flab.oasis.model.BookSuggestion;
 import com.flab.oasis.model.BookSuggestionRequest;
 import com.flab.oasis.model.UserCategory;
 import com.flab.oasis.repository.BookSuggestionRepository;
+import com.flab.oasis.repository.UserCategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class HomeService {
     private final BookSuggestionRepository bookSuggestionRepository;
-    private final UserCategoryMapper userCategoryMapper;
+    private final UserCategoryRepository userCategoryRepository;
 
     @Cacheable(cacheNames = "homeCache", keyGenerator = "oasisKeyGenerator", cacheManager = "ehCacheCacheManager")
     public List<BookSuggestion> getBookSuggestionListByBookSuggestionRequest(
@@ -28,7 +28,7 @@ public class HomeService {
                 bookSuggestionRepository.getBookSuggestionListBySuggestionType(
                         bookSuggestionRequest.getSuggestionType()
                 ),
-                userCategoryMapper.getUserCategoryByUid(
+                userCategoryRepository.getUserCategoryListByUid(
                         bookSuggestionRequest.getUid()
                 )
         );
