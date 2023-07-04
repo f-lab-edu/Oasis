@@ -8,8 +8,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,39 +24,30 @@ public class UserRelationService {
 
     @Cacheable(cacheNames = "recommendUserCache", key = "#uid", cacheManager = "ehCacheCacheManager")
     public List<String> getRecommendUserList(String uid) {
-        List<UserCategory> userCategoryList = userCategoryRepository.getUserCategoryListByUid(uid);
-        List<UserRelation> userRelationList = userRelationRepository.getUserRelationListByUid(uid);
+        List<String> relationUserList = userRelationRepository.getUserRelationListByUid(uid).stream()
+                .map(UserRelation::getRelationUser)
+                .collect(Collectors.toList());
 
-        if (userCategoryList.isEmpty()) {
-            return getRecommendUserAsManyAsNeed(
-                    getUidListFromUserRelationList(userRelationList), 30
-            );
-        }
+        List<String> overlappingCategoryUserList = userCategoryRepository.getUidListWithOverlappingBookCategory(uid);
 
-        List<String> overlappingCategoryUserList = userCategoryRepository.getUidListWithOverlappingBookCategory(
-                OverlappingCategoryUserSelect.builder()
-                        .uid(uid)
-                        .userCategoryList(userCategoryList)
-                        .userRelationList(userRelationList)
-                        .build()
-        );
+        Set<String> relationUserSet = new HashSet<>(relationUserList);
+        overlappingCategoryUserList = overlappingCategoryUserList.stream()
+                .filter(s -> !relationUserSet.contains(s))
+                 .collect(Collectors.toList());
 
         if (overlappingCategoryUserList.isEmpty()) {
-            return getRecommendUserAsManyAsNeed(
-                    getUidListFromUserRelationList(userRelationList), 30
-            );
+            return getRecommendUserAsManyAsNeed(relationUserList, 30);
         }
 
-        List<String> recommendUserList = makeRecommendUserList(userCategoryList, overlappingCategoryUserList);
+        List<String> recommendUserList = makeRecommendUserList(uid, overlappingCategoryUserList);
 
         // 추천 유저가 30명이 안될 경우, 부족한 추천 user를 채운다.
         if (recommendUserList.size() < 30) {
             // exclude 대상으로 relation이 있는 user와 생성된 recommend user를 추가한다.
-            List<String> excludeUidList = getUidListFromUserRelationList(userRelationList);
-            excludeUidList.addAll(recommendUserList);
+            relationUserList.addAll(recommendUserList);
 
             recommendUserList.addAll(
-                    getRecommendUserAsManyAsNeed(excludeUidList, 30 - recommendUserList.size())
+                    getRecommendUserAsManyAsNeed(relationUserList, 30 - recommendUserList.size())
             );
         }
 
@@ -88,8 +81,8 @@ public class UserRelationService {
                 .collect(Collectors.toList());
     }
 
-    private List<String> makeRecommendUserList(
-            List<UserCategory> userCategoryList, List<String> overlappingCategoryUserList) {
+    private List<String> makeRecommendUserList(String uid, List<String> overlappingCategoryUserList) {
+        List<UserCategory> userCategoryList = userCategoryRepository.getUserCategoryListByUid(uid);
         Map<String, Integer> userCategoryCountMap = userCategoryRepository.getUserCategoryCountList(
                 UserCategoryCountSelect.builder()
                         .overlappingCategoryUserList(overlappingCategoryUserList)
