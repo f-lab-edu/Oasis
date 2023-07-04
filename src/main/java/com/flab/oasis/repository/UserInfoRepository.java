@@ -2,8 +2,6 @@ package com.flab.oasis.repository;
 
 import com.flab.oasis.constant.ErrorCode;
 import com.flab.oasis.mapper.user.UserInfoMapper;
-import com.flab.oasis.model.UserFeedCount;
-import com.flab.oasis.model.UserFeedCountSelect;
 import com.flab.oasis.model.UserInfo;
 import com.flab.oasis.model.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +32,7 @@ public class UserInfoRepository {
                 ));
     }
 
-    public List<UserFeedCount> getUserFeedCountList(UserFeedCountSelect userFeedCountSelect) {
-        return userInfoMapper.getUserFeedCountList(userFeedCountSelect);
+    public List<String> getDefaultRecommendUserExcludeUidList(List<String> excludeUidList) {
+        return userInfoMapper.getDefaultRecommendUserExcludeUidList(excludeUidList);
     }
 }
