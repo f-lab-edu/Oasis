@@ -1,6 +1,7 @@
 package com.flab.oasis.service;
 
 import com.flab.oasis.constant.BookCategory;
+import com.flab.oasis.mapper.user.FeedMapper;
 import com.flab.oasis.model.*;
 import com.flab.oasis.repository.UserCategoryRepository;
 import com.flab.oasis.repository.UserInfoRepository;
@@ -9,10 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -23,6 +21,7 @@ public class UserRelationService {
     private final UserCategoryRepository userCategoryRepository;
     private final UserRelationRepository userRelationRepository;
     private final UserInfoRepository userInfoRepository;
+    private final FeedMapper feedMapper;
 
     @Cacheable(cacheNames = "recommendUserCache", key = "#uid", cacheManager = "ehCacheCacheManager")
     public List<String> getRecommendUserList(String uid) {
@@ -41,7 +40,6 @@ public class UserRelationService {
             return getRecommendUserAsManyAsNeed(relationUserList, 30);
         }
 
-        //
         List<String> recommendUserList = makeRecommendUserList(uid, overlappingCategoryUserList);
 
         // 추천 유저가 30명이 안될 경우, 부족한 추천 user를 채운다.
@@ -92,21 +90,29 @@ public class UserRelationService {
                 .map(UserCategory::getUid)
                 .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
 
-        List<UserFeedCount> userFeedCountList = userInfoRepository.getUserFeedCountList(
-                UserFeedCountSelect.builder()
-                        .uidList(overlappingCategoryUserList)
-                        .needSize(-1)
-                        .build()
-        );
+        // feed count는 0으로 두고, category count로 recommend user 생성
+        Map<String, RecommendUser> recommendUserMap = userCategoryCountMap.entrySet()
+                .stream()
+                .collect(
+                        Collectors.toMap(
+                                Map.Entry::getKey,
+                                entry -> RecommendUser.builder()
+                                        .uid(entry.getKey())
+                                        .categoryCount(entry.getValue())
+                                        .feedCount(0)
+                                        .build()
+                        )
+                );
 
-        List<RecommendUser> recommendUserList = userFeedCountList.stream()
-                .map(userFeedCount -> RecommendUser.builder()
-                        .uid(userFeedCount.getUid())
-                        .feedCount(userFeedCount.getFeedCount())
-                        .categoryCount(userCategoryCountMap.get(userFeedCount.getUid()))
-                        .build()
-                ).
-                collect(Collectors.toList());
+        // 작성한 feed가 존재할 경우, 해당 feed의 개수를 count하여 recommend user에 set
+        feedMapper.getFeedListByUidList(overlappingCategoryUserList).stream()
+                .map(Feed::getUid)
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+                .forEach((key, value) -> recommendUserMap.get(key).setFeedCount(value));
+
+        List<RecommendUser> recommendUserList = new ArrayList<>(recommendUserMap.values());
+
+        Collections.sort(recommendUserList);
 
         return recommendUserList.stream()
                 .map(RecommendUser::getUid)
