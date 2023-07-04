@@ -2,8 +2,6 @@ package com.flab.oasis.repository;
 
 import com.flab.oasis.mapper.user.UserCategoryMapper;
 import com.flab.oasis.model.UserCategory;
-import com.flab.oasis.model.UserCategoryCount;
-import com.flab.oasis.model.UserCategoryCountSelect;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Repository;
@@ -28,7 +26,7 @@ public class UserCategoryRepository {
         return userCategoryMapper.getUidListWithOverlappingBookCategory(uid);
     }
 
-    public List<UserCategoryCount> getUserCategoryCountList(UserCategoryCountSelect userCategoryCountSelect) {
-        return userCategoryMapper.getUserCategoryCountList(userCategoryCountSelect);
+    public List<UserCategory> getOverlappingUserCategoryList(List<String> overlappingCategoryUserList) {
+        return userCategoryMapper.getOverlappingUserCategoryList(overlappingCategoryUserList);
     }
 }

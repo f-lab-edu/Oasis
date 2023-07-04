@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -126,11 +127,11 @@ class UserRelationServiceTest {
         // 본인과 생성된 추천 유저들을 제외하고, 피드 작성량이 많은 순서대로 추천 User를 최대 30명을 가져온다.
         BDDMockito.given(userAuthService.getAuthenticatedUid())
                 .willReturn(uid);
-        BDDMockito.given(userCategoryRepository.getUserCategoryCountList(BDDMockito.any(UserCategoryCountSelect.class)))
+        BDDMockito.given(userCategoryRepository.getOverlappingUserCategoryList(ArgumentMatchers.any()))
                         .willReturn(Collections.singletonList(
-                                UserCategoryCount.builder()
+                                UserCategory.builder()
                                         .uid(expectedUid1)
-                                        .bookCategoryCount(0)
+                                        .bookCategory(BookCategory.BC101)
                                         .build()
                         ));
         BDDMockito.given(userInfoRepository.getUserFeedCountList(BDDMockito.any(UserFeedCountSelect.class)))
