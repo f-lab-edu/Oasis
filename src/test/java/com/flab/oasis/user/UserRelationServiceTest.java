@@ -82,9 +82,8 @@ class UserRelationServiceTest {
                 .willReturn(new ArrayList<>());
 
         // 겹치는 카테고리가 존재하는 유저가 없을 경우
-        BDDMockito.given(userCategoryRepository.getUidListWithOverlappingBookCategory(
-                        BDDMockito.any(OverlappingCategoryUserSelect.class)
-        )).willReturn(new ArrayList<>());
+        BDDMockito.given(userCategoryRepository.getUidListWithOverlappingBookCategory(uid))
+                .willReturn(new ArrayList<>());
 
         // 본인을 제외하고, 피드 작성량이 많은 순서대로 추천 User를 최대 30명을 가져온다.
         BDDMockito.given(userAuthService.getAuthenticatedUid())
@@ -120,9 +119,8 @@ class UserRelationServiceTest {
                 .willReturn(new ArrayList<>());
 
         // 카테고리가 겹치는 유저가 존재하나 30명이 안될 경우
-        BDDMockito.given(userCategoryRepository.getUidListWithOverlappingBookCategory(
-                BDDMockito.any(OverlappingCategoryUserSelect.class)
-        )).willReturn(Collections.singletonList(expectedUid1));
+        BDDMockito.given(userCategoryRepository.getUidListWithOverlappingBookCategory(uid))
+                .willReturn(Collections.singletonList(expectedUid1));
 
         // 생성된 추천 유저들을 겹치는 카테고리를 제외한 카테고리의 개수가 많고, 피드 작성량이 많은 순으로 정렬한다.
         // 본인과 생성된 추천 유저들을 제외하고, 피드 작성량이 많은 순서대로 추천 User를 최대 30명을 가져온다.
