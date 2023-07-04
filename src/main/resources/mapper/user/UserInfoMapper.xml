@@ -22,22 +22,18 @@
         WHERE UID = #{uid}
     </select>
 
-    <select id="getUserFeedCountList" parameterType="com.flab.oasis.model.UserFeedCountSelect" resultType="com.flab.oasis.model.UserFeedCount">
-        SELECT UID,
-            (SELECT COUNT(B.UID) FROM FEED B WHERE B.UID = A.UID) AS FEED_COUNT
-        FROM USER_INFO A
-        WHERE
-            UID
-                <if test="needSize != -1">NOT</if>
-                IN (
-                <foreach collection="uidList" item="item" separator=",">
-                    #{item}
-                </foreach>
-                )
-        ORDER BY FEED_COUNT DESC
-        <if test="needSize != -1">
-            LIMIT #{needSize, jdbcType=INTEGER}
-        </if>
+    <select id="getDefaultRecommendUserExcludeUidList" parameterType="java.util.List" resultType="java.lang.String">
+        SELECT A.UID
+        FROM USER_INFO A, (
+            <foreach collection="list" item="item" separator=" UNION ALL ">
+                SELECT #{item} AS UID
+            </foreach>
+        ) B
+        WHERE A.UID != B.UID
+        ORDER BY (
+            SELECT COUNT(C.UID) FROM FEED C WHERE A.UID = C.UID
+        ) DESC
+        LIMIT 30
     </select>
 
 </mapper>
