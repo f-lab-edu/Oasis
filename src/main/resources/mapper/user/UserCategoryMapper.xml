@@ -25,20 +25,14 @@
               A.BOOK_CATEGORY = B.BOOK_CATEGORY
     </select>
 
-    <select id="getUserCategoryCountList" parameterType="com.flab.oasis.model.UserCategoryCountSelect" resultType="com.flab.oasis.model.UserCategoryCount">
-        SELECT UID, COUNT(BOOK_CATEGORY) AS bookCategoryCount
-        FROM USER_CATEGORY
-        WHERE UID IN (
-            <foreach collection="overlappingCategoryUserList" item="item" separator=",">
-                #{item}
+    <select id="getOverlappingUserCategoryList" parameterType="java.util.List" resultType="com.flab.oasis.model.UserCategory">
+        SELECT A.UID, A.BOOK_CATEGORY
+        FROM USER_CATEGORY A, (
+            <foreach collection="list" item="item" separator=" UNION ALL ">
+                SELECT #{item} AS UID
             </foreach>
-        ) AND
-        BOOK_CATEGORY NOT IN (
-            <foreach collection="userCategoryList" item="item" separator=",">
-                #{item.bookCategory}
-            </foreach>
-        )
-        GROUP BY UID
+        ) B
+        WHERE A.UID = B.UID
     </select>
 
 </mapper>
