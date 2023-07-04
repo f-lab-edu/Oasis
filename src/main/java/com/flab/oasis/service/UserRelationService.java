@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -31,24 +32,25 @@ public class UserRelationService {
 
         List<String> overlappingCategoryUserList = userCategoryRepository.getUidListWithOverlappingBookCategory(uid);
 
+        // 카테고리가 겹치는 유저들 중 이미 relation이 존재하는 유저는 제외한다.
         Set<String> relationUserSet = new HashSet<>(relationUserList);
         overlappingCategoryUserList = overlappingCategoryUserList.stream()
                 .filter(s -> !relationUserSet.contains(s))
-                 .collect(Collectors.toList());
+                .collect(Collectors.toList());
 
         if (overlappingCategoryUserList.isEmpty()) {
-            return getRecommendUserAsManyAsNeed(relationUserList, 30);
+            return getDefaultRecommendUserExcludeUidList(relationUserList);
         }
 
-        List<String> recommendUserList = makeRecommendUserList(uid, overlappingCategoryUserList);
+        List<String> recommendUserList = makeRecommendUserListByCategory(uid, overlappingCategoryUserList);
 
-        // 추천 유저가 30명이 안될 경우, 부족한 추천 user를 채운다.
+        // 카테고리 추천 유저가 30명이 안될 경우, 기본 추천 유저를 가져온다.
         if (recommendUserList.size() < 30) {
-            // exclude 대상으로 relation이 있는 user와 생성된 recommend user를 추가한다.
-            relationUserList.addAll(recommendUserList);
-
             recommendUserList.addAll(
-                    getRecommendUserAsManyAsNeed(relationUserList, 30 - recommendUserList.size())
+                    getDefaultRecommendUserExcludeUidList(
+                            Stream.concat(relationUserList.stream(), recommendUserList.stream())
+                                    .collect(Collectors.toList())
+                    )
             );
         }
 
@@ -61,22 +63,14 @@ public class UserRelationService {
         userRelationRepository.createUserRelation(userRelation);
     }
 
-    // '본인 | relation이 있는 user | 생성된 recommend user'를 제외하고 needSize만큼 recommend user를 가져온다.
-    private List<String> getRecommendUserAsManyAsNeed(List<String> excludeUidList, int needSize) {
+    private List<String> getDefaultRecommendUserExcludeUidList(List<String> excludeUidList) {
         excludeUidList.add(userAuthService.getAuthenticatedUid());
 
-        return userInfoRepository.getUserFeedCountList(
-                UserFeedCountSelect.builder()
-                        .uidList(excludeUidList)
-                        .needSize(needSize)
-                        .build()
-        )
-                .stream()
-                .map(UserFeedCount::getUid)
-                .collect(Collectors.toList());
+        // '본인 | excludeUidList'를 제외하고 recommend user를 최대 30명 가져온다.
+        return userInfoRepository.getDefaultRecommendUserExcludeUidList(excludeUidList);
     }
 
-    private List<String> makeRecommendUserList(String uid, List<String> overlappingCategoryUserList) {
+    private List<String> makeRecommendUserListByCategory(String uid, List<String> overlappingCategoryUserList) {
         Set<BookCategory> userCategorySet = new HashSet<>(userCategoryRepository.getUserCategoryListByUid(uid))
                 .stream()
                 .map(UserCategory::getBookCategory)
