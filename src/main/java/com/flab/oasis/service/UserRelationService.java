@@ -75,12 +75,6 @@ public class UserRelationService {
                 .collect(Collectors.toList());
     }
 
-    private List<String> getUidListFromUserRelationList(List<UserRelation> userRelationList) {
-        return userRelationList.stream()
-                .map(UserRelation::getRelationUser)
-                .collect(Collectors.toList());
-    }
-
     private List<String> makeRecommendUserList(String uid, List<String> overlappingCategoryUserList) {
         List<UserCategory> userCategoryList = userCategoryRepository.getUserCategoryListByUid(uid);
         Map<String, Integer> userCategoryCountMap = userCategoryRepository.getUserCategoryCountList(
