@@ -1,5 +1,6 @@
 package com.flab.oasis.service;
 
+import com.flab.oasis.constant.BookCategory;
 import com.flab.oasis.model.*;
 import com.flab.oasis.repository.UserCategoryRepository;
 import com.flab.oasis.repository.UserInfoRepository;
@@ -12,6 +13,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -39,6 +41,7 @@ public class UserRelationService {
             return getRecommendUserAsManyAsNeed(relationUserList, 30);
         }
 
+        //
         List<String> recommendUserList = makeRecommendUserList(uid, overlappingCategoryUserList);
 
         // 추천 유저가 30명이 안될 경우, 부족한 추천 user를 채운다.
@@ -76,15 +79,18 @@ public class UserRelationService {
     }
 
     private List<String> makeRecommendUserList(String uid, List<String> overlappingCategoryUserList) {
-        List<UserCategory> userCategoryList = userCategoryRepository.getUserCategoryListByUid(uid);
-        Map<String, Integer> userCategoryCountMap = userCategoryRepository.getUserCategoryCountList(
-                UserCategoryCountSelect.builder()
-                        .overlappingCategoryUserList(overlappingCategoryUserList)
-                        .userCategoryList(userCategoryList)
-                        .build()
-        )
+        Set<BookCategory> userCategorySet = new HashSet<>(userCategoryRepository.getUserCategoryListByUid(uid))
                 .stream()
-                .collect(Collectors.toMap(UserCategoryCount::getUid, UserCategoryCount::getBookCategoryCount));
+                .map(UserCategory::getBookCategory)
+                .collect(Collectors.toSet());
+
+        // 겹치는 카테고리를 제외한 카테고리의 개수 카운트
+        Map<String, Long> userCategoryCountMap = userCategoryRepository.getOverlappingUserCategoryList(
+                overlappingCategoryUserList
+                ).stream()
+                .filter(userCategory -> !userCategorySet.contains(userCategory.getBookCategory()))
+                .map(UserCategory::getUid)
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
 
         List<UserFeedCount> userFeedCountList = userInfoRepository.getUserFeedCountList(
                 UserFeedCountSelect.builder()
