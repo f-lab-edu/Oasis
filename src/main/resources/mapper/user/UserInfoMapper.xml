@@ -24,12 +24,16 @@
 
     <select id="getDefaultRecommendUserExcludeUidList" parameterType="java.util.List" resultType="java.lang.String">
         SELECT A.UID
-        FROM USER_INFO A, (
-            <foreach collection="list" item="item" separator=" UNION ALL ">
-                SELECT #{item} AS UID
-            </foreach>
-        ) B
-        WHERE A.UID != B.UID
+        FROM USER_INFO A
+        WHERE NOT EXISTS (
+            SELECT B.UID
+            FROM (
+                <foreach collection="list" item="item" separator=" UNION ALL ">
+                    SELECT #{item} AS UID
+                </foreach>
+            ) B
+            WHERE A.UID = B.UID
+        )
         ORDER BY (
             SELECT COUNT(C.UID) FROM FEED C WHERE A.UID = C.UID
         ) DESC
