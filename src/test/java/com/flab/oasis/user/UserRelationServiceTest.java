@@ -55,11 +55,12 @@ class UserRelationServiceTest {
         BDDMockito.given(userRelationRepository.getUserRelationListByUid(uid))
                 .willReturn(new ArrayList<>());
 
-        // 카테고리가 겹치는 유저 목록 가져오기
-        BDDMockito.given(userCategoryRepository.getUidListWithOverlappingBookCategory(uid))
-                .willReturn(new ArrayList<>());
+        // excludeUidList에 해당하는 유저를 제외하고, 카테고리가 겹치는 유저를 최대 30명 가져오기
+        BDDMockito.given(
+                userCategoryRepository.getUserCategoryListIfOverlappingBookCategory(ArgumentMatchers.anyList())
+        ).willReturn(new ArrayList<>());
 
-        // 본인, relation이 존재하는 유저들을 제외하고, 기본 추천 유저 최대 30명 가져오기
+        // excludeUidList에 해당하는 유저를 제외하고, 기본 추천 유저 최대 30명 가져오기
         BDDMockito.given(userInfoRepository.getDefaultRecommendUserExcludeUidList(ArgumentMatchers.anyList()))
                 .willReturn(Collections.singletonList(expectedUid));
 
@@ -79,25 +80,22 @@ class UserRelationServiceTest {
         BDDMockito.given(userRelationRepository.getUserRelationListByUid(uid))
                 .willReturn(new ArrayList<>());
 
-        // 카테고리가 겹치는 유저 목록 가져오기
-        BDDMockito.given(userCategoryRepository.getUidListWithOverlappingBookCategory(uid))
-                .willReturn(Collections.singletonList(expectedUid1));
+        // excludeUidList에 해당하는 유저를 제외하고, 카테고리가 겹치는 유저를 최대 30명 가져오기
+        BDDMockito.given(
+                userCategoryRepository.getUserCategoryListIfOverlappingBookCategory(ArgumentMatchers.anyList())
+        ).willReturn(Collections.singletonList(
+                UserCategory.builder()
+                        .uid(expectedUid1)
+                        .bookCategory(BookCategory.BC101)
+                        .build()
+        ));
 
         // 겹치는 카테고리를 제외하기 위한 "uid"의 카테고리 가져오기
         BDDMockito.given(userCategoryRepository.getUserCategoryListByUid(uid))
                 .willReturn(Collections.singletonList(
                         UserCategory.builder()
                                 .uid(uid)
-                                .bookCategory(BookCategory.BC105)
-                                .build()
-                ));
-
-        // 카테고리가 겹치는 유저들의 카테고리 목록 가져오기
-        BDDMockito.given(userCategoryRepository.getUserCategoryListByUidList(ArgumentMatchers.anyList()))
-                .willReturn(Collections.singletonList(
-                        UserCategory.builder()
-                                .uid(expectedUid1)
-                                .bookCategory(BookCategory.BC101)
+                                .bookCategory(BookCategory.BC102)
                                 .build()
                 ));
 
@@ -110,12 +108,11 @@ class UserRelationServiceTest {
                                         .build()
                         ));
 
-        // 본인, 카테고리 추천 유저들, relation이 존재하는 유저들을 제외하고, 기본 추천 유저 최대 30명 가져오기
-        BDDMockito.given(userAuthService.getAuthenticatedUid())
-                .willReturn(uid);
+        // excludeUidList에 해당하는 유저를 제외하고, 기본 추천 유저 최대 30명 가져오기
         BDDMockito.given(userInfoRepository.getDefaultRecommendUserExcludeUidList(ArgumentMatchers.anyList()))
                 .willReturn(Collections.singletonList(expectedUid2));
 
+        // 카테고리 추천 유저를 생성 후, 크기가 30명 미만이면 기본 추천 유저 생성 로직 실행
         List<String> uidList = userRelationService.getRecommendUserList(uid);
 
         // 겹치는 카테고리가 존재하는 유저들이 순서상 우선 순위에 있어야 하고, 부족한만큼 채운 추천 유저는 후 순위에 있어야 한다.
