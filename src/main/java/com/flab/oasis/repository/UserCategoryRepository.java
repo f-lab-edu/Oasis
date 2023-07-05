@@ -26,7 +26,7 @@ public class UserCategoryRepository {
         return userCategoryMapper.getUidListWithOverlappingBookCategory(uid);
     }
 
-    public List<UserCategory> getOverlappingUserCategoryList(List<String> overlappingCategoryUserList) {
-        return userCategoryMapper.getOverlappingUserCategoryList(overlappingCategoryUserList);
+    public List<UserCategory> getUserCategoryListByUidList(List<String> overlappingCategoryUserList) {
+        return userCategoryMapper.getUserCategoryListByUidList(overlappingCategoryUserList);
     }
 }

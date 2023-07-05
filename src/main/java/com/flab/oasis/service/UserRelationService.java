@@ -77,9 +77,9 @@ public class UserRelationService {
                 .collect(Collectors.toSet());
 
         // 겹치는 카테고리를 제외한 카테고리의 개수 카운트
-        Map<String, Long> userCategoryCountMap = userCategoryRepository.getOverlappingUserCategoryList(
-                overlappingCategoryUserList
-                ).stream()
+        Map<String, Long> userCategoryCountMap = userCategoryRepository
+                .getUserCategoryListByUidList(overlappingCategoryUserList)
+                .stream()
                 .filter(userCategory -> !userCategorySet.contains(userCategory.getBookCategory()))
                 .map(UserCategory::getUid)
                 .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
