@@ -10,5 +10,5 @@ public interface UserCategoryMapper {
     public void createUserCategory(List<UserCategory> userCategoryList);
     public List<UserCategory> getUserCategoryListByUid(String uid);
     public List<String> getUidListWithOverlappingBookCategory(String uid);
-    public List<UserCategory> getOverlappingUserCategoryList(List<String> overlappingCategoryUserList);
+    public List<UserCategory> getUserCategoryListByUidList(List<String> overlappingCategoryUserList);
 }

@@ -25,7 +25,7 @@
               A.BOOK_CATEGORY = B.BOOK_CATEGORY
     </select>
 
-    <select id="getOverlappingUserCategoryList" parameterType="java.util.List" resultType="com.flab.oasis.model.UserCategory">
+    <select id="getUserCategoryListByUidList" parameterType="java.util.List" resultType="com.flab.oasis.model.UserCategory">
         SELECT A.UID, A.BOOK_CATEGORY
         FROM USER_CATEGORY A, (
             <foreach collection="list" item="item" separator=" UNION ALL ">
