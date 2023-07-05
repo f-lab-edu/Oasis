@@ -9,6 +9,5 @@ import java.util.List;
 public interface UserCategoryMapper {
     public void createUserCategory(List<UserCategory> userCategoryList);
     public List<UserCategory> getUserCategoryListByUid(String uid);
-    public List<String> getUidListWithOverlappingBookCategory(String uid);
-    public List<UserCategory> getUserCategoryListByUidList(List<String> overlappingCategoryUserList);
+    public List<UserCategory> getUserCategoryListIfOverlappingBookCategory(List<String> excludeUidList);
 }
