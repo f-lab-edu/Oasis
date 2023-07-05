@@ -1,7 +1,9 @@
 package com.flab.oasis.user;
 
 import com.flab.oasis.constant.BookCategory;
-import com.flab.oasis.model.*;
+import com.flab.oasis.mapper.user.FeedMapper;
+import com.flab.oasis.model.Feed;
+import com.flab.oasis.model.UserCategory;
 import com.flab.oasis.repository.UserCategoryRepository;
 import com.flab.oasis.repository.UserInfoRepository;
 import com.flab.oasis.repository.UserRelationRepository;
@@ -40,112 +42,79 @@ class UserRelationServiceTest {
     @Mock
     UserInfoRepository userInfoRepository;
 
-    @DisplayName("User Category가 존재하지 않을 경우")
+    @Mock
+    FeedMapper feedMapper;
+
+    @DisplayName("카테고리가 겹치는 유저가 존재하지 않을 경우")
     @Test
-    void testNotExistUserCategory() {
+    void testOverlappingCategoryIsNotExists() {
         String uid = "test";
         String expectedUid = "uid";
 
-        // User Category가 Empty일 경우
-        BDDMockito.given(userCategoryRepository.getUserCategoryListByUid(uid))
-                .willReturn(new ArrayList<>());
-
-        // 본인을 제외하고, 피드 작성량이 많은 순서대로 추천 User를 최대 30명을 가져온다.
-        BDDMockito.given(userAuthService.getAuthenticatedUid())
-                .willReturn(uid);
-        BDDMockito.given(userInfoRepository.getUserFeedCountList(BDDMockito.any(UserFeedCountSelect.class)))
-                .willReturn(Collections.singletonList(
-                        UserFeedCount.builder()
-                                .uid(expectedUid)
-                                .feedCount(0)
-                                .build()
-                ));
-
-        List<String> uidList = userRelationService.getRecommendUserList(uid);
-
-        Assertions.assertEquals(expectedUid, uidList.get(0));
-    }
-
-    @DisplayName("겹치는 User Category가 존재하지 않을 경우")
-    @Test
-    void testNotExistOverlappingUserCategory() {
-        String uid = "test";
-        String expectedUid = "uid";
-
-        BDDMockito.given(userCategoryRepository.getUserCategoryListByUid(uid))
-                .willReturn(Collections.singletonList(
-                        UserCategory.builder()
-                                .uid(uid)
-                                .bookCategory(BookCategory.BC101)
-                                .build()
-                ));
+        // relation이 존재하는 유저 목록 가져오기
         BDDMockito.given(userRelationRepository.getUserRelationListByUid(uid))
                 .willReturn(new ArrayList<>());
 
-        // 겹치는 카테고리가 존재하는 유저가 없을 경우
+        // 카테고리가 겹치는 유저 목록 가져오기
         BDDMockito.given(userCategoryRepository.getUidListWithOverlappingBookCategory(uid))
                 .willReturn(new ArrayList<>());
 
-        // 본인을 제외하고, 피드 작성량이 많은 순서대로 추천 User를 최대 30명을 가져온다.
-        BDDMockito.given(userAuthService.getAuthenticatedUid())
-                .willReturn(uid);
-        BDDMockito.given(userInfoRepository.getUserFeedCountList(BDDMockito.any(UserFeedCountSelect.class)))
-                .willReturn(Collections.singletonList(
-                        UserFeedCount.builder()
-                                .uid(expectedUid)
-                                .feedCount(0)
-                                .build()
-                ));
+        // 본인, relation이 존재하는 유저들을 제외하고, 기본 추천 유저 최대 30명 가져오기
+        BDDMockito.given(userInfoRepository.getDefaultRecommendUserExcludeUidList(ArgumentMatchers.anyList()))
+                .willReturn(Collections.singletonList(expectedUid));
 
         List<String> uidList = userRelationService.getRecommendUserList(uid);
 
         Assertions.assertEquals(expectedUid, uidList.get(0));
     }
 
-    @DisplayName("생성된 추천 유저가 30명이 안될 경우")
+    @DisplayName("생성된 카테고리 추천 유저가 30명이 안될 경우")
     @Test
     void testRecommendUserSizeLessThen30() {
         String uid = "test";
         String expectedUid1 = "uid";
         String expectedUid2 = "add";
 
+        // relation이 존재하는 유저 목록 가져오기
+        BDDMockito.given(userRelationRepository.getUserRelationListByUid(uid))
+                .willReturn(new ArrayList<>());
+
+        // 카테고리가 겹치는 유저 목록 가져오기
+        BDDMockito.given(userCategoryRepository.getUidListWithOverlappingBookCategory(uid))
+                .willReturn(Collections.singletonList(expectedUid1));
+
+        // 겹치는 카테고리를 제외하기 위한 "uid"의 카테고리 가져오기
         BDDMockito.given(userCategoryRepository.getUserCategoryListByUid(uid))
                 .willReturn(Collections.singletonList(
                         UserCategory.builder()
                                 .uid(uid)
+                                .bookCategory(BookCategory.BC105)
+                                .build()
+                ));
+
+        // 카테고리가 겹치는 유저들의 카테고리 목록 가져오기
+        BDDMockito.given(userCategoryRepository.getUserCategoryListByUidList(ArgumentMatchers.anyList()))
+                .willReturn(Collections.singletonList(
+                        UserCategory.builder()
+                                .uid(expectedUid1)
                                 .bookCategory(BookCategory.BC101)
                                 .build()
                 ));
-        BDDMockito.given(userRelationRepository.getUserRelationListByUid(uid))
-                .willReturn(new ArrayList<>());
 
-        // 카테고리가 겹치는 유저가 존재하나 30명이 안될 경우
-        BDDMockito.given(userCategoryRepository.getUidListWithOverlappingBookCategory(uid))
-                .willReturn(Collections.singletonList(expectedUid1));
-
-        // 생성된 추천 유저들을 겹치는 카테고리를 제외한 카테고리의 개수가 많고, 피드 작성량이 많은 순으로 정렬한다.
-        // 본인과 생성된 추천 유저들을 제외하고, 피드 작성량이 많은 순서대로 추천 User를 최대 30명을 가져온다.
-        BDDMockito.given(userAuthService.getAuthenticatedUid())
-                .willReturn(uid);
-        BDDMockito.given(userCategoryRepository.getOverlappingUserCategoryList(ArgumentMatchers.any()))
+        // 카테고리가 겹치는 유저들의 피드 목록 가져오기
+        BDDMockito.given(feedMapper.getFeedListByUidList(ArgumentMatchers.anyList()))
                         .willReturn(Collections.singletonList(
-                                UserCategory.builder()
+                                Feed.builder()
                                         .uid(expectedUid1)
-                                        .bookCategory(BookCategory.BC101)
+                                        .feedId(0)
                                         .build()
                         ));
-        BDDMockito.given(userInfoRepository.getUserFeedCountList(BDDMockito.any(UserFeedCountSelect.class)))
-                .willReturn(Collections.singletonList(
-                        UserFeedCount.builder()
-                                .uid(expectedUid1)
-                                .feedCount(0)
-                                .build()
-                )).willReturn(Collections.singletonList(
-                        UserFeedCount.builder()
-                                .uid(expectedUid2)
-                                .feedCount(0)
-                                .build()
-                ));
+
+        // 본인, 카테고리 추천 유저들, relation이 존재하는 유저들을 제외하고, 기본 추천 유저 최대 30명 가져오기
+        BDDMockito.given(userAuthService.getAuthenticatedUid())
+                .willReturn(uid);
+        BDDMockito.given(userInfoRepository.getDefaultRecommendUserExcludeUidList(ArgumentMatchers.anyList()))
+                .willReturn(Collections.singletonList(expectedUid2));
 
         List<String> uidList = userRelationService.getRecommendUserList(uid);
 
