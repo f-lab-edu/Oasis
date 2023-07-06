@@ -3,7 +3,6 @@ package com.flab.oasis.repository;
 import com.flab.oasis.mapper.user.UserRelationMapper;
 import com.flab.oasis.model.UserRelation;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Repository;
 
@@ -19,7 +18,6 @@ public class UserRelationRepository {
         return userRelationMapper.getUserRelationListByUid(uid);
     }
 
-    @CacheEvict(cacheNames = "UserRelation", key = "#userRelation.uid", cacheManager = "redisCacheManager")
     public void createUserRelation(UserRelation userRelation) {
         userRelationMapper.createUserRelation(userRelation);
     }
