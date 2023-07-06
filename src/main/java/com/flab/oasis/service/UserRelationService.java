@@ -10,6 +10,7 @@ import com.flab.oasis.repository.UserCategoryRepository;
 import com.flab.oasis.repository.UserInfoRepository;
 import com.flab.oasis.repository.UserRelationRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -57,10 +58,14 @@ public class UserRelationService {
         return recommendUserList;
     }
 
-    public void createUserRelation(UserRelation userRelation) {
-        userRelation.setUid(userAuthService.getAuthenticatedUid());
-
+    @CachePut(cacheNames = "UserRelation", key = "#userRelation.uid", cacheManager = "redisCacheManager")
+    public List<UserRelation> createUserRelation(UserRelation userRelation) {
         userRelationRepository.createUserRelation(userRelation);
+
+        List<UserRelation> userRelationList = userRelationRepository.getUserRelationListByUid(uid);
+        userRelationList.add(userRelation);
+
+        return userRelationList;
     }
 
     private List<String> getDefaultRecommendUserExcludeUidList(List<String> excludeUidList) {
