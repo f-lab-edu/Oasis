@@ -21,7 +21,6 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class UserRelationService {
-    private final UserAuthService userAuthService;
     private final UserCategoryRepository userCategoryRepository;
     private final UserRelationRepository userRelationRepository;
     private final UserInfoRepository userInfoRepository;
@@ -62,7 +61,7 @@ public class UserRelationService {
     public List<UserRelation> createUserRelation(UserRelation userRelation) {
         userRelationRepository.createUserRelation(userRelation);
 
-        List<UserRelation> userRelationList = userRelationRepository.getUserRelationListByUid(uid);
+        List<UserRelation> userRelationList = userRelationRepository.getUserRelationListByUid(userRelation.getUid());
         userRelationList.add(userRelation);
 
         return userRelationList;
