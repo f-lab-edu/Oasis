@@ -22,9 +22,9 @@ public class UserRelationController {
     }
 
     @PostMapping("/relation")
-    public SuccessResponse createUserRelation(@RequestBody UserRelation userRelation) {
-        userRelationService.createUserRelation(userRelation);
+    public List<UserRelation> createUserRelation(@RequestBody UserRelation userRelation) {
+        userRelation.setUid(userAuthService.getAuthenticatedUid());
 
-        return new SuccessResponse();
+        return userRelationService.createUserRelation(userRelation);
     }
 }
