@@ -22,21 +22,14 @@
         WHERE UID = #{uid}
     </select>
 
-    <select id="getDefaultRecommendUserExcludeUidList" parameterType="java.util.List" resultType="java.lang.String">
+    <select id="getDefaultRecommendUserList" parameterType="java.lang.String" resultType="java.lang.String">
         SELECT A.UID
         FROM USER_INFO A
-        WHERE NOT EXISTS (
-            SELECT B.UID
-            FROM (
-                <foreach collection="list" item="item" separator=" UNION ALL ">
-                    SELECT #{item} AS UID
-                </foreach>
-            ) B
-            WHERE A.UID = B.UID
-        )
+        WHERE A.UID != #{uid} AND
+            A.CREATE_DATETIME BETWEEN DATE_SUB(NOW(), INTERVAL 6 MONTH) AND NOW()
         ORDER BY (
-            SELECT COUNT(C.UID) FROM FEED C WHERE A.UID = C.UID
-        ) DESC
+            SELECT COUNT(B.UID) FROM FEED B WHERE A.UID = B.UID
+        )
         LIMIT 30
     </select>
 
