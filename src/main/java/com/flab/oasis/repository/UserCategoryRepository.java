@@ -22,7 +22,11 @@ public class UserCategoryRepository {
         return userCategoryMapper.getUserCategoryListByUid(uid);
     }
 
-    public List<UserCategory> getUserCategoryListIfOverlappingBookCategory(List<String> excludeUidList) {
-        return userCategoryMapper.getUserCategoryListIfOverlappingBookCategory(excludeUidList);
+    public List<String> getUidListIfOverlappingBookCategory(String uid) {
+        return userCategoryMapper.getUidListIfOverlappingBookCategory(uid);
+    }
+
+    public List<UserCategory> getUserCategoryListByUidList(List<String> uidList) {
+        return userCategoryMapper.getUserCategoryListByUidList(uidList);
     }
 }
