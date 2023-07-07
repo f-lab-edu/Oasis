@@ -30,16 +30,15 @@ public class UserRelationService {
 
     @Cacheable(cacheNames = "recommendUserCache", key = "#uid", cacheManager = "redisCacheManager")
     public List<String> getRecommendUserListByUid(String uid) {
-        List<String> excludeUidList = userRelationRepository.getUserRelationListByUid(uid).stream()
+        Set<String> excludeUidSet = userRelationRepository.getUserRelationListByUid(uid).stream()
                 .map(UserRelation::getRelationUser)
-                .collect(Collectors.toList());
-        excludeUidList.add(uid);
+                .collect(Collectors.toSet());
+        excludeUidSet.add(uid);
 
         // category가 겹치는 user를 가져온다.
         List<String> overlappingCategoryUidList = userCategoryRepository.getUidListIfOverlappingBookCategory(uid);
 
         // exclude uid에 해당하는 user를 제외한다.
-        Set<String> excludeUidSet = new HashSet<>(excludeUidList);
         overlappingCategoryUidList = overlappingCategoryUidList.stream()
                 .filter(s -> !excludeUidSet.contains(s))
                 .collect(Collectors.toList());
@@ -49,17 +48,17 @@ public class UserRelationService {
                 .getUserCategoryListByUidList(overlappingCategoryUidList);
 
         if (overlappingUserCategoryList.isEmpty()) {
-            return getDefaultRecommendUserExcludeUidList(excludeUidList);
+            return getDefaultRecommendUserExcludeUidList(uid, excludeUidSet);
         }
 
         List<String> recommendUserList = makeRecommendUserListByCategory(uid, overlappingUserCategoryList);
 
         // 카테고리 추천 유저가 30명이 안될 경우, 기본 추천 유저를 가져온다.
         if (recommendUserList.size() < CHECK_SIZE) {
-            excludeUidList.addAll(recommendUserList);
+            excludeUidSet.addAll(recommendUserList);
 
             recommendUserList.addAll(
-                    getDefaultRecommendUserExcludeUidList(excludeUidList)
+                    getDefaultRecommendUserExcludeUidList(uid, excludeUidSet)
             );
         }
 
@@ -76,9 +75,11 @@ public class UserRelationService {
         return userRelationList;
     }
 
-    private List<String> getDefaultRecommendUserExcludeUidList(List<String> excludeUidList) {
-        // excludeUidList를 제외하고 recommend user를 최대 30명 가져온다.
-        return userInfoRepository.getDefaultRecommendUserExcludeUidList(excludeUidList);
+    private List<String> getDefaultRecommendUserExcludeUidList(String uid, Set<String> excludeUidSet) {
+        // 6개월 안에 가입한 default recommend user를 최대 30명 가져와서 exclude uid를 제외한 유저를 반환한다.
+        return userInfoRepository.getDefaultRecommendUserList(uid).stream()
+                .filter(s -> !excludeUidSet.contains(s))
+                .collect(Collectors.toList());
     }
 
     private List<String> makeRecommendUserListByCategory(String uid, List<UserCategory> overlappingCategoryUserList) {

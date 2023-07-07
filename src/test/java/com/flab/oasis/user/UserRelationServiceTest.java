@@ -61,7 +61,7 @@ class UserRelationServiceTest {
         ).willReturn(new ArrayList<>());
 
         // excludeUidList에 해당하는 유저를 제외하고, 기본 추천 유저 최대 30명 가져오기
-        BDDMockito.given(userInfoRepository.getDefaultRecommendUserExcludeUidList(ArgumentMatchers.anyList()))
+        BDDMockito.given(userInfoRepository.getDefaultRecommendUserList(uid))
                 .willReturn(Collections.singletonList(expectedUid));
 
         List<String> uidList = userRelationService.getRecommendUserListByUid(uid);
@@ -106,15 +106,15 @@ class UserRelationServiceTest {
 
         // 카테고리가 겹치는 유저들의 피드 목록 가져오기
         BDDMockito.given(feedMapper.getFeedListByUidList(ArgumentMatchers.anyList()))
-                        .willReturn(Collections.singletonList(
-                                Feed.builder()
-                                        .uid(expectedUid1)
-                                        .feedId(0)
-                                        .build()
-                        ));
+                .willReturn(Collections.singletonList(
+                        Feed.builder()
+                                .uid(expectedUid1)
+                                .feedId(0)
+                                .build()
+                ));
 
         // excludeUidList에 해당하는 유저를 제외하고, 기본 추천 유저 최대 30명 가져오기
-        BDDMockito.given(userInfoRepository.getDefaultRecommendUserExcludeUidList(ArgumentMatchers.anyList()))
+        BDDMockito.given(userInfoRepository.getDefaultRecommendUserList(uid))
                 .willReturn(Collections.singletonList(expectedUid2));
 
         // 카테고리 추천 유저를 생성 후, 크기가 30명 미만이면 기본 추천 유저 생성 로직 실행

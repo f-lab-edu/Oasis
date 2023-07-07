@@ -32,7 +32,7 @@ public class UserInfoRepository {
                 ));
     }
 
-    public List<String> getDefaultRecommendUserExcludeUidList(List<String> excludeUidList) {
-        return userInfoMapper.getDefaultRecommendUserExcludeUidList(excludeUidList);
+    public List<String> getDefaultRecommendUserList(String uid) {
+        return userInfoMapper.getDefaultRecommendUserList(uid);
     }
 }
