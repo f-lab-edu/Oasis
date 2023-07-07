@@ -17,7 +17,7 @@ public class UserRelationController {
 
     @GetMapping("/relation/recommend")
     public List<String> getRecommendUserList() {
-        return userRelationService.getRecommendUserList(userAuthService.getAuthenticatedUid());
+        return userRelationService.getRecommendUserListByUid(userAuthService.getAuthenticatedUid());
     }
 
     @PostMapping("/relation")

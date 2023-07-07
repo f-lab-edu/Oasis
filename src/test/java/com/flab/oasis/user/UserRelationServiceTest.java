@@ -64,7 +64,7 @@ class UserRelationServiceTest {
         BDDMockito.given(userInfoRepository.getDefaultRecommendUserExcludeUidList(ArgumentMatchers.anyList()))
                 .willReturn(Collections.singletonList(expectedUid));
 
-        List<String> uidList = userRelationService.getRecommendUserList(uid);
+        List<String> uidList = userRelationService.getRecommendUserListByUid(uid);
 
         Assertions.assertEquals(expectedUid, uidList.get(0));
     }
@@ -118,7 +118,7 @@ class UserRelationServiceTest {
                 .willReturn(Collections.singletonList(expectedUid2));
 
         // 카테고리 추천 유저를 생성 후, 크기가 30명 미만이면 기본 추천 유저 생성 로직 실행
-        List<String> uidList = userRelationService.getRecommendUserList(uid);
+        List<String> uidList = userRelationService.getRecommendUserListByUid(uid);
 
         // 겹치는 카테고리가 존재하는 유저들이 순서상 우선 순위에 있어야 하고, 부족한만큼 채운 추천 유저는 후 순위에 있어야 한다.
         Assertions.assertAll(
