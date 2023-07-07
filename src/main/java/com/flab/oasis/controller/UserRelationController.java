@@ -1,7 +1,6 @@
 package com.flab.oasis.controller;
 
 import com.flab.oasis.model.UserRelation;
-import com.flab.oasis.model.response.SuccessResponse;
 import com.flab.oasis.service.UserAuthService;
 import com.flab.oasis.service.UserRelationService;
 import lombok.RequiredArgsConstructor;
