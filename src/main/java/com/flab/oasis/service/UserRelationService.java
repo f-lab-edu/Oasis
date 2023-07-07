@@ -28,8 +28,8 @@ public class UserRelationService {
 
     private static final int CHECK_SIZE = 30;
 
-    @Cacheable(cacheNames = "recommendUserCache", key = "#uid", cacheManager = "ehCacheCacheManager")
-    public List<String> getRecommendUserList(String uid) {
+    @Cacheable(cacheNames = "recommendUserCache", key = "#uid", cacheManager = "redisCacheManager")
+    public List<String> getRecommendUserListByUid(String uid) {
         List<String> excludeUidList = userRelationRepository.getUserRelationListByUid(uid).stream()
                 .map(UserRelation::getRelationUser)
                 .collect(Collectors.toList());
