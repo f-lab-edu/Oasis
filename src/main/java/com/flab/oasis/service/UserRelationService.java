@@ -109,11 +109,8 @@ public class UserRelationService {
                 .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
                 .forEach((key, value) -> recommendUserMap.get(key).setFeedCount(value));
 
-        List<RecommendUser> recommendUserList = new ArrayList<>(recommendUserMap.values());
-
-        Collections.sort(recommendUserList);
-
-        return recommendUserList.stream()
+        return new ArrayList<>(recommendUserMap.values()).stream()
+                .sorted()
                 .map(RecommendUser::getUid)
                 .collect(Collectors.toList());
     }
