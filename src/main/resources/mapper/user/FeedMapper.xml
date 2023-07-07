@@ -26,7 +26,7 @@
     </delete>
 
     <select id="getFeedListByUidList" parameterType="java.util.List" resultType="com.flab.oasis.model.Feed">
-        SELECT A.UID, A.FEED_ID
+        SELECT A.UID, A.FEED_ID AS feedId
         FROM FEED A, (
             <foreach collection="list" item="item" separator=" UNION ALL ">
                 SELECT #{item} AS UID
