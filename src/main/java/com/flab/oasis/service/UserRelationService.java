@@ -35,9 +35,18 @@ public class UserRelationService {
                 .collect(Collectors.toList());
         excludeUidList.add(uid);
 
-        // excludeUidList를 제외하고 category가 겹치는 user를 최대 30명 가져온다.
+        // category가 겹치는 user를 가져온다.
+        List<String> overlappingCategoryUidList = userCategoryRepository.getUidListIfOverlappingBookCategory(uid);
+
+        // exclude uid에 해당하는 user를 제외한다.
+        Set<String> excludeUidSet = new HashSet<>(excludeUidList);
+        overlappingCategoryUidList = overlappingCategoryUidList.stream()
+                .filter(s -> !excludeUidSet.contains(s))
+                .collect(Collectors.toList());
+
+        // overlappingCategoryUidList에 해당하는 UserCategory를 가져온다.
         List<UserCategory> overlappingUserCategoryList = userCategoryRepository
-                .getUserCategoryListIfOverlappingBookCategory(excludeUidList);
+                .getUserCategoryListByUidList(overlappingCategoryUidList);
 
         if (overlappingUserCategoryList.isEmpty()) {
             return getDefaultRecommendUserExcludeUidList(excludeUidList);
