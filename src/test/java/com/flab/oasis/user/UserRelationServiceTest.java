@@ -57,7 +57,7 @@ class UserRelationServiceTest {
 
         // excludeUidList에 해당하는 유저를 제외하고, 카테고리가 겹치는 유저를 최대 30명 가져오기
         BDDMockito.given(
-                userCategoryRepository.getUserCategoryListIfOverlappingBookCategory(ArgumentMatchers.anyList())
+                userCategoryRepository.getUidListIfOverlappingBookCategory(uid)
         ).willReturn(new ArrayList<>());
 
         // excludeUidList에 해당하는 유저를 제외하고, 기본 추천 유저 최대 30명 가져오기
@@ -80,13 +80,18 @@ class UserRelationServiceTest {
         BDDMockito.given(userRelationRepository.getUserRelationListByUid(uid))
                 .willReturn(new ArrayList<>());
 
-        // excludeUidList에 해당하는 유저를 제외하고, 카테고리가 겹치는 유저를 최대 30명 가져오기
+        // 카테고리가 겹치는 유저 가져오기
         BDDMockito.given(
-                userCategoryRepository.getUserCategoryListIfOverlappingBookCategory(ArgumentMatchers.anyList())
+                userCategoryRepository.getUidListIfOverlappingBookCategory(uid)
+        ).willReturn(Collections.singletonList(expectedUid1));
+
+        // 카테고리가 겹치는 유저의 UserCategory 가져오기
+        BDDMockito.given(
+                userCategoryRepository.getUserCategoryListByUidList(ArgumentMatchers.anyList())
         ).willReturn(Collections.singletonList(
                 UserCategory.builder()
                         .uid(expectedUid1)
-                        .bookCategory(BookCategory.BC101)
+                        .bookCategory(BookCategory.BC105)
                         .build()
         ));
 
