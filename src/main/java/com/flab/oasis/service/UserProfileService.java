@@ -53,7 +53,7 @@ public class UserProfileService {
         }
     }
 
-    public UserProfileResponse getUserProfileByUid() throws NotFoundException {
+    public UserProfileResponse getUserProfile() throws NotFoundException {
         String uid = userAuthService.getAuthenticatedUid();
 
         try{
