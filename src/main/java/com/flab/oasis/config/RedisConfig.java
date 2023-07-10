@@ -87,6 +87,9 @@ public class RedisConfig implements CachingConfigurer {
                 ).withCacheConfiguration(
                         "uidListByBookCategory",
                         createDefaultConfiguration().entryTtl(Duration.ofDays(1))
+                ).withCacheConfiguration(
+                        "defaultRecommendUser",
+                        createDefaultConfiguration().entryTtl(Duration.ofDays(1))
                 )
                 .build();
     }
