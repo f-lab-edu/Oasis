@@ -1,5 +1,6 @@
 package com.flab.oasis.controller;
 
+import com.flab.oasis.model.RecommendUserRequest;
 import com.flab.oasis.model.UserRelation;
 import com.flab.oasis.service.UserAuthService;
 import com.flab.oasis.service.UserRelationService;
@@ -17,7 +18,12 @@ public class UserRelationController {
 
     @GetMapping("/relation/recommend")
     public List<String> getRecommendUserList() {
-        return userRelationService.getRecommendUserListByUid(userAuthService.getAuthenticatedUid());
+        return userRelationService.getRecommendUserList(
+                RecommendUserRequest.builder()
+                        .uid(userAuthService.getAuthenticatedUid())
+                        .checkSize(30)
+                        .build()
+        );
     }
 
     @PostMapping("/relation")
