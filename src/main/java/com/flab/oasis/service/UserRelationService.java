@@ -23,32 +23,71 @@ public class UserRelationService {
     private final UserInfoRepository userInfoRepository;
     private final FeedMapper feedMapper;
 
-    @Cacheable(cacheNames = "recommendUserCache", key = "#uid", cacheManager = "redisCacheManager")
+    @Cacheable(cacheNames = "recommendUserCache", key = "#recommendUserRequest.uid", cacheManager = "redisCacheManager")
     public List<String> getRecommendUserList(RecommendUserRequest recommendUserRequest) {
+        // 추천 유저에서 제외할 목록을 가져온다.
         Set<String> excludeUidSet = userRelationRepository.getUserRelationListByUid(recommendUserRequest.getUid())
                 .stream()
                 .map(UserRelation::getRelationUser)
                 .collect(Collectors.toSet());
         excludeUidSet.add(recommendUserRequest.getUid());
 
-        // category가 겹치는 user를 가져온다.
-        List<String> overlappingCategoryUidList = userCategoryRepository
-                .getUidListIfOverlappingBookCategory(recommendUserRequest.getUid());
+        // 추천받을 유저의 category 목록을 가져온다.
+        Set<BookCategory> bookCategorySet = userCategoryRepository.getUserCategoryListByUid(
+                        recommendUserRequest.getUid()
+                ).stream()
+                .map(UserCategory::getBookCategory)
+                .collect(Collectors.toSet());
 
-        // exclude uid에 해당하는 user를 제외한다.
-        overlappingCategoryUidList = overlappingCategoryUidList.stream()
-                .filter(s -> !excludeUidSet.contains(s))
-                .collect(Collectors.toList());
+        // category별로 6개월 안에 가입했거나 category를 수정한 uid 목록을 가져온다.
+        Map<BookCategory, Set<String>> bookCategoryUidSetMap = Arrays.stream(BookCategory.values())
+                .collect(Collectors.toMap(
+                        bookCategory -> bookCategory,
+                        bookCategory -> new HashSet<>(userCategoryRepository.getUidListByBookCategory(bookCategory))
+                ));
 
-        // overlappingCategoryUidList에 해당하는 UserCategory를 가져온다.
-        List<UserCategory> overlappingUserCategoryList = userCategoryRepository
-                .getUserCategoryListByUidList(overlappingCategoryUidList);
+        Map<String, RecommendUser> recommendUserMap = new HashMap<>();
 
-        if (overlappingUserCategoryList.isEmpty()) {
+        // book category가 겹치면서 excludeUidSet에 해당하지 않는 uid를 추천 유저로 만든다.
+        bookCategorySet.forEach(bookCategory -> bookCategoryUidSetMap.get(bookCategory).stream()
+                .filter(uid -> !recommendUserMap.containsKey(uid) && !excludeUidSet.contains(uid))
+                .forEach(uid -> recommendUserMap.put(
+                        uid,
+                        RecommendUser.builder()
+                                .uid(uid)
+                                .categoryCount(0)
+                                .feedCount(0)
+                                .build()
+                ))
+        );
+
+        // book category가 겹치는 유저가 없으면 기본 유저만 반환한다.
+        if (recommendUserMap.isEmpty()) {
             return getDefaultRecommendUserExcludeUidList(recommendUserRequest.getUid(), excludeUidSet);
         }
 
-        List<String> recommendUserList = makeRecommendUserListByCategory(recommendUserRequest.getUid(), overlappingUserCategoryList);
+        // 겹치는 카테고리를 제외한 나머지 카테고리의 개수를 카운트한다.
+        bookCategoryUidSetMap.entrySet().stream()
+                .filter(entry -> !bookCategorySet.contains(entry.getKey()))
+                .forEach(entry -> entry.getValue().stream()
+                        .filter(recommendUserMap::containsKey)
+                        .forEach(uid -> recommendUserMap.get(uid)
+                                .setCategoryCount(
+                                        recommendUserMap.get(uid).getCategoryCount() + 1
+                                )
+                        )
+                );
+
+        // 작성한 feed가 존재할 경우, 해당 feed의 개수를 count하여 recommend user에 set
+        feedMapper.getFeedListByUidList(new ArrayList<>(recommendUserMap.keySet())).stream()
+                .map(Feed::getUid)
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+                .forEach((key, value) -> recommendUserMap.get(key).setFeedCount(value));
+
+        List<String> recommendUserList = new ArrayList<>(recommendUserMap.values()).stream()
+                .sorted()
+                .map(RecommendUser::getUid)
+                .collect(Collectors.toList());
 
         // 카테고리 추천 유저가 30명이 안될 경우, 기본 추천 유저를 가져온다.
         if (recommendUserList.size() < recommendUserRequest.getCheckSize()) {
@@ -76,49 +115,6 @@ public class UserRelationService {
         // 6개월 안에 가입한 default recommend user를 최대 30명 가져와서 exclude uid를 제외한 유저를 반환한다.
         return userInfoRepository.getDefaultRecommendUserList(uid).stream()
                 .filter(s -> !excludeUidSet.contains(s))
-                .collect(Collectors.toList());
-    }
-
-    private List<String> makeRecommendUserListByCategory(String uid, List<UserCategory> overlappingCategoryUserList) {
-        Set<BookCategory> userCategorySet = new HashSet<>(userCategoryRepository.getUserCategoryListByUid(uid))
-                .stream()
-                .map(UserCategory::getBookCategory)
-                .collect(Collectors.toSet());
-
-        // 겹치는 카테고리를 제외한 카테고리의 개수 카운트
-        Map<String, Long> userCategoryCountMap = overlappingCategoryUserList.stream()
-                .filter(userCategory -> !userCategorySet.contains(userCategory.getBookCategory()))
-                .map(UserCategory::getUid)
-                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
-
-        // feed count는 0으로 두고, category count로 recommend user 생성
-        Map<String, RecommendUser> recommendUserMap = userCategoryCountMap.entrySet()
-                .stream()
-                .collect(
-                        Collectors.toMap(
-                                Map.Entry::getKey,
-                                entry -> RecommendUser.builder()
-                                        .uid(entry.getKey())
-                                        .categoryCount(entry.getValue())
-                                        .feedCount(0)
-                                        .build()
-                        )
-                );
-
-        List<String> uidList = overlappingCategoryUserList.stream()
-                .map(UserCategory::getUid)
-                .distinct()
-                .collect(Collectors.toList());
-
-        // 작성한 feed가 존재할 경우, 해당 feed의 개수를 count하여 recommend user에 set
-        feedMapper.getFeedListByUidList(uidList).stream()
-                .map(Feed::getUid)
-                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
-                .forEach((key, value) -> recommendUserMap.get(key).setFeedCount(value));
-
-        return new ArrayList<>(recommendUserMap.values()).stream()
-                .sorted()
-                .map(RecommendUser::getUid)
                 .collect(Collectors.toList());
     }
 }
