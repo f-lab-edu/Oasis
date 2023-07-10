@@ -5,6 +5,7 @@ import com.flab.oasis.mapper.user.FeedMapper;
 import com.flab.oasis.model.Feed;
 import com.flab.oasis.model.RecommendUserRequest;
 import com.flab.oasis.model.UserCategory;
+import com.flab.oasis.model.UserRelation;
 import com.flab.oasis.repository.UserCategoryRepository;
 import com.flab.oasis.repository.UserInfoRepository;
 import com.flab.oasis.repository.UserRelationRepository;
@@ -143,7 +144,6 @@ class UserRelationServiceTest {
         BDDMockito.given(userInfoRepository.getDefaultRecommendUserList(uid))
                 .willReturn(Collections.singletonList(expectedUid2));
 
-        // 카테고리 추천 유저를 생성 후, 크기가 30명 미만이면 기본 추천 유저 생성 로직 실행
         List<String> uidList = userRelationService.getRecommendUserList(
                 RecommendUserRequest.builder()
                         .uid(uid)
@@ -188,7 +188,6 @@ class UserRelationServiceTest {
         BDDMockito.given(feedMapper.getFeedListByUid(expectedUid))
                 .willReturn(Collections.singletonList(new Feed()));
 
-        // 카테고리 추천 유저를 생성 후, 크기가 30명 미만이면 기본 추천 유저 생성 로직 실행
         List<String> uidList = userRelationService.getRecommendUserList(
                 RecommendUserRequest.builder()
                         .uid(uid)
@@ -197,5 +196,46 @@ class UserRelationServiceTest {
         );
 
         Assertions.assertEquals(expectedUid, uidList.get(0));
+    }
+
+    @DisplayName("생성된 추천 유저가 exclude uid에 해당할 경우")
+    @Test
+    void testRecommendUserIsExcludeUser() {
+        String uid = "test";
+        String expectedUid = "uid";
+
+        // relation이 존재하는 유저 목록 가져오기
+        BDDMockito.given(userRelationRepository.getUserRelationListByUid(uid))
+                .willReturn(Collections.singletonList(
+                        UserRelation.builder()
+                                .uid(uid)
+                                .relationUser(expectedUid)
+                                .build()
+                ));
+
+        // 추천받을 유저의 category 목록 가져오기
+        BDDMockito.given(userCategoryRepository.getUserCategoryListByUid(uid))
+                .willReturn(Collections.singletonList(
+                        UserCategory.builder()
+                                .uid(uid)
+                                .bookCategory(BookCategory.BC101)
+                                .build()
+                ));
+
+        // 카테고리별 uid 목록 가져오기
+        for (BookCategory bookCategory : BookCategory.values()) {
+            BDDMockito.given(
+                    userCategoryRepository.getUidListByBookCategory(bookCategory)
+            ).willReturn(Collections.singletonList(expectedUid));
+        }
+
+        List<String> uidList = userRelationService.getRecommendUserList(
+                RecommendUserRequest.builder()
+                        .uid(uid)
+                        .checkSize(1)
+                        .build()
+        );
+
+        Assertions.assertTrue(uidList.isEmpty());
     }
 }
