@@ -3,11 +3,11 @@ package com.flab.oasis.user;
 import com.flab.oasis.constant.BookCategory;
 import com.flab.oasis.mapper.user.FeedMapper;
 import com.flab.oasis.model.Feed;
+import com.flab.oasis.model.RecommendUserRequest;
 import com.flab.oasis.model.UserCategory;
 import com.flab.oasis.repository.UserCategoryRepository;
 import com.flab.oasis.repository.UserInfoRepository;
 import com.flab.oasis.repository.UserRelationRepository;
-import com.flab.oasis.service.UserAuthService;
 import com.flab.oasis.service.UserRelationService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -29,9 +29,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class UserRelationServiceTest {
     @InjectMocks
     UserRelationService userRelationService;
-
-    @Mock
-    UserAuthService userAuthService;
 
     @Mock
     UserCategoryRepository userCategoryRepository;
@@ -64,14 +61,19 @@ class UserRelationServiceTest {
         BDDMockito.given(userInfoRepository.getDefaultRecommendUserList(uid))
                 .willReturn(Collections.singletonList(expectedUid));
 
-        List<String> uidList = userRelationService.getRecommendUserListByUid(uid);
+        List<String> uidList = userRelationService.getRecommendUserList(
+                RecommendUserRequest.builder()
+                        .uid(uid)
+                        .checkSize(1)
+                        .build()
+        );
 
         Assertions.assertEquals(expectedUid, uidList.get(0));
     }
 
-    @DisplayName("생성된 카테고리 추천 유저가 30명이 안될 경우")
+    @DisplayName("생성된 카테고리 추천 유저가 check size보다 적을 경우")
     @Test
-    void testRecommendUserSizeLessThen30() {
+    void testRecommendUserSizeLessThenCheckSize() {
         String uid = "test";
         String expectedUid1 = "uid";
         String expectedUid2 = "add";
@@ -118,7 +120,12 @@ class UserRelationServiceTest {
                 .willReturn(Collections.singletonList(expectedUid2));
 
         // 카테고리 추천 유저를 생성 후, 크기가 30명 미만이면 기본 추천 유저 생성 로직 실행
-        List<String> uidList = userRelationService.getRecommendUserListByUid(uid);
+        List<String> uidList = userRelationService.getRecommendUserList(
+                RecommendUserRequest.builder()
+                        .uid(uid)
+                        .checkSize(2)
+                        .build()
+        );
 
         // 겹치는 카테고리가 존재하는 유저들이 순서상 우선 순위에 있어야 하고, 부족한만큼 채운 추천 유저는 후 순위에 있어야 한다.
         Assertions.assertAll(
