@@ -2,10 +2,7 @@ package com.flab.oasis.user;
 
 import com.flab.oasis.constant.BookCategory;
 import com.flab.oasis.mapper.user.FeedMapper;
-import com.flab.oasis.model.Feed;
-import com.flab.oasis.model.RecommendUserRequest;
-import com.flab.oasis.model.UserCategory;
-import com.flab.oasis.model.UserRelation;
+import com.flab.oasis.model.*;
 import com.flab.oasis.repository.UserCategoryRepository;
 import com.flab.oasis.repository.UserInfoRepository;
 import com.flab.oasis.repository.UserRelationRepository;
@@ -21,8 +18,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -57,9 +57,13 @@ class UserRelationServiceTest {
         BDDMockito.given(userCategoryRepository.getUserCategoryListByUid(uid))
                 .willReturn(new ArrayList<>());
 
-        // excludeUidList에 해당하는 유저를 제외하고, 기본 추천 유저 최대 30명 가져오기
-        BDDMockito.given(userInfoRepository.getDefaultRecommendUserList(uid))
+        // excludeUidList에 해당하는 유저를 제외하고, 기본 추천 유저 가져오기
+        BDDMockito.given(userInfoRepository.getDefaultRecommendUserList())
                 .willReturn(Collections.singletonList(expectedUid));
+
+        // 기본 추천 유저의 피드 목록 가져오기
+        BDDMockito.given(feedMapper.getFeedListByUid(expectedUid))
+                .willReturn(new ArrayList<>());
 
         List<String> uidList = userRelationService.getRecommendUserList(
                 RecommendUserRequest.builder()
@@ -95,9 +99,13 @@ class UserRelationServiceTest {
                 userCategoryRepository.getUidListByBookCategory(ArgumentMatchers.any(BookCategory.class))
         ).willReturn(new ArrayList<>());
 
-        // excludeUidList에 해당하는 유저를 제외하고, 기본 추천 유저 최대 30명 가져오기
-        BDDMockito.given(userInfoRepository.getDefaultRecommendUserList(uid))
+        // excludeUidList에 해당하는 유저를 제외하고, 기본 추천 유저 가져오기
+        BDDMockito.given(userInfoRepository.getDefaultRecommendUserList())
                 .willReturn(Collections.singletonList(expectedUid));
+
+        // 기본 추천 유저의 피드 목록 가져오기
+        BDDMockito.given(feedMapper.getFeedListByUid(expectedUid))
+                .willReturn(new ArrayList<>());
 
         List<String> uidList = userRelationService.getRecommendUserList(
                 RecommendUserRequest.builder()
@@ -136,13 +144,13 @@ class UserRelationServiceTest {
             ).willReturn(Collections.singletonList(expectedUid1));
         }
 
-        // 카테고리가 겹치는 유저의 피드 목록 가져오기
-        BDDMockito.given(feedMapper.getFeedListByUid(expectedUid1))
-                .willReturn(Collections.singletonList(new Feed()));
-
-        // excludeUidList에 해당하는 유저를 제외하고, 기본 추천 유저 최대 30명 가져오기
-        BDDMockito.given(userInfoRepository.getDefaultRecommendUserList(uid))
+        // excludeUidList에 해당하는 유저를 제외하고, 기본 추천 유저 가져오기
+        BDDMockito.given(userInfoRepository.getDefaultRecommendUserList())
                 .willReturn(Collections.singletonList(expectedUid2));
+
+        // 카테고리/기본 추천 유저의 피드 목록 가져오기
+        BDDMockito.given(feedMapper.getFeedListByUid(ArgumentMatchers.any()))
+                .willReturn(new ArrayList<>());
 
         List<String> uidList = userRelationService.getRecommendUserList(
                 RecommendUserRequest.builder()
@@ -184,9 +192,9 @@ class UserRelationServiceTest {
             ).willReturn(Collections.singletonList(expectedUid));
         }
 
-        // 카테고리가 겹치는 유저의 피드 목록 가져오기
+        // 카테고리 추천 유저의 피드 목록 가져오기
         BDDMockito.given(feedMapper.getFeedListByUid(expectedUid))
-                .willReturn(Collections.singletonList(new Feed()));
+                .willReturn(new ArrayList<>());
 
         List<String> uidList = userRelationService.getRecommendUserList(
                 RecommendUserRequest.builder()
@@ -202,14 +210,14 @@ class UserRelationServiceTest {
     @Test
     void testRecommendUserIsExcludeUser() {
         String uid = "test";
-        String expectedUid = "uid";
+        String excludeUid = "uid";
 
         // relation이 존재하는 유저 목록 가져오기
         BDDMockito.given(userRelationRepository.getUserRelationListByUid(uid))
                 .willReturn(Collections.singletonList(
                         UserRelation.builder()
                                 .uid(uid)
-                                .relationUser(expectedUid)
+                                .relationUser(excludeUid)
                                 .build()
                 ));
 
@@ -226,8 +234,12 @@ class UserRelationServiceTest {
         for (BookCategory bookCategory : BookCategory.values()) {
             BDDMockito.given(
                     userCategoryRepository.getUidListByBookCategory(bookCategory)
-            ).willReturn(Collections.singletonList(expectedUid));
+            ).willReturn(Collections.singletonList(excludeUid));
         }
+
+        // excludeUidList에 해당하는 유저를 제외하고, 기본 추천 유저 가져오기
+        BDDMockito.given(userInfoRepository.getDefaultRecommendUserList())
+                .willReturn(Collections.singletonList(excludeUid));
 
         List<String> uidList = userRelationService.getRecommendUserList(
                 RecommendUserRequest.builder()
