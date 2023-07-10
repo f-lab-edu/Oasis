@@ -1,5 +1,6 @@
 package com.flab.oasis.repository;
 
+import com.flab.oasis.constant.BookCategory;
 import com.flab.oasis.mapper.user.UserCategoryMapper;
 import com.flab.oasis.model.UserCategory;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,11 @@ public class UserCategoryRepository {
     @Cacheable(cacheNames = "UserCategory", key = "#uid", cacheManager = "redisCacheManager")
     public List<UserCategory> getUserCategoryListByUid(String uid) {
         return userCategoryMapper.getUserCategoryListByUid(uid);
+    }
+
+    @Cacheable(cacheNames = "uidListByBookCategory", key = "#bookCategory", cacheManager = "redisCacheManager")
+    public List<String> getUidListByBookCategory(BookCategory bookCategory) {
+        return userCategoryMapper.getUidListByBookCategory(bookCategory);
     }
 
     public List<String> getUidListIfOverlappingBookCategory(String uid) {
