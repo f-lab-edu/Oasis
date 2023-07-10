@@ -42,6 +42,34 @@ class UserRelationServiceTest {
     @Mock
     FeedMapper feedMapper;
 
+    @DisplayName("설정한 카테고리가 존재하지 않을 경우")
+    @Test
+    void testUserCategoryIsEmpty() {
+        String uid = "test";
+        String expectedUid = "uid";
+
+        // relation이 존재하는 유저 목록 가져오기
+        BDDMockito.given(userRelationRepository.getUserRelationListByUid(uid))
+                .willReturn(new ArrayList<>());
+
+        // 추천받을 유저의 category 목록 가져오기
+        BDDMockito.given(userCategoryRepository.getUserCategoryListByUid(uid))
+                .willReturn(new ArrayList<>());
+
+        // excludeUidList에 해당하는 유저를 제외하고, 기본 추천 유저 최대 30명 가져오기
+        BDDMockito.given(userInfoRepository.getDefaultRecommendUserList(uid))
+                .willReturn(Collections.singletonList(expectedUid));
+
+        List<String> uidList = userRelationService.getRecommendUserList(
+                RecommendUserRequest.builder()
+                        .uid(uid)
+                        .checkSize(1)
+                        .build()
+        );
+
+        Assertions.assertEquals(expectedUid, uidList.get(0));
+    }
+
     @DisplayName("카테고리가 겹치는 유저가 존재하지 않을 경우")
     @Test
     void testOverlappingCategoryIsNotExists() {
@@ -54,9 +82,14 @@ class UserRelationServiceTest {
 
         // 추천받을 유저의 category 목록 가져오기
         BDDMockito.given(userCategoryRepository.getUserCategoryListByUid(uid))
-                .willReturn(new ArrayList<>());
+                .willReturn(Collections.singletonList(
+                        UserCategory.builder()
+                                .uid(uid)
+                                .bookCategory(BookCategory.BC101)
+                                .build()
+                ));
 
-
+        // 카테고리별 uid 목록 가져오기
         BDDMockito.given(
                 userCategoryRepository.getUidListByBookCategory(ArgumentMatchers.any(BookCategory.class))
         ).willReturn(new ArrayList<>());
