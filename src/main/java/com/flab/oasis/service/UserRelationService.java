@@ -56,7 +56,7 @@ public class UserRelationService {
                         RecommendUser.builder()
                                 .uid(uid)
                                 .categoryCount(0)
-                                .feedCount(0)
+                                .feedCount(feedMapper.getFeedListByUid(uid).size())
                                 .build()
                 ))
         );
@@ -78,13 +78,7 @@ public class UserRelationService {
                         )
                 );
 
-        // 작성한 feed가 존재할 경우, 해당 feed의 개수를 count하여 recommend user에 set
-        feedMapper.getFeedListByUidList(new ArrayList<>(recommendUserMap.keySet())).stream()
-                .map(Feed::getUid)
-                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
-                .forEach((key, value) -> recommendUserMap.get(key).setFeedCount(value));
-
-        List<String> recommendUserList = new ArrayList<>(recommendUserMap.values()).stream()
+        List<String> recommendUserList = recommendUserMap.values().stream()
                 .sorted()
                 .map(RecommendUser::getUid)
                 .collect(Collectors.toList());
