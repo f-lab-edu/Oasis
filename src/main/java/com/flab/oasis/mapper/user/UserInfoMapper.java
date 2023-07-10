@@ -10,5 +10,5 @@ public interface UserInfoMapper {
     public boolean isExistsNickname(String nickname);
     public void createUserInfo(UserInfo userInfo);
     public UserInfo getUserInfoByUid(String uid);
-    public List<String> getDefaultRecommendUserList(String uid);
+    public List<String> getDefaultRecommendUserList();
 }

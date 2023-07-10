@@ -22,15 +22,10 @@
         WHERE UID = #{uid}
     </select>
 
-    <select id="getDefaultRecommendUserList" parameterType="java.lang.String" resultType="java.lang.String">
-        SELECT A.UID
-        FROM USER_INFO A
-        WHERE A.UID != #{uid} AND
-            A.CREATE_DATETIME BETWEEN DATE_SUB(NOW(), INTERVAL 6 MONTH) AND NOW()
-        ORDER BY (
-            SELECT COUNT(B.UID) FROM FEED B WHERE A.UID = B.UID
-        )
-        LIMIT 30
+    <select id="getDefaultRecommendUserList" resultType="java.lang.String">
+        SELECT UID
+        FROM USER_INFO
+        WHERE MODIFY_DATETIME BETWEEN DATE_SUB(NOW(), INTERVAL 6 MONTH) AND NOW()
     </select>
 
 </mapper>
