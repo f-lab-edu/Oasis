@@ -27,12 +27,4 @@ public class UserCategoryRepository {
     public List<String> getUidListByBookCategory(BookCategory bookCategory) {
         return userCategoryMapper.getUidListByBookCategory(bookCategory);
     }
-
-    public List<String> getUidListIfOverlappingBookCategory(String uid) {
-        return userCategoryMapper.getUidListIfOverlappingBookCategory(uid);
-    }
-
-    public List<UserCategory> getUserCategoryListByUidList(List<String> uidList) {
-        return userCategoryMapper.getUserCategoryListByUidList(uidList);
-    }
 }
