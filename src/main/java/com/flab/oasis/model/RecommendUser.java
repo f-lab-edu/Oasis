@@ -1,6 +1,5 @@
 package com.flab.oasis.model;
 
-import com.google.common.collect.ComparisonChain;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -17,9 +16,11 @@ public class RecommendUser implements Comparable<RecommendUser> {
 
     @Override
     public int compareTo(RecommendUser o) {
-        return ComparisonChain.start()
-                .compare(categoryCount, o.categoryCount)
-                .compare(feedCount, o.feedCount)
-                .result();
+        long compareCategoryCount = o.getCategoryCount() - this.categoryCount;
+        if (compareCategoryCount != 0) {
+            return (int) compareCategoryCount;
+        }
+
+        return (int) (o.getFeedCount() - this.feedCount);
     }
 }
