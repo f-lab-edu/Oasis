@@ -24,22 +24,4 @@
               MODIFY_DATETIME BETWEEN DATE_SUB(NOW(), INTERVAL 6 MONTH) AND NOW()
     </select>
 
-    <select id="getUidListIfOverlappingBookCategory" parameterType="java.lang.String" resultType="java.lang.String">
-        SELECT DISTINCT A.UID
-        FROM USER_CATEGORY A,
-             (SELECT UID, BOOK_CATEGORY FROM USER_CATEGORY WHERE UID = #{uid}) B
-        WHERE A.UID != B.UID AND
-              A.BOOK_CATEGORY = B.BOOK_CATEGORY
-    </select>
-
-    <select id="getUserCategoryListByUidList" parameterType="java.util.List" resultType="com.flab.oasis.model.UserCategory">
-        SELECT A.UID, A.BOOK_CATEGORY AS bookCategory
-        FROM USER_CATEGORY A, (
-            <foreach collection="list" item="item" separator=" UNION ALL ">
-                SELECT #{item} AS UID
-            </foreach>
-        ) B
-        WHERE A.UID = B.UID
-    </select>
-
 </mapper>
