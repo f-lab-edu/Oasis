@@ -2,7 +2,10 @@ package com.flab.oasis.service;
 
 import com.flab.oasis.constant.BookCategory;
 import com.flab.oasis.mapper.user.FeedMapper;
-import com.flab.oasis.model.*;
+import com.flab.oasis.model.RecommendUser;
+import com.flab.oasis.model.RecommendUserRequest;
+import com.flab.oasis.model.UserCategory;
+import com.flab.oasis.model.UserRelation;
 import com.flab.oasis.repository.UserCategoryRepository;
 import com.flab.oasis.repository.UserInfoRepository;
 import com.flab.oasis.repository.UserRelationRepository;
@@ -12,7 +15,6 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -41,7 +43,7 @@ public class UserRelationService {
 
         // 설정한 category가 없으면 기본 추천 유저를 반환한다.
         if (bookCategorySet.isEmpty()) {
-            return getDefaultRecommendUserExcludeUidList(recommendUserRequest.getUid(), excludeUidSet);
+            return getDefaultRecommendUserExcludeUidList(excludeUidSet);
         }
 
         // category별로 6개월 안에 가입했거나 category를 수정한 uid 목록을 가져온다.
@@ -83,12 +85,12 @@ public class UserRelationService {
                 .map(RecommendUser::getUid)
                 .collect(Collectors.toList());
 
-        // 카테고리 추천 유저가 30명이 안될 경우, 기본 추천 유저를 가져온다.
+        // 카테고리 추천 유저가 check size보다 적을 경우, 기본 추천 유저를 추가한다.
         if (recommendUserList.size() < recommendUserRequest.getCheckSize()) {
             excludeUidSet.addAll(recommendUserList);
 
             recommendUserList.addAll(
-                    getDefaultRecommendUserExcludeUidList(recommendUserRequest.getUid(), excludeUidSet)
+                    getDefaultRecommendUserExcludeUidList(excludeUidSet)
             );
         }
 
@@ -104,11 +106,18 @@ public class UserRelationService {
 
         return userRelationList;
     }
-    
-    private List<String> getDefaultRecommendUserExcludeUidList(String uid, Set<String> excludeUidSet) {
-        // 6개월 안에 가입한 default recommend user를 최대 30명 가져와서 exclude uid를 제외한 유저를 반환한다.
-        return userInfoRepository.getDefaultRecommendUserList(uid).stream()
-                .filter(s -> !excludeUidSet.contains(s))
+
+    private List<String> getDefaultRecommendUserExcludeUidList(Set<String> excludeUidSet) {
+        // 6개월 안에 가입했거나 정보를 수정한 user를 가져와서 exclude uid를 제외하고 default recommend user로 반환한다.
+        return userInfoRepository.getDefaultRecommendUserList().stream()
+                .filter(uid -> !excludeUidSet.contains(uid))
+                .map(uid -> RecommendUser.builder()
+                            .uid(uid)
+                            .categoryCount(0)
+                            .feedCount(feedMapper.getFeedListByUid(uid).size())
+                            .build()
+                ).sorted()
+                .map(RecommendUser::getUid)
                 .collect(Collectors.toList());
     }
 }
