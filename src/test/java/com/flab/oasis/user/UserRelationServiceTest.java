@@ -52,9 +52,11 @@ class UserRelationServiceTest {
         BDDMockito.given(userRelationRepository.getUserRelationListByUid(uid))
                 .willReturn(new ArrayList<>());
 
-        // excludeUidList에 해당하는 유저를 제외하고, 카테고리가 겹치는 유저를 최대 30명 가져오기
+        BDDMockito.given(userCategoryRepository.getUserCategoryListByUid(uid))
+                .willReturn(new ArrayList<>());
+
         BDDMockito.given(
-                userCategoryRepository.getUidListIfOverlappingBookCategory(uid)
+                userCategoryRepository.getUidListByBookCategory(BookCategory.BC101)
         ).willReturn(new ArrayList<>());
 
         // excludeUidList에 해당하는 유저를 제외하고, 기본 추천 유저 최대 30명 가져오기
@@ -82,29 +84,20 @@ class UserRelationServiceTest {
         BDDMockito.given(userRelationRepository.getUserRelationListByUid(uid))
                 .willReturn(new ArrayList<>());
 
-        // 카테고리가 겹치는 유저 가져오기
-        BDDMockito.given(
-                userCategoryRepository.getUidListIfOverlappingBookCategory(uid)
-        ).willReturn(Collections.singletonList(expectedUid1));
-
-        // 카테고리가 겹치는 유저의 UserCategory 가져오기
-        BDDMockito.given(
-                userCategoryRepository.getUserCategoryListByUidList(ArgumentMatchers.anyList())
-        ).willReturn(Collections.singletonList(
-                UserCategory.builder()
-                        .uid(expectedUid1)
-                        .bookCategory(BookCategory.BC105)
-                        .build()
-        ));
-
-        // 겹치는 카테고리를 제외하기 위한 "uid"의 카테고리 가져오기
         BDDMockito.given(userCategoryRepository.getUserCategoryListByUid(uid))
                 .willReturn(Collections.singletonList(
                         UserCategory.builder()
                                 .uid(uid)
-                                .bookCategory(BookCategory.BC102)
+                                .bookCategory(BookCategory.BC101)
                                 .build()
                 ));
+
+        // 카테고리별 uid 목록 가져오기
+        for (BookCategory bookCategory : BookCategory.values()) {
+            BDDMockito.given(
+                    userCategoryRepository.getUidListByBookCategory(bookCategory)
+            ).willReturn(Collections.singletonList(expectedUid1));
+        }
 
         // 카테고리가 겹치는 유저들의 피드 목록 가져오기
         BDDMockito.given(feedMapper.getFeedListByUidList(ArgumentMatchers.anyList()))
@@ -145,29 +138,20 @@ class UserRelationServiceTest {
         BDDMockito.given(userRelationRepository.getUserRelationListByUid(uid))
                 .willReturn(new ArrayList<>());
 
-        // 카테고리가 겹치는 유저 가져오기
-        BDDMockito.given(
-                userCategoryRepository.getUidListIfOverlappingBookCategory(uid)
-        ).willReturn(Collections.singletonList(expectedUid1));
-
-        // 카테고리가 겹치는 유저의 UserCategory 가져오기
-        BDDMockito.given(
-                userCategoryRepository.getUserCategoryListByUidList(ArgumentMatchers.anyList())
-        ).willReturn(Collections.singletonList(
-                UserCategory.builder()
-                        .uid(expectedUid1)
-                        .bookCategory(BookCategory.BC105)
-                        .build()
-        ));
-
-        // 겹치는 카테고리를 제외하기 위한 "uid"의 카테고리 가져오기
         BDDMockito.given(userCategoryRepository.getUserCategoryListByUid(uid))
                 .willReturn(Collections.singletonList(
                         UserCategory.builder()
                                 .uid(uid)
-                                .bookCategory(BookCategory.BC102)
+                                .bookCategory(BookCategory.BC101)
                                 .build()
                 ));
+
+        // 카테고리별 uid 목록 가져오기
+        for (BookCategory bookCategory : BookCategory.values()) {
+            BDDMockito.given(
+                    userCategoryRepository.getUidListByBookCategory(bookCategory)
+            ).willReturn(Collections.singletonList(expectedUid1));
+        }
 
         // 카테고리가 겹치는 유저들의 피드 목록 가져오기
         BDDMockito.given(feedMapper.getFeedListByUidList(ArgumentMatchers.anyList()))
