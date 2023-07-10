@@ -14,6 +14,12 @@
         VALUES (#{uid}, #{feedId}, #{writeDate}, #{bookId}, #{report}, #{feedLike}, NOW(), NOW())
     </insert>
 
+    <select id="getFeedListByUid" parameterType="java.lang.String" resultType="com.flab.oasis.model.Feed">
+        SELECT UID, FEED_ID AS feedId, WRITE_DATE AS writeDate, BOOK_ID AS bookId, REPORT, FEED_LIKE AS feedLike
+        FROM FEED
+        WHERE UID = #{uid}
+    </select>
+
     <update id="updateFeed" parameterType="com.flab.oasis.model.Feed">
         UPDATE FEED
         SET REPORT = #{report}
@@ -24,15 +30,5 @@
         DELETE FROM FEED
         WHERE UID = #{uid} AND FEED_ID = #{feedId}
     </delete>
-
-    <select id="getFeedListByUidList" parameterType="java.util.List" resultType="com.flab.oasis.model.Feed">
-        SELECT A.UID, A.FEED_ID AS feedId
-        FROM FEED A, (
-            <foreach collection="list" item="item" separator=" UNION ALL ">
-                SELECT #{item} AS UID
-            </foreach>
-        ) B
-        WHERE A.UID = B.UID
-    </select>
 
 </mapper>

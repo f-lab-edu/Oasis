@@ -9,7 +9,7 @@ import java.util.List;
 public interface FeedMapper {
     public Integer getMaxFeedIdByUid(String uid);
     public void writeFeed(Feed feed);
+    public List<Feed> getFeedListByUid(String uid);
     public void updateFeed(Feed feed);
     public void deleteFeed(Feed feed);
-    public List<Feed> getFeedListByUidList(List<String> uidList);
 }
