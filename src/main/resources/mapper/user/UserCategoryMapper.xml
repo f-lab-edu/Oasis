@@ -17,6 +17,13 @@
         WHERE UID = #{uid}
     </select>
 
+    <select id="getUidListByBookCategory" parameterType="com.flab.oasis.constant.BookCategory" resultType="java.lang.String">
+        SELECT UID
+        FROM USER_CATEGORY
+        WHERE BOOK_CATEGORY = #{bookCategory} AND
+              MODIFY_DATETIME BETWEEN DATE_SUB(NOW(), INTERVAL 6 MONTH) AND NOW()
+    </select>
+
     <select id="getUidListIfOverlappingBookCategory" parameterType="java.lang.String" resultType="java.lang.String">
         SELECT DISTINCT A.UID
         FROM USER_CATEGORY A,
