@@ -32,7 +32,8 @@ public class UserInfoRepository {
                 ));
     }
 
-    public List<String> getDefaultRecommendUserList(String uid) {
-        return userInfoMapper.getDefaultRecommendUserList(uid);
+    @Cacheable(cacheNames = "defaultRecommendUser", key = "'default'", cacheManager = "redisCacheManager")
+    public List<String> getDefaultRecommendUserList() {
+        return userInfoMapper.getDefaultRecommendUserList();
     }
 }
