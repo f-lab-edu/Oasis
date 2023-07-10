@@ -2,10 +2,7 @@ package com.flab.oasis.service;
 
 import com.flab.oasis.constant.BookCategory;
 import com.flab.oasis.mapper.user.FeedMapper;
-import com.flab.oasis.model.Feed;
-import com.flab.oasis.model.RecommendUser;
-import com.flab.oasis.model.UserCategory;
-import com.flab.oasis.model.UserRelation;
+import com.flab.oasis.model.*;
 import com.flab.oasis.repository.UserCategoryRepository;
 import com.flab.oasis.repository.UserInfoRepository;
 import com.flab.oasis.repository.UserRelationRepository;
@@ -26,17 +23,17 @@ public class UserRelationService {
     private final UserInfoRepository userInfoRepository;
     private final FeedMapper feedMapper;
 
-    private static final int CHECK_SIZE = 30;
-
     @Cacheable(cacheNames = "recommendUserCache", key = "#uid", cacheManager = "redisCacheManager")
-    public List<String> getRecommendUserListByUid(String uid) {
-        Set<String> excludeUidSet = userRelationRepository.getUserRelationListByUid(uid).stream()
+    public List<String> getRecommendUserList(RecommendUserRequest recommendUserRequest) {
+        Set<String> excludeUidSet = userRelationRepository.getUserRelationListByUid(recommendUserRequest.getUid())
+                .stream()
                 .map(UserRelation::getRelationUser)
                 .collect(Collectors.toSet());
-        excludeUidSet.add(uid);
+        excludeUidSet.add(recommendUserRequest.getUid());
 
         // category가 겹치는 user를 가져온다.
-        List<String> overlappingCategoryUidList = userCategoryRepository.getUidListIfOverlappingBookCategory(uid);
+        List<String> overlappingCategoryUidList = userCategoryRepository
+                .getUidListIfOverlappingBookCategory(recommendUserRequest.getUid());
 
         // exclude uid에 해당하는 user를 제외한다.
         overlappingCategoryUidList = overlappingCategoryUidList.stream()
@@ -48,17 +45,17 @@ public class UserRelationService {
                 .getUserCategoryListByUidList(overlappingCategoryUidList);
 
         if (overlappingUserCategoryList.isEmpty()) {
-            return getDefaultRecommendUserExcludeUidList(uid, excludeUidSet);
+            return getDefaultRecommendUserExcludeUidList(recommendUserRequest.getUid(), excludeUidSet);
         }
 
-        List<String> recommendUserList = makeRecommendUserListByCategory(uid, overlappingUserCategoryList);
+        List<String> recommendUserList = makeRecommendUserListByCategory(recommendUserRequest.getUid(), overlappingUserCategoryList);
 
         // 카테고리 추천 유저가 30명이 안될 경우, 기본 추천 유저를 가져온다.
-        if (recommendUserList.size() < CHECK_SIZE) {
+        if (recommendUserList.size() < recommendUserRequest.getCheckSize()) {
             excludeUidSet.addAll(recommendUserList);
 
             recommendUserList.addAll(
-                    getDefaultRecommendUserExcludeUidList(uid, excludeUidSet)
+                    getDefaultRecommendUserExcludeUidList(recommendUserRequest.getUid(), excludeUidSet)
             );
         }
 
