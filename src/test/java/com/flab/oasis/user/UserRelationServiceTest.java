@@ -133,4 +133,60 @@ class UserRelationServiceTest {
                 () -> assertEquals(expectedUid2, uidList.get(1))
         );
     }
+
+    @DisplayName("생성된 카테고리 추천 유저가 check size를 충족할 경우")
+    @Test
+    void testRecommendUserSizeIsCheckSize() {
+        String uid = "test";
+        String expectedUid1 = "uid";
+        String expectedUid2 = "add";
+
+        // relation이 존재하는 유저 목록 가져오기
+        BDDMockito.given(userRelationRepository.getUserRelationListByUid(uid))
+                .willReturn(new ArrayList<>());
+
+        // 카테고리가 겹치는 유저 가져오기
+        BDDMockito.given(
+                userCategoryRepository.getUidListIfOverlappingBookCategory(uid)
+        ).willReturn(Collections.singletonList(expectedUid1));
+
+        // 카테고리가 겹치는 유저의 UserCategory 가져오기
+        BDDMockito.given(
+                userCategoryRepository.getUserCategoryListByUidList(ArgumentMatchers.anyList())
+        ).willReturn(Collections.singletonList(
+                UserCategory.builder()
+                        .uid(expectedUid1)
+                        .bookCategory(BookCategory.BC105)
+                        .build()
+        ));
+
+        // 겹치는 카테고리를 제외하기 위한 "uid"의 카테고리 가져오기
+        BDDMockito.given(userCategoryRepository.getUserCategoryListByUid(uid))
+                .willReturn(Collections.singletonList(
+                        UserCategory.builder()
+                                .uid(uid)
+                                .bookCategory(BookCategory.BC102)
+                                .build()
+                ));
+
+        // 카테고리가 겹치는 유저들의 피드 목록 가져오기
+        BDDMockito.given(feedMapper.getFeedListByUidList(ArgumentMatchers.anyList()))
+                .willReturn(Collections.singletonList(
+                        Feed.builder()
+                                .uid(expectedUid1)
+                                .feedId(0)
+                                .build()
+                ));
+
+        // 카테고리 추천 유저를 생성 후, 크기가 30명 미만이면 기본 추천 유저 생성 로직 실행
+        List<String> uidList = userRelationService.getRecommendUserList(
+                RecommendUserRequest.builder()
+                        .uid(uid)
+                        .checkSize(1)
+                        .build()
+        );
+
+        // 겹치는 카테고리가 존재하는 유저들이 순서상 우선 순위에 있어야 하고, 부족한만큼 채운 추천 유저는 후 순위에 있어야 한다.
+        Assertions.assertEquals(expectedUid1, uidList.get(0));
+    }
 }
