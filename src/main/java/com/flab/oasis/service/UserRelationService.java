@@ -39,6 +39,11 @@ public class UserRelationService {
                 .map(UserCategory::getBookCategory)
                 .collect(Collectors.toSet());
 
+        // 설정한 category가 없으면 기본 추천 유저를 반환한다.
+        if (bookCategorySet.isEmpty()) {
+            return getDefaultRecommendUserExcludeUidList(recommendUserRequest.getUid(), excludeUidSet);
+        }
+
         // category별로 6개월 안에 가입했거나 category를 수정한 uid 목록을 가져온다.
         Map<BookCategory, Set<String>> bookCategoryUidSetMap = Arrays.stream(BookCategory.values())
                 .collect(Collectors.toMap(
@@ -60,11 +65,6 @@ public class UserRelationService {
                                 .build()
                 ))
         );
-
-        // book category가 겹치는 유저가 없으면 기본 유저만 반환한다.
-        if (recommendUserMap.isEmpty()) {
-            return getDefaultRecommendUserExcludeUidList(recommendUserRequest.getUid(), excludeUidSet);
-        }
 
         // 겹치는 카테고리를 제외한 나머지 카테고리의 개수를 카운트한다.
         bookCategoryUidSetMap.entrySet().stream()
@@ -104,7 +104,7 @@ public class UserRelationService {
 
         return userRelationList;
     }
-
+    
     private List<String> getDefaultRecommendUserExcludeUidList(String uid, Set<String> excludeUidSet) {
         // 6개월 안에 가입한 default recommend user를 최대 30명 가져와서 exclude uid를 제외한 유저를 반환한다.
         return userInfoRepository.getDefaultRecommendUserList(uid).stream()
