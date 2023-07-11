@@ -3,7 +3,6 @@ package com.flab.oasis.service;
 import com.flab.oasis.constant.BookCategory;
 import com.flab.oasis.mapper.user.FeedMapper;
 import com.flab.oasis.model.RecommendUser;
-import com.flab.oasis.model.RecommendUserRequest;
 import com.flab.oasis.model.UserCategory;
 import com.flab.oasis.model.UserRelation;
 import com.flab.oasis.repository.UserCategoryRepository;
@@ -25,19 +24,17 @@ public class UserRelationService {
     private final UserInfoRepository userInfoRepository;
     private final FeedMapper feedMapper;
 
-    @Cacheable(cacheNames = "recommendUserCache", key = "#recommendUserRequest.uid", cacheManager = "redisCacheManager")
-    public List<String> getRecommendUserList(RecommendUserRequest recommendUserRequest) {
+    @Cacheable(cacheNames = "recommendUserCache", key = "#uid", cacheManager = "redisCacheManager")
+    public List<String> getRecommendUserListByUidAndCheckSize(String uid, int checkSize) {
         // 추천 유저에서 제외할 목록을 가져온다.
-        Set<String> excludeUidSet = userRelationRepository.getUserRelationListByUid(recommendUserRequest.getUid())
+        Set<String> excludeUidSet = userRelationRepository.getUserRelationListByUid(uid)
                 .stream()
                 .map(UserRelation::getRelationUser)
                 .collect(Collectors.toSet());
-        excludeUidSet.add(recommendUserRequest.getUid());
+        excludeUidSet.add(uid);
 
         // 추천받을 유저의 category 목록을 가져온다.
-        Set<BookCategory> bookCategorySet = userCategoryRepository.getUserCategoryListByUid(
-                        recommendUserRequest.getUid()
-                ).stream()
+        Set<BookCategory> bookCategorySet = userCategoryRepository.getUserCategoryListByUid(uid).stream()
                 .map(UserCategory::getBookCategory)
                 .collect(Collectors.toSet());
 
@@ -57,13 +54,16 @@ public class UserRelationService {
 
         // book category가 겹치면서 excludeUidSet에 해당하지 않는 uid를 추천 유저로 만든다.
         bookCategorySet.forEach(bookCategory -> bookCategoryUidSetMap.get(bookCategory).stream()
-                .filter(uid -> !recommendUserMap.containsKey(uid) && !excludeUidSet.contains(uid))
-                .forEach(uid -> recommendUserMap.put(
-                        uid,
+                .filter(recommendCandidateUid ->
+                                !recommendUserMap.containsKey(recommendCandidateUid) &&
+                                        !excludeUidSet.contains(recommendCandidateUid)
+                )
+                .forEach(recommendUid -> recommendUserMap.put(
+                        recommendUid,
                         RecommendUser.builder()
-                                .uid(uid)
+                                .uid(recommendUid)
                                 .categoryCount(0)
-                                .feedCount(feedMapper.getFeedListByUid(uid).size())
+                                .feedCount(feedMapper.getFeedListByUid(recommendUid).size())
                                 .build()
                 ))
         );
@@ -73,9 +73,9 @@ public class UserRelationService {
                 .filter(entry -> !bookCategorySet.contains(entry.getKey()))
                 .forEach(entry -> entry.getValue().stream()
                         .filter(recommendUserMap::containsKey)
-                        .forEach(uid -> recommendUserMap.get(uid)
+                        .forEach(recommendUid -> recommendUserMap.get(recommendUid)
                                 .setCategoryCount(
-                                        recommendUserMap.get(uid).getCategoryCount() + 1
+                                        recommendUserMap.get(recommendUid).getCategoryCount() + 1
                                 )
                         )
                 );
@@ -86,7 +86,7 @@ public class UserRelationService {
                 .collect(Collectors.toList());
 
         // 카테고리 추천 유저가 check size보다 적을 경우, 기본 추천 유저를 추가한다.
-        if (recommendUserList.size() < recommendUserRequest.getCheckSize()) {
+        if (recommendUserList.size() < checkSize) {
             excludeUidSet.addAll(recommendUserList);
 
             recommendUserList.addAll(
@@ -110,11 +110,11 @@ public class UserRelationService {
     private List<String> getDefaultRecommendUserExcludeUidList(Set<String> excludeUidSet) {
         // 6개월 안에 가입했거나 정보를 수정한 user를 가져와서 exclude uid를 제외하고 default recommend user로 반환한다.
         return userInfoRepository.getDefaultRecommendUserList().stream()
-                .filter(uid -> !excludeUidSet.contains(uid))
-                .map(uid -> RecommendUser.builder()
-                            .uid(uid)
+                .filter(recommendCandidateUid -> !excludeUidSet.contains(recommendCandidateUid))
+                .map(recommendUid -> RecommendUser.builder()
+                            .uid(recommendUid)
                             .categoryCount(0)
-                            .feedCount(feedMapper.getFeedListByUid(uid).size())
+                            .feedCount(feedMapper.getFeedListByUid(recommendUid).size())
                             .build()
                 ).sorted()
                 .map(RecommendUser::getUid)
