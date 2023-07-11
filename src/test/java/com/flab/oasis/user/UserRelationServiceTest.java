@@ -2,6 +2,7 @@ package com.flab.oasis.user;
 
 import com.flab.oasis.constant.BookCategory;
 import com.flab.oasis.mapper.user.FeedMapper;
+import com.flab.oasis.model.RecommendCandidateUser;
 import com.flab.oasis.model.UserCategory;
 import com.flab.oasis.model.UserRelation;
 import com.flab.oasis.repository.UserCategoryRepository;
@@ -18,6 +19,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -89,7 +91,7 @@ class UserRelationServiceTest {
 
         // 카테고리별 uid 목록 가져오기
         BDDMockito.given(
-                userCategoryRepository.getUidListByBookCategory(ArgumentMatchers.any(BookCategory.class))
+                userCategoryRepository.getRecommendCandidateUserListByBookCategory(ArgumentMatchers.any(BookCategory.class))
         ).willReturn(new ArrayList<>());
 
         // excludeUidList에 해당하는 유저를 제외하고, 기본 추천 유저 가져오기
@@ -128,8 +130,13 @@ class UserRelationServiceTest {
         // 카테고리별 uid 목록 가져오기
         for (BookCategory bookCategory : BookCategory.values()) {
             BDDMockito.given(
-                    userCategoryRepository.getUidListByBookCategory(bookCategory)
-            ).willReturn(Collections.singletonList(expectedUid1));
+                    userCategoryRepository.getRecommendCandidateUserListByBookCategory(bookCategory)
+            ).willReturn(Collections.singletonList(
+                    RecommendCandidateUser.builder()
+                            .uid(expectedUid1)
+                            .modifyDatetime(LocalDateTime.now())
+                            .build()
+            ));
         }
 
         // excludeUidList에 해당하는 유저를 제외하고, 기본 추천 유저 가져오기
@@ -171,8 +178,13 @@ class UserRelationServiceTest {
         // 카테고리별 uid 목록 가져오기
         for (BookCategory bookCategory : BookCategory.values()) {
             BDDMockito.given(
-                    userCategoryRepository.getUidListByBookCategory(bookCategory)
-            ).willReturn(Collections.singletonList(expectedUid));
+                    userCategoryRepository.getRecommendCandidateUserListByBookCategory(bookCategory)
+            ).willReturn(Collections.singletonList(
+                    RecommendCandidateUser.builder()
+                            .uid(expectedUid)
+                            .modifyDatetime(LocalDateTime.now())
+                            .build()
+            ));
         }
 
         // 카테고리 추천 유저의 피드 목록 가져오기
@@ -211,8 +223,13 @@ class UserRelationServiceTest {
         // 카테고리별 uid 목록 가져오기
         for (BookCategory bookCategory : BookCategory.values()) {
             BDDMockito.given(
-                    userCategoryRepository.getUidListByBookCategory(bookCategory)
-            ).willReturn(Collections.singletonList(excludeUid));
+                    userCategoryRepository.getRecommendCandidateUserListByBookCategory(bookCategory)
+            ).willReturn(Collections.singletonList(
+                    RecommendCandidateUser.builder()
+                            .uid(excludeUid)
+                            .modifyDatetime(LocalDateTime.now())
+                            .build()
+            ));
         }
 
         // excludeUidList에 해당하는 유저를 제외하고, 기본 추천 유저 가져오기
