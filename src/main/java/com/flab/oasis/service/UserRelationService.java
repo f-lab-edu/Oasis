@@ -2,6 +2,7 @@ package com.flab.oasis.service;
 
 import com.flab.oasis.constant.BookCategory;
 import com.flab.oasis.mapper.user.FeedMapper;
+import com.flab.oasis.model.RecommendCandidateUser;
 import com.flab.oasis.model.RecommendUser;
 import com.flab.oasis.model.UserCategory;
 import com.flab.oasis.model.UserRelation;
@@ -13,6 +14,7 @@ import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -47,7 +49,13 @@ public class UserRelationService {
         Map<BookCategory, Set<String>> bookCategoryUidSetMap = Arrays.stream(BookCategory.values())
                 .collect(Collectors.toMap(
                         bookCategory -> bookCategory,
-                        bookCategory -> new HashSet<>(userCategoryRepository.getUidListByBookCategory(bookCategory))
+                        bookCategory -> userCategoryRepository
+                                .getRecommendCandidateUserListByBookCategory(bookCategory).stream()
+                                .filter(recommendCandidateUser -> LocalDateTime.now()
+                                        .plusMonths(-6)
+                                        .isBefore(recommendCandidateUser.getModifyDatetime())
+                                ).map(RecommendCandidateUser::getUid)
+                                .collect(Collectors.toSet())
                 ));
 
         Map<String, RecommendUser> recommendUserMap = new HashMap<>();
