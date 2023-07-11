@@ -2,6 +2,7 @@ package com.flab.oasis.repository;
 
 import com.flab.oasis.constant.BookCategory;
 import com.flab.oasis.mapper.user.UserCategoryMapper;
+import com.flab.oasis.model.RecommendCandidateUser;
 import com.flab.oasis.model.UserCategory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
@@ -23,8 +24,8 @@ public class UserCategoryRepository {
         return userCategoryMapper.getUserCategoryListByUid(uid);
     }
 
-    @Cacheable(cacheNames = "uidListByBookCategory", key = "#bookCategory", cacheManager = "redisCacheManager")
-    public List<String> getUidListByBookCategory(BookCategory bookCategory) {
-        return userCategoryMapper.getUidListByBookCategory(bookCategory);
+    @Cacheable(cacheNames = "recommendCandidateUser", key = "#bookCategory", cacheManager = "redisCacheManager")
+    public List<RecommendCandidateUser> getRecommendCandidateUserListByBookCategory(BookCategory bookCategory) {
+        return userCategoryMapper.getRecommendCandidateUserListByBookCategory(bookCategory);
     }
 }
