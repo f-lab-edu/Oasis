@@ -17,11 +17,10 @@
         WHERE UID = #{uid}
     </select>
 
-    <select id="getUidListByBookCategory" parameterType="com.flab.oasis.constant.BookCategory" resultType="java.lang.String">
-        SELECT UID
+    <select id="getRecommendCandidateUserListByBookCategory" parameterType="com.flab.oasis.constant.BookCategory" resultType="com.flab.oasis.model.RecommendCandidateUser">
+        SELECT UID, MODIFY_DATETIME
         FROM USER_CATEGORY
-        WHERE BOOK_CATEGORY = #{bookCategory} AND
-              MODIFY_DATETIME BETWEEN DATE_SUB(NOW(), INTERVAL 6 MONTH) AND NOW()
+        WHERE BOOK_CATEGORY = #{bookCategory}
     </select>
 
 </mapper>
