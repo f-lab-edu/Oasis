@@ -85,7 +85,7 @@ public class RedisConfig implements CachingConfigurer {
                         "recommendUserCache",
                         createDefaultConfiguration().entryTtl(Duration.ofMinutes(1))
                 ).withCacheConfiguration(
-                        "uidListByBookCategory",
+                        "recommendCandidateUser",
                         createDefaultConfiguration().entryTtl(Duration.ofDays(1))
                 ).withCacheConfiguration(
                         "defaultRecommendUser",
