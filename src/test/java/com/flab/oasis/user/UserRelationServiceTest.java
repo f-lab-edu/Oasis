@@ -2,7 +2,8 @@ package com.flab.oasis.user;
 
 import com.flab.oasis.constant.BookCategory;
 import com.flab.oasis.mapper.user.FeedMapper;
-import com.flab.oasis.model.*;
+import com.flab.oasis.model.UserCategory;
+import com.flab.oasis.model.UserRelation;
 import com.flab.oasis.repository.UserCategoryRepository;
 import com.flab.oasis.repository.UserInfoRepository;
 import com.flab.oasis.repository.UserRelationRepository;
@@ -18,11 +19,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -65,12 +63,7 @@ class UserRelationServiceTest {
         BDDMockito.given(feedMapper.getFeedListByUid(expectedUid))
                 .willReturn(new ArrayList<>());
 
-        List<String> uidList = userRelationService.getRecommendUserList(
-                RecommendUserRequest.builder()
-                        .uid(uid)
-                        .checkSize(1)
-                        .build()
-        );
+        List<String> uidList = userRelationService.getRecommendUserListByUidAndCheckSize(uid, 1);
 
         Assertions.assertEquals(expectedUid, uidList.get(0));
     }
@@ -107,12 +100,7 @@ class UserRelationServiceTest {
         BDDMockito.given(feedMapper.getFeedListByUid(expectedUid))
                 .willReturn(new ArrayList<>());
 
-        List<String> uidList = userRelationService.getRecommendUserList(
-                RecommendUserRequest.builder()
-                        .uid(uid)
-                        .checkSize(1)
-                        .build()
-        );
+        List<String> uidList = userRelationService.getRecommendUserListByUidAndCheckSize(uid, 1);
 
         Assertions.assertEquals(expectedUid, uidList.get(0));
     }
@@ -152,12 +140,7 @@ class UserRelationServiceTest {
         BDDMockito.given(feedMapper.getFeedListByUid(ArgumentMatchers.any()))
                 .willReturn(new ArrayList<>());
 
-        List<String> uidList = userRelationService.getRecommendUserList(
-                RecommendUserRequest.builder()
-                        .uid(uid)
-                        .checkSize(2)
-                        .build()
-        );
+        List<String> uidList = userRelationService.getRecommendUserListByUidAndCheckSize(uid, 2);
 
         // 겹치는 카테고리가 존재하는 유저들이 순서상 우선 순위에 있어야 하고, 부족한만큼 채운 추천 유저는 후 순위에 있어야 한다.
         Assertions.assertAll(
@@ -196,12 +179,7 @@ class UserRelationServiceTest {
         BDDMockito.given(feedMapper.getFeedListByUid(expectedUid))
                 .willReturn(new ArrayList<>());
 
-        List<String> uidList = userRelationService.getRecommendUserList(
-                RecommendUserRequest.builder()
-                        .uid(uid)
-                        .checkSize(1)
-                        .build()
-        );
+        List<String> uidList = userRelationService.getRecommendUserListByUidAndCheckSize(uid, 1);
 
         Assertions.assertEquals(expectedUid, uidList.get(0));
     }
@@ -241,12 +219,7 @@ class UserRelationServiceTest {
         BDDMockito.given(userInfoRepository.getDefaultRecommendUserList())
                 .willReturn(Collections.singletonList(excludeUid));
 
-        List<String> uidList = userRelationService.getRecommendUserList(
-                RecommendUserRequest.builder()
-                        .uid(uid)
-                        .checkSize(1)
-                        .build()
-        );
+        List<String> uidList = userRelationService.getRecommendUserListByUidAndCheckSize(uid, 1);
 
         Assertions.assertTrue(uidList.isEmpty());
     }
