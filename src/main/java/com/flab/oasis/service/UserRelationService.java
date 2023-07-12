@@ -26,7 +26,7 @@ public class UserRelationService {
     private final UserInfoRepository userInfoRepository;
     private final FeedMapper feedMapper;
 
-    @Cacheable(cacheNames = "recommendUserCache", key = "#uid", cacheManager = "redisCacheManager")
+    @Cacheable(cacheNames = "RecommendUserList", key = "#uid", cacheManager = "redisCacheManager")
     public List<String> getRecommendUserListByUidAndCheckSize(String uid, int checkSize) {
         // 추천 유저에서 제외할 목록을 가져온다.
         Set<String> excludeUidSet = userRelationRepository.getUserRelationListByUid(uid)

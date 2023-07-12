@@ -24,7 +24,7 @@ public class UserCategoryRepository {
         return userCategoryMapper.getUserCategoryListByUid(uid);
     }
 
-    @Cacheable(cacheNames = "recommendCandidateUser", key = "#bookCategory", cacheManager = "redisCacheManager")
+    @Cacheable(cacheNames = "RecommendCandidateUserListByBookCategory", key = "#bookCategory", cacheManager = "redisCacheManager")
     public List<RecommendCandidateUser> getRecommendCandidateUserListByBookCategory(BookCategory bookCategory) {
         return userCategoryMapper.getRecommendCandidateUserListByBookCategory(bookCategory);
     }

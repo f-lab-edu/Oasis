@@ -82,13 +82,13 @@ public class RedisConfig implements CachingConfigurer {
                 .fromConnectionFactory(redisConnectionFactory)
                 .cacheDefaults(createDefaultConfiguration())
                 .withCacheConfiguration(
-                        "recommendUserCache",
+                        "RecommendUserList",
                         createDefaultConfiguration().entryTtl(Duration.ofMinutes(1))
                 ).withCacheConfiguration(
-                        "recommendCandidateUser",
+                        "RecommendCandidateUserListByBookCategory",
                         createDefaultConfiguration().entryTtl(Duration.ofDays(1))
                 ).withCacheConfiguration(
-                        "defaultRecommendUser",
+                        "DefaultRecommendUserList",
                         createDefaultConfiguration().entryTtl(Duration.ofDays(1))
                 )
                 .build();
