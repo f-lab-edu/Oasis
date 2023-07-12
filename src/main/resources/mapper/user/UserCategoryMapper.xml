@@ -18,7 +18,7 @@
     </select>
 
     <select id="getRecommendCandidateUserListByBookCategory" parameterType="com.flab.oasis.constant.BookCategory" resultType="com.flab.oasis.model.RecommendCandidateUser">
-        SELECT UID, MODIFY_DATETIME
+        SELECT UID, MODIFY_DATETIME AS modifyDatetime
         FROM USER_CATEGORY
         WHERE BOOK_CATEGORY = #{bookCategory}
     </select>
