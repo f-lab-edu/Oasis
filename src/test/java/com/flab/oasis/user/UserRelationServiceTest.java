@@ -1,10 +1,12 @@
 package com.flab.oasis.user;
 
 import com.flab.oasis.constant.BookCategory;
+import com.flab.oasis.constant.ConstantName;
 import com.flab.oasis.mapper.user.FeedMapper;
 import com.flab.oasis.model.RecommendCandidateUser;
 import com.flab.oasis.model.UserCategory;
 import com.flab.oasis.model.UserRelation;
+import com.flab.oasis.repository.ConstantDefinitionRepository;
 import com.flab.oasis.repository.UserCategoryRepository;
 import com.flab.oasis.repository.UserInfoRepository;
 import com.flab.oasis.repository.UserRelationRepository;
@@ -30,6 +32,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class UserRelationServiceTest {
     @InjectMocks
     UserRelationService userRelationService;
+
+    @Mock
+    ConstantDefinitionRepository constantDefinitionRepository;
 
     @Mock
     UserCategoryRepository userCategoryRepository;
@@ -65,7 +70,7 @@ class UserRelationServiceTest {
         BDDMockito.given(feedMapper.getFeedListByUid(expectedUid))
                 .willReturn(new ArrayList<>());
 
-        List<String> uidList = userRelationService.getRecommendUserListByUidAndCheckSize(uid, 1);
+        List<String> uidList = userRelationService.getRecommendUserListByUidAndCheckSize(uid);
 
         Assertions.assertEquals(expectedUid, uidList.get(0));
     }
@@ -94,6 +99,11 @@ class UserRelationServiceTest {
                 userCategoryRepository.getRecommendCandidateUserListByBookCategory(ArgumentMatchers.any(BookCategory.class))
         ).willReturn(new ArrayList<>());
 
+        // checkSize를 1로 지정
+        BDDMockito.given(
+                constantDefinitionRepository.getIntValueByConstantName(ConstantName.RECOMMEND_USER_CHECK_SIZE)
+        ).willReturn(1);
+
         // excludeUidList에 해당하는 유저를 제외하고, 기본 추천 유저 가져오기
         BDDMockito.given(userInfoRepository.getDefaultRecommendUserList())
                 .willReturn(Collections.singletonList(expectedUid));
@@ -102,7 +112,7 @@ class UserRelationServiceTest {
         BDDMockito.given(feedMapper.getFeedListByUid(expectedUid))
                 .willReturn(new ArrayList<>());
 
-        List<String> uidList = userRelationService.getRecommendUserListByUidAndCheckSize(uid, 1);
+        List<String> uidList = userRelationService.getRecommendUserListByUidAndCheckSize(uid);
 
         Assertions.assertEquals(expectedUid, uidList.get(0));
     }
@@ -139,6 +149,11 @@ class UserRelationServiceTest {
             ));
         }
 
+        // checkSize를 2로 지정
+        BDDMockito.given(
+                constantDefinitionRepository.getIntValueByConstantName(ConstantName.RECOMMEND_USER_CHECK_SIZE)
+        ).willReturn(2);
+
         // excludeUidList에 해당하는 유저를 제외하고, 기본 추천 유저 가져오기
         BDDMockito.given(userInfoRepository.getDefaultRecommendUserList())
                 .willReturn(Collections.singletonList(expectedUid2));
@@ -147,7 +162,7 @@ class UserRelationServiceTest {
         BDDMockito.given(feedMapper.getFeedListByUid(ArgumentMatchers.any()))
                 .willReturn(new ArrayList<>());
 
-        List<String> uidList = userRelationService.getRecommendUserListByUidAndCheckSize(uid, 2);
+        List<String> uidList = userRelationService.getRecommendUserListByUidAndCheckSize(uid);
 
         // 겹치는 카테고리가 존재하는 유저들이 순서상 우선 순위에 있어야 하고, 부족한만큼 채운 추천 유저는 후 순위에 있어야 한다.
         Assertions.assertAll(
@@ -191,7 +206,12 @@ class UserRelationServiceTest {
         BDDMockito.given(feedMapper.getFeedListByUid(expectedUid))
                 .willReturn(new ArrayList<>());
 
-        List<String> uidList = userRelationService.getRecommendUserListByUidAndCheckSize(uid, 1);
+        // checkSize를 1로 지정
+        BDDMockito.given(
+                constantDefinitionRepository.getIntValueByConstantName(ConstantName.RECOMMEND_USER_CHECK_SIZE)
+        ).willReturn(1);
+
+        List<String> uidList = userRelationService.getRecommendUserListByUidAndCheckSize(uid);
 
         Assertions.assertEquals(expectedUid, uidList.get(0));
     }
@@ -232,11 +252,16 @@ class UserRelationServiceTest {
             ));
         }
 
+        // checkSize를 1로 지정
+        BDDMockito.given(
+                constantDefinitionRepository.getIntValueByConstantName(ConstantName.RECOMMEND_USER_CHECK_SIZE)
+        ).willReturn(1);
+
         // excludeUidList에 해당하는 유저를 제외하고, 기본 추천 유저 가져오기
         BDDMockito.given(userInfoRepository.getDefaultRecommendUserList())
                 .willReturn(Collections.singletonList(excludeUid));
 
-        List<String> uidList = userRelationService.getRecommendUserListByUidAndCheckSize(uid, 1);
+        List<String> uidList = userRelationService.getRecommendUserListByUidAndCheckSize(uid);
 
         Assertions.assertTrue(uidList.isEmpty());
     }
