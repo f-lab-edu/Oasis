@@ -1,11 +1,13 @@
 package com.flab.oasis.service;
 
 import com.flab.oasis.constant.BookCategory;
+import com.flab.oasis.constant.ConstantName;
 import com.flab.oasis.mapper.user.FeedMapper;
 import com.flab.oasis.model.RecommendCandidateUser;
 import com.flab.oasis.model.RecommendUser;
 import com.flab.oasis.model.UserCategory;
 import com.flab.oasis.model.UserRelation;
+import com.flab.oasis.repository.ConstantDefinitionRepository;
 import com.flab.oasis.repository.UserCategoryRepository;
 import com.flab.oasis.repository.UserInfoRepository;
 import com.flab.oasis.repository.UserRelationRepository;
@@ -21,13 +23,14 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class UserRelationService {
+    private final ConstantDefinitionRepository constantDefinitionRepository;
     private final UserCategoryRepository userCategoryRepository;
     private final UserRelationRepository userRelationRepository;
     private final UserInfoRepository userInfoRepository;
     private final FeedMapper feedMapper;
 
     @Cacheable(cacheNames = "RecommendUserList", key = "#uid", cacheManager = "redisCacheManager")
-    public List<String> getRecommendUserListByUidAndCheckSize(String uid, int checkSize) {
+    public List<String> getRecommendUserListByUidAndCheckSize(String uid) {
         // 추천 유저에서 제외할 목록을 가져온다.
         Set<String> excludeUidSet = userRelationRepository.getUserRelationListByUid(uid)
                 .stream()
@@ -94,6 +97,9 @@ public class UserRelationService {
                 .collect(Collectors.toList());
 
         // 카테고리 추천 유저가 check size보다 적을 경우, 기본 추천 유저를 추가한다.
+        int checkSize = constantDefinitionRepository.getIntValueByConstantName(
+                ConstantName.RECOMMEND_USER_CHECK_SIZE
+        );
         if (recommendUserList.size() < checkSize) {
             excludeUidSet.addAll(recommendUserList);
 
