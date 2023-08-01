@@ -4,6 +4,9 @@
          monitoring="autodetect"
          dynamicConfig="true">
 
+    <cache name="defaultCache" maxEntriesLocalHeap="1000" eternal="false" overflowToDisk="false"
+           diskPersistent="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" memoryStoreEvictionPolicy="LRU"/>
+
     <cache name="homeCache" maxEntriesLocalHeap="1000" eternal="false" overflowToDisk="false"
            diskPersistent="false" timeToIdleSeconds="0" timeToLiveSeconds="3600" memoryStoreEvictionPolicy="LRU"/>
 
