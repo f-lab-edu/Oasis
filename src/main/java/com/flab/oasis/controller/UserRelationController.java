@@ -17,9 +17,7 @@ public class UserRelationController {
 
     @GetMapping("/relation/recommend")
     public List<String> getRecommendUserList() {
-        return userRelationService.getRecommendUserListByUidAndCheckSize(
-                userAuthService.getAuthenticatedUid(), 30
-        );
+        return userRelationService.getRecommendUserListByUidAndCheckSize(userAuthService.getAuthenticatedUid());
     }
 
     @PostMapping("/relation")
