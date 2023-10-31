@@ -40,6 +40,8 @@ dependencies {
 	implementation group: 'com.auth0', name: 'java-jwt', version: '4.3.0'
 	implementation group: 'com.google.api-client', name: 'google-api-client', version: '2.2.0'
 	implementation group: 'com.google.api-client', name: 'google-api-client-jackson2', version: '2.2.0'
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+	implementation 'com.fasterxml.jackson.core:jackson-databind'
 }
 
 tasks.named('test') {

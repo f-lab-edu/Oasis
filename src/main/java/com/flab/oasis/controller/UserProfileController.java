@@ -1,8 +1,6 @@
 package com.flab.oasis.controller;
 
-import com.flab.oasis.constant.ResponseCode;
 import com.flab.oasis.model.UserProfile;
-import com.flab.oasis.model.exception.NotFoundException;
 import com.flab.oasis.model.response.SuccessResponse;
 import com.flab.oasis.model.response.UserProfileResponse;
 import com.flab.oasis.service.UserProfileService;
@@ -28,7 +26,7 @@ public class UserProfileController {
     }
 
     @GetMapping("/profile")
-    public UserProfileResponse getUserProfileByUid() {
-        return userProfileService.getUserProfileByUid();
+    public UserProfileResponse getUserProfile() {
+        return userProfileService.getUserProfile();
     }
 }

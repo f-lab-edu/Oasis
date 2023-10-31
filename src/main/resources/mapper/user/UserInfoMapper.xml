@@ -22,4 +22,10 @@
         WHERE UID = #{uid}
     </select>
 
+    <select id="getDefaultRecommendUserList" resultType="java.lang.String">
+        SELECT UID
+        FROM USER_INFO
+        WHERE MODIFY_DATETIME BETWEEN DATE_SUB(NOW(), INTERVAL 6 MONTH) AND NOW()
+    </select>
+
 </mapper>

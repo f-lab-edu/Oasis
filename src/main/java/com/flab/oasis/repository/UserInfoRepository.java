@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -29,5 +30,10 @@ public class UserInfoRepository {
                 .orElseThrow(() -> new NotFoundException(
                         ErrorCode.NOT_FOUND, "UserInfo does not created.", uid
                 ));
+    }
+
+    @Cacheable(cacheNames = "DefaultRecommendUserList", key = "'default'", cacheManager = "redisCacheManager")
+    public List<String> getDefaultRecommendUserList() {
+        return userInfoMapper.getDefaultRecommendUserList();
     }
 }

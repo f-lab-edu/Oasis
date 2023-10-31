@@ -21,6 +21,8 @@ import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSeriali
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
+import java.time.Duration;
+
 @Configuration
 @EnableRedisRepositories
 public class RedisConfig implements CachingConfigurer {
@@ -79,6 +81,16 @@ public class RedisConfig implements CachingConfigurer {
         return RedisCacheManager.RedisCacheManagerBuilder
                 .fromConnectionFactory(redisConnectionFactory)
                 .cacheDefaults(createDefaultConfiguration())
+                .withCacheConfiguration(
+                        "RecommendUserList",
+                        createDefaultConfiguration().entryTtl(Duration.ofMinutes(1))
+                ).withCacheConfiguration(
+                        "RecommendCandidateUserListByBookCategory",
+                        createDefaultConfiguration().entryTtl(Duration.ofDays(1))
+                ).withCacheConfiguration(
+                        "DefaultRecommendUserList",
+                        createDefaultConfiguration().entryTtl(Duration.ofDays(1))
+                )
                 .build();
     }
 
